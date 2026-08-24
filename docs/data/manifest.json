@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T23:44:32.362Z",
+  "builtAt": "2026-08-24T23:49:57.945Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3392392,
+  "electors": 3420870,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 5517,
-  "coverage": 27.86,
+  "partsDone": 5560,
+  "coverage": 28.08,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -169,8 +169,8 @@
       "nameKn": "ಕೆ.ಆರ್‌.ಪುರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 509,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 15,
+      "electors": 9233
     },
     "152": {
       "name": "Byatarayanapura",
@@ -225,8 +225,8 @@
       "nameKn": "ಹೆಬ್ಬಾಳ",
       "district": "B.B.M.P(NORTH)",
       "parts": 285,
-      "partsDone": 257,
-      "electors": 143292
+      "partsDone": 285,
+      "electors": 162537
     },
     "159": {
       "name": "Pulakeshinagar",
