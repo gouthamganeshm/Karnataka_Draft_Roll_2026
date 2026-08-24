@@ -1,0 +1,70 @@
+# Publish `docs/` to GitHub Pages on every push to main.
+#
+# Deliberately separate from `build-roll.yml`. That pipeline fetches PDFs from
+# the roll CDN, which refuses GitHub's runners with `406 Not Acceptable`, so its
+# deploy job is unreachable — it sits behind three stages that cannot finish.
+#
+# This job touches no external host at all. It uploads a directory that is
+# already in the repository, which is exactly the work a hosted runner can still
+# do. The OCR runs on a desktop, `5-publish.mjs` commits the JSON, and pushing
+# is what makes the site update.
+#
+# Requires Settings -> Pages -> Source: **GitHub Actions**. If Pages is instead
+# set to "Deploy from a branch" (main, /docs), that serves the same files and
+# this workflow is redundant rather than harmful — it will simply fail to
+# deploy, and the branch build stays the source of truth.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    # Site shell and roll data both live under docs/, so this covers a code
+    # change and a fresh publish alike. Nothing else can change what is served.
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a newer publish supersede one still uploading, but never cancel a deploy
+# half-done — a partially replaced bucket tree would be served as if whole.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy docs/ to Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report what is being published
+        run: |
+          echo "files: $(find docs -type f | wc -l)"
+          echo "size:  $(du -sh docs | cut -f1)"
+          if [ -f docs/data/manifest.json ]; then
+            node -e "
+              const m = require('./docs/data/manifest.json');
+              console.log('coverage: ' + m.coverage.toFixed(1) + '%');
+              console.log('electors: ' + m.electors);
+              console.log('booths:   ' + m.partsDone + '/' + m.parts);
+            "
+          else
+            echo 'no docs/data — publishing the site shell only'
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4
