@@ -1,0 +1,72 @@
+{
+  "state": "S10",
+  "rollType": "S10-2026-DR",
+  "publishedAt": "2026-08-24",
+  "claimsCloseAt": "2026-09-23",
+  "builtAt": "2026-08-24T14:17:25.729Z",
+  "shardDepth": 2,
+  "suffixLength": 8,
+  "electors": 331485,
+  "constituencies": 7,
+  "parts": 3354,
+  "partsDone": 481,
+  "coverage": 14.34,
+  "acs": {
+    "150": {
+      "name": "Yelahanka",
+      "nameKn": "ಯಲಹಂಕ",
+      "district": "BANGALORE URBAN",
+      "parts": 418,
+      "partsDone": 418,
+      "electors": 290059
+    },
+    "152": {
+      "name": "Byatarayanapura",
+      "nameKn": "ಬ್ಯಾಟರಾಯನಪುರ",
+      "district": "BANGALORE URBAN",
+      "parts": 442,
+      "partsDone": 55,
+      "electors": 37248
+    },
+    "153": {
+      "name": "Yeshwanthapura",
+      "nameKn": "ಯಶವಂತಪುರ",
+      "district": "BANGALORE URBAN",
+      "parts": 553,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "155": {
+      "name": "Dasarahalli",
+      "nameKn": "ದಾಸರಹಳ್ಳಿ",
+      "district": "BANGALORE URBAN",
+      "parts": 419,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "174": {
+      "name": "Mahadevapura",
+      "nameKn": "ಮಹದೇವಪುರ",
+      "district": "BANGALORE URBAN",
+      "parts": 533,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "176": {
+      "name": "Bangalore South",
+      "nameKn": "ಬೆಂಗಳೂರು ದಕ್ಷಿಣ",
+      "district": "BANGALORE URBAN",
+      "parts": 605,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "177": {
+      "name": "Anekal",
+      "nameKn": "ಆನೇಕಲ್‌",
+      "district": "BANGALORE URBAN",
+      "parts": 384,
+      "partsDone": 8,
+      "electors": 4178
+    }
+  }
+}
