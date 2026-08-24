@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T22:59:46.082Z",
+  "builtAt": "2026-08-24T23:05:38.526Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3157203,
+  "electors": 3187137,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 5087,
-  "coverage": 25.69,
+  "partsDone": 5144,
+  "coverage": 25.98,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -249,8 +249,8 @@
       "nameKn": "ಸಿ.ವಿ. ರಾಮನ್‌ ನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 244,
-      "partsDone": 71,
-      "electors": 35462
+      "partsDone": 128,
+      "electors": 65396
     },
     "162": {
       "name": "Shivajinagar",
