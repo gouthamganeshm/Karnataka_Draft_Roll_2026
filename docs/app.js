@@ -7,6 +7,15 @@
 const BASE = (window.ROLL_CONFIG?.DATA_BASE ?? './data').replace(/\/+$/, '');
 const EPIC_RE = /^[A-Z]{3}[0-9]{7}$/;
 
+/* Every published part sits at a deterministic, public path on ECI's own CDN —
+ * no captcha, no session (see HANDOFF.md section 2). A result can therefore
+ * link straight to the exact page a claim or an appeal needs to cite, built
+ * from the AC and part number the lookup already returned — nothing new has to
+ * be stored to offer this. */
+const partPdfUrl = (acNo, partNo) =>
+  `https://voters.eci.gov.in/eroll/2026/s10/sir-draftroll/${acNo}/` +
+  `2026-EROLLGEN-S10-${acNo}-SIR-DraftRoll-Revision1-KAN-${partNo}-WI.pdf`;
+
 /* Below this, a "not on the roll" answer is not trustworthy: the number could
  * be missing because the import has not reached its booth yet. 99% rather than
  * 100% because a handful of booths are always unreadable at the source, and
@@ -47,6 +56,7 @@ const STRINGS = {
     checkOfficial: 'Confirm on the official portal',
     checkAgain: 'Search another number',
     print: 'Print this result', fAc: 'Constituency', fPart: 'Booth', fSerial: 'Serial number',
+    viewSourcePdf: 'View this booth’s official roll PDF ↗',
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
     tileCoverage: 'State coverage',
@@ -89,6 +99,7 @@ const STRINGS = {
     checkOfficial: 'ಅಧಿಕೃತ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿ',
     checkAgain: 'ಮತ್ತೊಂದು ಸಂಖ್ಯೆ ಹುಡುಕಿ',
     print: 'ಈ ಫಲಿತಾಂಶ ಮುದ್ರಿಸಿ', fAc: 'ಕ್ಷೇತ್ರ', fPart: 'ಮತಗಟ್ಟೆ', fSerial: 'ಕ್ರಮ ಸಂಖ್ಯೆ',
+    viewSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಪಟ್ಟಿ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
     tileCoverage: 'ರಾಜ್ಯ ವ್ಯಾಪ್ತಿ',
@@ -213,6 +224,13 @@ function renderCard({ tone, title, lede, rec, partName, extra }) {
       dl.append(el('dt', null, k), el('dd', null, String(v)));
     }
     card.append(dl);
+
+    const [, acNo, partNo] = rec;
+    const src = el('a', 'source-link', t('viewSourcePdf'));
+    src.href = partPdfUrl(acNo, partNo);
+    src.target = '_blank';
+    src.rel = 'noopener noreferrer';
+    card.append(src);
   }
   if (extra) card.append(extra);
 
