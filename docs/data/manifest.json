@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T21:00:05.368Z",
+  "builtAt": "2026-08-24T21:05:22.754Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 2523647,
+  "electors": 2544660,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 4001,
-  "coverage": 20.21,
+  "partsDone": 4044,
+  "coverage": 20.42,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -281,8 +281,8 @@
       "nameKn": "ರಾಜಾಜಿನಗರ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 194,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 43,
+      "electors": 21013
     },
     "166": {
       "name": "Govindarajanagar",
