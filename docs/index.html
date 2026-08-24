@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Karnataka Draft Roll 2026 — search the draft electoral roll by EPIC</title>
+<meta name="description" content="Search the Karnataka SIR 2026 draft electoral roll by EPIC number. The lookup runs entirely in your browser.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1b3a5c">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+</head>
+<body>
+
+<a class="skip-link" href="#lookup-form" data-i18n="skip">Skip to the EPIC search</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <h1 data-i18n="title">Karnataka Draft Roll 2026</h1>
+      <p class="tagline" data-i18n="tagline">Find your entry in the SIR draft electoral roll — by EPIC, name or serial number</p>
+    </div>
+    <div class="header-controls">
+      <div class="switch" role="group" aria-label="Language">
+        <button type="button" class="switch-btn is-active" data-lang="en">English</button>
+        <button type="button" class="switch-btn" data-lang="kn">ಕನ್ನಡ</button>
+      </div>
+      <button type="button" class="icon-btn" id="theme-btn" aria-label="Switch theme" title="Switch theme">
+        <span aria-hidden="true" id="theme-icon">◐</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="deadline-banner" id="deadline-banner" hidden>
+    <p id="deadline-banner-text"></p>
+  </div>
+
+  <!-- ============================================================ lookup -->
+  <section class="panel panel-lookup" aria-labelledby="lookup-heading">
+    <div class="lookup-copy">
+      <h2 id="lookup-heading" data-i18n="lookupHeading">Search the draft roll</h2>
+      <p data-i18n="intro">
+        The draft roll for the Special Intensive Revision 2026 was published as
+        one PDF per polling booth — around 58,000 of them. This searches all of
+        them at once and tells you whether your number is on the roll, and which
+        booth it sits in. If your entry is missing, that is what the claims and
+        objections window is for.
+      </p>
+      <p class="help" data-i18n="scopeNote">
+        The published rolls are page images, not text, so this site reads them by
+        OCR and indexes only the two fields it can verify exactly: the EPIC
+        number and the serial. Names, ages and relatives are not held here —
+        check those on the official PDF.
+      </p>
+      <p class="privacy-note">
+        <span aria-hidden="true">🔒</span>
+        <span data-i18n="privacyNote">The number you type never leaves this device. The search runs in your browser against pre-computed data files.</span>
+      </p>
+    </div>
+
+    <form id="lookup-form" class="lookup-form" novalidate>
+      <label for="epic" data-i18n="epicLabel">EPIC number</label>
+      <input id="epic" name="epic" type="text" inputmode="text" autocomplete="off"
+             autocapitalize="characters" spellcheck="false" maxlength="10"
+             placeholder="ABC1234567" aria-describedby="epic-help">
+      <p class="help" id="epic-help" data-i18n="epicHelp">
+        Printed on the front of your voter ID card. Exactly 3 letters followed by 7 digits.
+      </p>
+
+      <button type="submit" class="submit" id="submit-btn">
+        <span data-i18n="checkBtn">Search this EPIC</span>
+      </button>
+    </form>
+  </section>
+
+  <section id="result" class="result" aria-live="polite" tabindex="-1" hidden></section>
+
+  <!-- ========================================================= dashboard -->
+  <section class="dash" aria-labelledby="dash-heading">
+    <div class="section-head">
+      <h2 id="dash-heading" data-i18n="dashHeading">What is in this dataset</h2>
+      <p class="section-sub" id="dash-scope"></p>
+      <p class="provenance" id="data-provenance"></p>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+    <p class="coverage-line" id="coverage-line"></p>
+
+    <div class="card">
+      <div class="section-head compact">
+        <h3 data-i18n="districtTitle">Import coverage by district</h3>
+        <p class="chart-sub" data-i18n="districtSub">A constituency is only searchable once every one of its booths has been read. Click a column heading to sort.</p>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table" id="district-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="meta" id="footer-meta"></p>
+    <p class="meta" data-i18n="footerSource">
+      Source: the draft electoral roll published by the Chief Electoral Officer,
+      Karnataka for the Special Intensive Revision 2026. This site is an
+      independent, unofficial reformatting of those documents. Always confirm
+      with your BLO or voters.eci.gov.in before acting.
+    </p>
+    <p class="meta"><a href="https://voters.eci.gov.in/download-eroll?stateCode=S10" rel="noopener noreferrer" target="_blank" data-i18n="footerLink">Official draft roll download on voters.eci.gov.in</a></p>
+    <p class="meta"><a href="https://ceo.karnataka.gov.in/" rel="noopener noreferrer" target="_blank" data-i18n="footerCeo">Chief Electoral Officer, Karnataka</a></p>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>

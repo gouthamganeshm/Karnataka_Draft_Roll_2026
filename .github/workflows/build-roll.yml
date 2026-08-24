@@ -1,0 +1,226 @@
+# Ingest the SIR draft roll: discover -> OCR (one job per constituency) -> build.
+#
+# The work is split per constituency rather than run as one job, for two reasons:
+# a GitHub-hosted runner is killed at 6 hours, and the largest constituency in
+# Karnataka (AC 176, Bangalore South, 605 parts) takes about half that on a
+# 4-vCPU runner. One job per AC keeps every job well inside the limit and lets a
+# single failed constituency be re-run on its own.
+#
+# Rows are cached per constituency and `2-extract.py` skips parts already listed
+# in `cache/done/<ac>.txt`, so a re-run resumes instead of re-OCR-ing. That
+# matters: a full state pass is ~60,000 parts and days of compute.
+
+name: Build roll data
+
+on:
+  workflow_dispatch:
+    inputs:
+      district:
+        description: 'ECI district code, e.g. S1034 = Bangalore Urban. Blank = whole state (224 ACs).'
+        required: false
+        default: 'S1034'
+      limit:
+        description: 'Parts per constituency (blank = all). Use a small number for a smoke test.'
+        required: false
+        default: ''
+      deploy:
+        description: 'Publish the site to GitHub Pages when the build finishes'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # Never let two ingests race on the same cache keys.
+  group: build-roll
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    name: Discover constituencies
+    runs-on: ubuntu-latest
+    outputs:
+      acs: ${{ steps.list.outputs.acs }}
+      count: ${{ steps.list.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build the constituency and part tree
+        run: |
+          if [ -n "${{ inputs.district }}" ]; then
+            node scripts/1-discover.mjs --district "${{ inputs.district }}"
+          else
+            node scripts/1-discover.mjs
+          fi
+
+      - name: Emit the constituency list as a job matrix
+        id: list
+        run: |
+          acs=$(node -e "
+            const m = require('./cache/manifest.json');
+            const acs = m.constituencies.filter(c => c.parts.length).map(c => c.acNumber);
+            if (!acs.length) { console.error('no constituencies with parts'); process.exit(1); }
+            console.log(JSON.stringify(acs));
+          ")
+          echo "acs=$acs" >> "$GITHUB_OUTPUT"
+          echo "count=$(node -e "console.log(JSON.parse(process.argv[1]).length)" "$acs")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest
+          path: cache/manifest.json
+          retention-days: 7
+
+  extract:
+    name: OCR AC ${{ matrix.ac }}
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      # Well under the runner concurrency a free account gets, and polite to the
+      # ECI CDN: 8 jobs x 3 workers is 24 PDF fetches in flight, not 224.
+      max-parallel: 8
+      matrix:
+        ac: ${{ fromJson(needs.discover.outputs.acs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Tesseract
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends tesseract-ocr
+          tesseract --version | head -1
+
+      - name: Install Python dependencies
+        run: pip install --disable-pip-version-check -r scripts/ocr/requirements.txt
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: manifest
+          path: cache
+
+      # Restore whatever this AC finished on a previous run. `restore-keys` lets
+      # a partial cache from an earlier attempt be picked up even though the key
+      # carries the run id, which is what makes a re-run resume rather than
+      # start over.
+      - name: Restore progress for AC ${{ matrix.ac }}
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            cache/rows
+            cache/done
+          key: rows-ac${{ matrix.ac }}-${{ github.run_id }}
+          restore-keys: |
+            rows-ac${{ matrix.ac }}-
+
+      - name: OCR the constituency
+        run: |
+          python scripts/2-extract.py \
+            --ac ${{ matrix.ac }} \
+            --workers "$(nproc)" \
+            ${{ inputs.limit && format('--limit {0}', inputs.limit) || '' }}
+
+      - name: Save progress for AC ${{ matrix.ac }}
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            cache/rows
+            cache/done
+          key: rows-ac${{ matrix.ac }}-${{ github.run_id }}
+
+      # Compressed because the rows are the only thing worth keeping and they
+      # are highly repetitive: ~50 MB of JSONL per AC goes to a few MB gzipped.
+      - name: Upload rows
+        if: always()
+        run: gzip -9 -c cache/rows/${{ matrix.ac }}.jsonl > rows-${{ matrix.ac }}.jsonl.gz
+        continue-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rows-${{ matrix.ac }}
+          path: rows-${{ matrix.ac }}.jsonl.gz
+          if-no-files-found: warn
+          retention-days: 14
+
+  build:
+    name: Build buckets and site
+    needs: [discover, extract]
+    # `always()` so a single failed constituency does not throw away the rest.
+    # The coverage figure in the manifest is what tells the site how much of the
+    # state is really present, and it is computed from the rows that arrived.
+    if: always() && needs.discover.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: manifest
+          path: cache
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rows-*
+          path: incoming
+          merge-multiple: true
+
+      - name: Unpack rows
+        run: |
+          mkdir -p cache/rows
+          shopt -s nullglob
+          for f in incoming/rows-*.jsonl.gz; do
+            base=$(basename "$f" .jsonl.gz)      # rows-176
+            gunzip -c "$f" > "cache/rows/${base#rows-}.jsonl"
+          done
+          echo "constituencies with rows: $(ls cache/rows | wc -l)"
+          wc -l cache/rows/*.jsonl | tail -1
+
+      - name: Build hash buckets and manifest
+        run: node scripts/3-build-data.mjs
+
+      - name: Assemble the site
+        run: |
+          cp -r data docs/data
+          du -sh docs/data
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: docs
+          retention-days: 14
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    if: inputs.deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: pages
+        uses: actions/deploy-pages@v4

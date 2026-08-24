@@ -1,0 +1,16 @@
+{
+  "name": "karnataka-draft-roll-2026",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Search the Karnataka SIR 2026 draft electoral roll by EPIC number",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "discover": "node scripts/1-discover.mjs",
+    "extract": "node scripts/2-extract.mjs",
+    "build": "node scripts/3-build-data.mjs",
+    "upload": "node scripts/4-upload-r2.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node scripts/test-parse.mjs"
+  }
+}

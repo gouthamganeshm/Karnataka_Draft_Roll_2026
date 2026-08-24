@@ -1,0 +1,9 @@
+# This tool exists so an individual can check their own voter ID, and so the
+# scale of the deletions is visible. It is not a dataset to be indexed or
+# mirrored, and the records behind it are about real people.
+#
+# On a static host there is no rate limiter to fall back on, so this request
+# and the noindex meta tag are the only controls there are. Please respect them.
+
+User-agent: *
+Disallow: /

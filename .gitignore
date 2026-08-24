@@ -1,0 +1,8 @@
+node_modules/
+cache/
+cache-*/
+data/
+data-*/
+docs/data/
+*.log
+__pycache__/
