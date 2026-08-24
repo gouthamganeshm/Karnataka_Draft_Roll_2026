@@ -174,6 +174,44 @@ that were already right, which is why it is safe.
 
 ---
 
+## 4c. Name, age, gender — tried, declined 2026-08-24, do not re-raise lightly
+
+Asked for explicitly, then declined by the user in the same conversation once
+the tradeoff was in front of them. **Only the source-PDF link shipped** (see
+4b); no name/age/gender code was committed anywhere.
+
+What was actually found before the decline, in case this comes up again:
+
+- The card layout **is** exactly what was asked for — below the header
+  (serial + EPIC) every card has four plain text lines: ಹೆಸರು (name), ತಂದೆಯ/
+  ಗಂಡನ ಹೆಸರು (father's/husband's name), ಮನೆಯ ಸಂಖ್ಯೆ (house number), then
+  ವಯಸ್ಸು + ಲಿಂಗ (age + gender) sharing one line. Confirmed visually against a
+  rendered page (AC 177 part 3). Geometry to isolate the four lines (ink-gap
+  splitting below the header, symmetric to the existing header-box detection)
+  worked cleanly in a scratch test.
+- **Kannada name OCR itself did not work well enough to trust.** `kan.traineddata`
+  (tessdata_best, since eng is the only model installed system-wide and Program
+  Files is not writable without admin — it was placed at
+  `~/tessdata/kan.traineddata` instead, machine-local, not in the repo) produced
+  garbage on several of the first eight cards tried — e.g. "ರ್ಪ್ಚ್ರಾಾಾು" for a
+  name, correct only when the name happened to be short and simple. Age
+  (plain digits) and gender (one of three fixed Kannada tokens) looked
+  tractable; **name did not**, and there is no grammar or sequence check for a
+  name the way `EPIC_RE` and serial-continuity check the other two fields — a
+  wrong name would ship with nothing to catch it.
+- The harder objection, independent of accuracy: storing name/age/gender in the
+  public hash-bucket files makes the **full elector list** (name, age, gender,
+  booth) crawlable **without needing anyone's EPIC** — no EPIC is stored in a
+  bucket today specifically so a bucket file alone is useless. That is the
+  scrapeable-registry outcome the current design's own site copy says it
+  refuses to become. Raised to the user before building further; they declined
+  once they saw the tradeoff stated plainly.
+
+If this is revisited: fix the OCR accuracy problem first and separately from
+the publication-shape problem. Test-driving `kan.traineddata` against a larger
+sample before touching `roll_ocr.py` would have caught the accuracy problem
+before the harder question needed asking at all.
+
 ## 4b. Publishing — decided 2026-08-24, supersedes the Actions plan
 
 The user's call after the runner kept returning 406: **"process the data locally
@@ -205,6 +243,35 @@ Two things to know before republishing often:
 
 Verified end-to-end against the published tree: `AAH4480430` -> `[092b831c, 177,
 3, 1]`, and a bogus `ZZZ9999999` returns nothing.
+
+### Automation — `scripts/6-auto-publish.mjs`, running since 2026-08-24
+
+The user asked for this specifically ("process the data locally and push the
+json, part by part, instead of depending on GitHub Actions" / "so data keeps
+on adding without ur intervention"). It watches `cache/done/` and calls
+`5-publish.mjs` whenever the count has grown, logging every cycle to
+`cache/publish.log`.
+
+**Not literally per-part.** A full publish rebuilds every hash bucket from
+scratch (that is how a booth that turns out unreadable is guaranteed not to
+linger in a stale one) and that rebuild alone measured **~47s at ~1M rows**,
+before the commit and push. The OCR was completing a part every ~7s at its
+measured 9 parts/min, so firing a publish per part would mean each one starts
+before the last finishes, fighting the OCR pool for the same CPU. Polling
+every 3 minutes instead was the judgment call made in place of asking —
+flagged to the user as a deviation from the literal request, not yet
+reaffirmed either way. It was run un-modified through two full cycles with no
+intervention: 137f728 (14.3% -> 46.2%) and 852cd41 / b830df6f (-> 49.2%),
+each appearing on the live site within about a minute of the push.
+
+    node scripts/6-auto-publish.mjs                  # every 3 minutes, default
+    node scripts/6-auto-publish.mjs --interval 300    # every 5 minutes
+    node scripts/6-auto-publish.mjs --once            # single check, no loop
+
+Leave it running for the rest of this district's ingest. `2-extract.py` and
+`6-auto-publish.mjs` are two independent long-lived processes — killing one
+does not affect the other, and both resume cleanly (`cache/done/` for
+extraction, git history for publishing).
 
 ## 5. THE ACTIVE BLOCKER — read this first
 
