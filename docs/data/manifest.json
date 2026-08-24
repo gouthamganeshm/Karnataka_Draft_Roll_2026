@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T23:11:05.603Z",
+  "builtAt": "2026-08-24T23:32:23.144Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3214237,
+  "electors": 3328858,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 5194,
-  "coverage": 26.23,
+  "partsDone": 5407,
+  "coverage": 27.31,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -225,8 +225,8 @@
       "nameKn": "ಹೆಬ್ಬಾಳ",
       "district": "B.B.M.P(NORTH)",
       "parts": 285,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 147,
+      "electors": 79758
     },
     "159": {
       "name": "Pulakeshinagar",
@@ -249,8 +249,8 @@
       "nameKn": "ಸಿ.ವಿ. ರಾಮನ್‌ ನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 244,
-      "partsDone": 178,
-      "electors": 92496
+      "partsDone": 244,
+      "electors": 127359
     },
     "162": {
       "name": "Shivajinagar",
