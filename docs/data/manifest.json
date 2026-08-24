@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T20:23:07.787Z",
+  "builtAt": "2026-08-24T20:29:09.607Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 2342875,
+  "electors": 2376337,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 3670,
-  "coverage": 18.53,
+  "partsDone": 3731,
+  "coverage": 18.84,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -313,8 +313,8 @@
       "nameKn": "ಚಿಕ್ಕಪೇಟೆ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 222,
-      "partsDone": 111,
-      "electors": 63115
+      "partsDone": 172,
+      "electors": 96577
     },
     "170": {
       "name": "Basavanagudi",
