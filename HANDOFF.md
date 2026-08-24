@@ -100,6 +100,8 @@ empty name. (Open item — see section 7.)
                              cache/rows/<ac>.jsonl; PDF bytes never hit disk
     scripts/3-build-data.mjs SHA-256 hash buckets  ->  data/
     scripts/4-upload-r2.mjs  optional Cloudflare R2 upload
+    scripts/probe-cdn.mjs    diagnostic only, not part of the pipeline: can this
+                             host read the PDFs at all?  (see section 5)
     docs/                    the static site
 
 **Resumability**: every finished part is recorded in `cache/done/<ac>.txt` and
@@ -156,8 +158,12 @@ that were already right, which is why it is safe.
 - Local OCR progress **preserved, not lost** (gitignored, on this machine only):
   `cache/rows/150.jsonl` = 50,567 rows / 65 parts done;
   `cache/rows/177.jsonl` = 1,614 rows / 3 parts done. ~4.7 MB total.
-- Local extraction was **stopped on the user's instruction** ("stop local run,
-  run in github actions"). No Python workers remain.
+- Local extraction was stopped once ("stop local run, run in github actions"),
+  then **restarted on 2026-08-24** when the runner turned out to be blocked and
+  the user had no access to the machine themselves ("u can do it"). Full pass
+  over all 7 ACs, 3,281 parts outstanding at the time, 11 workers, logging to
+  `cache/extract.log`. Measured **9 parts/min** once the pool warmed, i.e. ~6 h,
+  and it is resumable, so an interruption costs only the part in flight.
 - End-to-end already validated once locally: discover -> extract (AC 177, 3
   parts) -> build (16 buckets, 1,555 electors) -> lookup
   (`AAH4480430` -> AC 177 part 3 serial 1; an absent EPIC correctly suppressed at
@@ -193,19 +199,41 @@ UA -> 200, ranged GET -> 206, bogus part -> 404.
 The rewrite was re-run locally and reproduces **3,354 parts, 0 failed**, so it is
 behaviour-preserving.
 
+### What that run actually returned (2026-08-24)
+
+The workflow was triggered and `discover` failed again — but `3eefd06` did its
+job, because the non-answer now has a number on it. All 7 ACs:
+
+    AC 150 part 1: GET -> HTTP 406 Not Acceptable
+
+So the browser UA and the HEAD->GET fallback were **not** the cause. A 406 is an
+edge deny decision, and the same commit run **from the user's machine reproduces
+3,354 parts, 0 failed** — verified again on 2026-08-24, along with all 8 request
+shapes returning 200/206 and a clean 404 on a bogus part. The block is on the
+runner, not on the files, the path or the code.
+
+Two candidate causes remain, with opposite remedies:
+
+- **IP-level denial** of GitHub's egress -> not patchable from inside a workflow.
+- **Client fingerprint** — undici's TLS handshake, header order and ALPN differ
+  from curl's, and edge bot rules key on exactly that -> patchable, but note it
+  would have to be patched in **two** places: `1-discover.mjs` (undici `fetch`)
+  and `2-extract.py` (`urllib.request`). Neither is browser-shaped today.
+
 ### Next action
 
-Ask the user to trigger: **Actions -> Build roll data -> Run workflow**, with
-`district = S1034`, **`limit = 2`**, `deploy = false`. That is a ~3-minute smoke
-test that proves the runner can actually pull PDFs, instead of discovering a
-block four hours into a real run. Read the preflight output.
+Trigger **Actions -> Probe roll CDN -> Run workflow** (defaults are fine). It is
+a ~1-minute, one-job workflow added for exactly this, runnable from a phone; it
+tries the same URL through 8 request shapes across both `fetch` and curl, checks
+that a known-missing part still 404s, prints the egress IP, and ends with a
+one-line VERDICT. It **exits non-zero when nothing worked**, so the red X is the
+answer without reading the log.
 
-- If it comes back **200/404 correctly** -> the UA or HEAD was the cause; re-run
-  with `limit` blank and `deploy = true`.
-- If it comes back **403 / WAF challenge / timeout** -> hosted runners cannot read
-  the PDFs at all. That is not patchable from inside the workflow. The options
-  are a **self-hosted runner** on the user's machine (GitHub orchestrates, their
-  IP fetches) or going back to a **local run**. Do not burn more runs guessing.
+Do not change transport code before reading that verdict — guessing between the
+two causes above is what has already cost two runs.
+
+`scripts/probe-cdn.mjs` runs locally too (`node scripts/probe-cdn.mjs`), which is
+how the baseline above was measured.
 
 Separately, before any run with `deploy = true`: **Settings -> Pages -> Source:
 GitHub Actions** must be set, or the `deploy` job fails at the *end* of a long

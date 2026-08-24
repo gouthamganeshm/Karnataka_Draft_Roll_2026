@@ -1,0 +1,58 @@
+# Can a GitHub-hosted runner read the roll PDFs?
+#
+# Split out of `build-roll.yml` deliberately. The full ingest is a four-job,
+# multi-hour pipeline, and discovering an edge block partway through it costs an
+# afternoon to learn one fact. This job answers that one fact in under a minute
+# and can be run from a phone.
+#
+# Background: the discover stage was answered `406 Not Acceptable` for all seven
+# Bangalore Urban constituencies on `ubuntu-latest`, while the same runner
+# talked to the gateway API on a different host without trouble, and the same
+# code on a desktop in India returned 200/206 for every request shape tried.
+#
+# What the result means:
+#
+#   every shape OK      -> the earlier 406 was transient; re-run `build-roll`.
+#   curl OK, fetch not  -> the edge is refusing the HTTP client, not the IP.
+#                          Both `1-discover.mjs` (undici) and `2-extract.py`
+#                          (urllib) would need routing through curl — neither
+#                          transport is browser-shaped today.
+#   everything blocked  -> IP-level denial. Not patchable from inside a
+#                          workflow. The run needs an egress the edge accepts:
+#                          a self-hosted runner, or the local pipeline.
+
+name: Probe roll CDN
+
+on:
+  workflow_dispatch:
+    inputs:
+      ac:
+        description: 'AC number to probe (default 177 Anekal)'
+        required: false
+        default: '177'
+      part:
+        description: 'Part number to probe (default 1 — every AC has one)'
+        required: false
+        default: '1'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe from a hosted runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Fails the job when nothing worked, so the red X is the answer and
+      # nobody has to read the log to find out.
+      - name: Probe
+        run: |
+          node scripts/probe-cdn.mjs \
+            --ac '${{ inputs.ac || '177' }}' \
+            --part '${{ inputs.part || '1' }}'
