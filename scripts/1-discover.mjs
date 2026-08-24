@@ -59,20 +59,60 @@ const CDN = 'https://voters.eci.gov.in/eroll/2026/s10/sir-draftroll';
 const partUrl = (ac, part) =>
   `${CDN}/${ac}/2026-EROLLGEN-S10-${ac}-SIR-DraftRoll-Revision1-KAN-${part}-WI.pdf`;
 
-/* Does this part exist? A missing part is a clean 404; anything else is treated
- * as unknown and retried, so a flaky response never shortens a constituency. */
+/* Does this part exist?
+ *
+ * A missing part is a clean 404 and a present one is a 200. Anything else is
+ * treated as unknown and retried, so a flaky response never shortens a
+ * constituency — a short count would silently drop real booths.
+ *
+ * Two things the CDN cares about that a bare `fetch` does not send:
+ *
+ *  - A browser user-agent. Node sends `node`, and the edge in front of the roll
+ *    files answers some clients differently than it answers a browser.
+ *  - A fallback away from HEAD. Every part probe wants only "does this exist",
+ *    which is what HEAD is for, but an edge that dislikes HEAD will answer it
+ *    with neither 200 nor 404. So an inconclusive HEAD is retried as a
+ *    one-byte ranged GET, which costs nothing and is an ordinary read.
+ *
+ * The status of the last inconclusive answer is carried into the thrown error,
+ * because a WAF challenge, a geo-block and an origin timeout are all "not 404"
+ * and only the number distinguishes them.
+ */
+const PROBE_HEADERS = {
+  'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+    '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  accept: 'application/pdf,*/*',
+  'accept-language': 'en-IN,en;q=0.9',
+  referer: 'https://voters.eci.gov.in/'
+};
+
+async function probe(url, method) {
+  const headers = { ...PROBE_HEADERS };
+  if (method === 'GET') headers.range = 'bytes=0-0';
+  const res = await fetch(url, { method, headers, redirect: 'follow' });
+  if (res.status === 404) return { exists: false };
+  if (res.ok) return { exists: true };
+  return { status: `${res.status} ${res.statusText}` };
+}
+
 async function partExists(ac, part, tries = 3) {
+  const url = partUrl(ac, part);
+  let last = 'no response';
   for (let attempt = 1; attempt <= tries; attempt++) {
-    try {
-      const res = await fetch(partUrl(ac, part), { method: 'HEAD', redirect: 'follow' });
-      if (res.status === 404) return false;
-      if (res.ok) return true;
-    } catch {
-      // network error — fall through to the retry
+    // HEAD first; fall back to a ranged GET once HEAD has proved unhelpful.
+    for (const method of attempt === 1 ? ['HEAD'] : ['HEAD', 'GET']) {
+      try {
+        const r = await probe(url, method);
+        if (r.exists !== undefined) return r.exists;
+        last = `${method} -> HTTP ${r.status}`;
+      } catch (err) {
+        last = `${method} -> ${err.message}`;
+      }
     }
     if (attempt < tries) await new Promise((r) => setTimeout(r, 500 * attempt * attempt));
   }
-  throw new Error(`could not determine whether AC ${ac} part ${part} exists`);
+  throw new Error(`AC ${ac} part ${part}: ${last}`);
 }
 
 await mkdir(CACHE, { recursive: true });
@@ -182,7 +222,7 @@ progress('');
 log(`  ${listed} parts across ${results.filter((r) => r.parts.length).length} constituencies`);
 if (failed) {
   log(`  ${failed} constituencies could not be counted:`);
-  for (const r of results.filter((x) => x.error)) log(`    ${r.acNumber} ${r.name} — ${r.error}`);
+  for (const r of results.filter((x) => x.error)) log(`    ${r.name} — ${r.error}`);
 }
 
 const stillEmpty = results.filter((r) => !r.parts.length);

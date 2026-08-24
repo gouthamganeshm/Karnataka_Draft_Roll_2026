@@ -49,6 +49,27 @@ jobs:
         with:
           node-version: '20'
 
+      # The roll PDFs sit behind an edge that has answered GitHub's runners
+      # differently than it answers a desktop. When a part probe comes back as
+      # neither 200 nor 404, this is the record of what it actually was — the
+      # discover and OCR stages both read from this host, so a block here is
+      # fatal to the run and worth naming precisely rather than inferring.
+      - name: Probe the roll CDN
+        run: |
+          url=https://voters.eci.gov.in/eroll/2026/s10/sir-draftroll/177/2026-EROLLGEN-S10-177-SIR-DraftRoll-Revision1-KAN-1-WI.pdf
+          ua='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+          echo "--- egress IP ---"
+          curl -s --max-time 20 https://api.ipify.org || echo '(unavailable)'; echo
+          for label in "HEAD bare" "HEAD browser-ua" "GET range browser-ua"; do
+            echo "--- $label ---"
+            case "$label" in
+              "HEAD bare")           curl -s -S -I --max-time 60 "$url" ;;
+              "HEAD browser-ua")     curl -s -S -I --max-time 60 -A "$ua" -H 'Referer: https://voters.eci.gov.in/' "$url" ;;
+              "GET range browser-ua") curl -s -S --max-time 60 -D - -o /dev/null -r 0-0 -A "$ua" -H 'Referer: https://voters.eci.gov.in/' "$url" ;;
+            esac || echo "curl exit $?"
+          done
+        continue-on-error: true
+
       - name: Build the constituency and part tree
         run: |
           if [ -n "${{ inputs.district }}" ]; then
