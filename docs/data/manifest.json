@@ -3,15 +3,159 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T16:55:50.828Z",
+  "builtAt": "2026-08-24T16:59:41.487Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 1193888,
-  "constituencies": 7,
-  "parts": 3354,
-  "partsDone": 1902,
-  "coverage": 56.71,
+  "electors": 1209480,
+  "constituencies": 68,
+  "parts": 19801,
+  "partsDone": 1922,
+  "coverage": 9.71,
   "acs": {
+    "1": {
+      "name": "Nippani",
+      "nameKn": "ನಿಪ್ಪಾಣಿ",
+      "district": "BELGAUM",
+      "parts": 259,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "2": {
+      "name": "Chikkodi-Sadalga",
+      "nameKn": "ಚಿಕ್ಕೋಡಿ-ಸದಲಗಾ",
+      "district": "BELGAUM",
+      "parts": 255,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "3": {
+      "name": "Athani",
+      "nameKn": "ಅಥಣಿ",
+      "district": "BELGAUM",
+      "parts": 270,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "4": {
+      "name": "Kagwad",
+      "nameKn": "ಕಾಗವಾಡ",
+      "district": "BELGAUM",
+      "parts": 238,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "5": {
+      "name": "Kudachi",
+      "nameKn": "ಕುಡಚಿ",
+      "district": "BELGAUM",
+      "parts": 227,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "6": {
+      "name": "Raybag",
+      "nameKn": "ರಾಯಭಾಗ",
+      "district": "BELGAUM",
+      "parts": 246,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "7": {
+      "name": "Hukkeri",
+      "nameKn": "ಹುಕ್ಕೇರಿ",
+      "district": "BELGAUM",
+      "parts": 234,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "8": {
+      "name": "Arabhavi",
+      "nameKn": "ಅರಭಾವಿ",
+      "district": "BELGAUM",
+      "parts": 290,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "9": {
+      "name": "Gokak",
+      "nameKn": "ಗೋಕಾಕ",
+      "district": "BELGAUM",
+      "parts": 297,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "10": {
+      "name": "Yemkanamardi",
+      "nameKn": "ಯಮಕನಮರಡಿ",
+      "district": "BELGAUM",
+      "parts": 243,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "11": {
+      "name": "Belgaum Uttar",
+      "nameKn": "ಬೆಳಗಾವಿ ಉತ್ತರ",
+      "district": "BELGAUM",
+      "parts": 260,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "12": {
+      "name": "Belgaum Dakshin",
+      "nameKn": "ಬೆಳಗಾವಿ  ದಕ್ಷಿಣ",
+      "district": "BELGAUM",
+      "parts": 260,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "13": {
+      "name": "Belgaum Rural",
+      "nameKn": "ಬೆಳಗಾವಿ ಗ್ರಾಮಾಂತರ",
+      "district": "BELGAUM",
+      "parts": 299,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "14": {
+      "name": "Khanapur",
+      "nameKn": "ಖಾನಾಪೂರ",
+      "district": "BELGAUM",
+      "parts": 319,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "15": {
+      "name": "Kittur",
+      "nameKn": "ಕಿತ್ತೂರು",
+      "district": "BELGAUM",
+      "parts": 232,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "16": {
+      "name": "Bailahongal",
+      "nameKn": "ಬೈಲಹೊಂಗಲ",
+      "district": "BELGAUM",
+      "parts": 225,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "17": {
+      "name": "Saundatti Yellamma",
+      "nameKn": "ಸವದತ್ತಿ ಯಲ್ಲಮ್ಮ",
+      "district": "BELGAUM",
+      "parts": 238,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "18": {
+      "name": "Ramdurg",
+      "nameKn": "ರಾಮದುರ್ಗ",
+      "district": "BELGAUM",
+      "parts": 252,
+      "partsDone": 0,
+      "electors": 0
+    },
     "150": {
       "name": "Yelahanka",
       "nameKn": "ಯಲಹಂಕ",
@@ -19,6 +163,14 @@
       "parts": 418,
       "partsDone": 418,
       "electors": 290059
+    },
+    "151": {
+      "name": "K.R. Pura",
+      "nameKn": "ಕೆ.ಆರ್‌.ಪುರ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 509,
+      "partsDone": 0,
+      "electors": 0
     },
     "152": {
       "name": "Byatarayanapura",
@@ -36,6 +188,14 @@
       "partsDone": 553,
       "electors": 325412
     },
+    "154": {
+      "name": "Rajarajeshwarinagar",
+      "nameKn": "ರಾಜರಾಜೇಶ್ವರಿನಗರ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 437,
+      "partsDone": 0,
+      "electors": 0
+    },
     "155": {
       "name": "Dasarahalli",
       "nameKn": "ದಾಸರಹಳ್ಳಿ",
@@ -44,13 +204,165 @@
       "partsDone": 419,
       "electors": 215790
     },
+    "156": {
+      "name": "Mahalakshmi Layout",
+      "nameKn": "ಮಹಾಲಕ್ಷ್ಮಿ ಬಡಾವಣೆ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 276,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "157": {
+      "name": "Malleshwaram",
+      "nameKn": "ಮಲ್ಲೇಶ್ವರಂ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 207,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "158": {
+      "name": "Hebbal",
+      "nameKn": "ಹೆಬ್ಬಾಳ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 285,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "159": {
+      "name": "Pulakeshinagar",
+      "nameKn": "ಪುಲಕೇಶಿನಗರ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 228,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "160": {
+      "name": "Sarvagnanagar",
+      "nameKn": "ಸರ್ವಜ್ಞ ನಗರ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 337,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "161": {
+      "name": "C.V. RamannNagar",
+      "nameKn": "ಸಿ.ವಿ. ರಾಮನ್‌ ನಗರ",
+      "district": "B.B.M.P(NORTH)",
+      "parts": 244,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "162": {
+      "name": "Shivajinagar",
+      "nameKn": "ಶಿವಾಜಿನಗರ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 191,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "163": {
+      "name": "Shantinagar",
+      "nameKn": "ಶಾಂತಿನಗರ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 193,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "164": {
+      "name": "Gandhinagar",
+      "nameKn": "ಗಾಂಧಿನಗರ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 220,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "165": {
+      "name": "Rajajinagar",
+      "nameKn": "ರಾಜಾಜಿನಗರ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 194,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "166": {
+      "name": "Govindarajanagar",
+      "nameKn": "ಗೋವಿಂದರಾಜ ನಗರ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 269,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "167": {
+      "name": "Vijayanagar",
+      "nameKn": "ವಿಜಯನಗರ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 284,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "168": {
+      "name": "Chamrajapet",
+      "nameKn": "ಚಾಮರಾಜಪೇಟೆ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 216,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "169": {
+      "name": "Chickpet",
+      "nameKn": "ಚಿಕ್ಕಪೇಟೆ",
+      "district": "B.B.M.P(CENTRAL)",
+      "parts": 222,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "170": {
+      "name": "Basavanagudi",
+      "nameKn": "ಬಸವನಗುಡಿ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 220,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "171": {
+      "name": "Padmanabanagar",
+      "nameKn": "ಪದ್ಮನಾಭನಗರ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 279,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "172": {
+      "name": "B.T.M Layout",
+      "nameKn": "ಬಿ.ಟಿ.ಎಂ ಲೇಔಟ್",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 243,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "173": {
+      "name": "Jayanagar",
+      "nameKn": "ಜಯನಗರ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 210,
+      "partsDone": 0,
+      "electors": 0
+    },
     "174": {
       "name": "Mahadevapura",
       "nameKn": "ಮಹದೇವಪುರ",
       "district": "BANGALORE URBAN",
       "parts": 533,
-      "partsDone": 68,
-      "electors": 56674
+      "partsDone": 88,
+      "electors": 72266
+    },
+    "175": {
+      "name": "Bommanahalli",
+      "nameKn": "ಬೊಮ್ಮನಹಳ್ಳಿ",
+      "district": "B.B.M.P(SOUTH)",
+      "parts": 390,
+      "partsDone": 0,
+      "electors": 0
     },
     "176": {
       "name": "Bangalore South",
@@ -67,6 +379,182 @@
       "parts": 384,
       "partsDone": 8,
       "electors": 4178
+    },
+    "178": {
+      "name": "Hosakote",
+      "nameKn": "ಹೊಸಕೋಟೆ",
+      "district": "BANGALORE RURAL",
+      "parts": 298,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "179": {
+      "name": "Devanahalli",
+      "nameKn": "ದೇವನಹಳ್ಳಿ",
+      "district": "BANGALORE RURAL",
+      "parts": 296,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "180": {
+      "name": "Doddaballapur",
+      "nameKn": "ದೊಡ್ಡಬಳ್ಳಾಪುರ",
+      "district": "BANGALORE RURAL",
+      "parts": 279,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "181": {
+      "name": "Nelamangala",
+      "nameKn": "ನೆಲಮಂಗಲ",
+      "district": "BANGALORE RURAL",
+      "parts": 281,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "193": {
+      "name": "Shravanabelagola",
+      "nameKn": "ಶ್ರವಣಬೆಳಗೊಳ",
+      "district": "HASSAN",
+      "parts": 272,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "194": {
+      "name": "Arsikere",
+      "nameKn": "ಅರಸೀಕೆರೆ",
+      "district": "HASSAN",
+      "parts": 281,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "195": {
+      "name": "Belur",
+      "nameKn": "ಬೇಲೂರು",
+      "district": "HASSAN",
+      "parts": 276,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "196": {
+      "name": "Hassan",
+      "nameKn": "ಹಾಸನ",
+      "district": "HASSAN",
+      "parts": 282,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "197": {
+      "name": "Holenarasipur",
+      "nameKn": "ಹೊಳೇನರಸೀಪುರ",
+      "district": "HASSAN",
+      "parts": 330,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "198": {
+      "name": "Arakalgud",
+      "nameKn": "ಅರಕಲಗೂಡು",
+      "district": "HASSAN",
+      "parts": 292,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "199": {
+      "name": "Sakaleshpur",
+      "nameKn": "ಸಕಲೇಶಪುರ",
+      "district": "HASSAN",
+      "parts": 295,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "210": {
+      "name": "Piriyapatna",
+      "nameKn": "ಪಿರಿಯಾಪಟ್ಟಣ",
+      "district": "MYSORE",
+      "parts": 240,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "211": {
+      "name": "Krishnarajanagara",
+      "nameKn": "ಕೃಷ್ಣರಾಜನಗರ",
+      "district": "MYSORE",
+      "parts": 259,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "212": {
+      "name": "Hunsur",
+      "nameKn": "ಹುಣಸೂರು",
+      "district": "MYSORE",
+      "parts": 285,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "213": {
+      "name": "Heggadadevankote",
+      "nameKn": "ಹೆಗ್ಗಡದೇವನಕೋಟೆ",
+      "district": "MYSORE",
+      "parts": 288,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "214": {
+      "name": "Nanjangud",
+      "nameKn": "ನಂಜನಗೂಡು",
+      "district": "MYSORE",
+      "parts": 249,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "215": {
+      "name": "Chamundeshwari",
+      "nameKn": "ಚಾಮುಂಡೇಶ್ವರಿ",
+      "district": "MYSORE",
+      "parts": 351,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "216": {
+      "name": "Krishnaraja",
+      "nameKn": "ಕೃಷ್ಣರಾಜ",
+      "district": "MYSORE",
+      "parts": 265,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "217": {
+      "name": "Chamaraja",
+      "nameKn": "ಚಾಮರಾಜ",
+      "district": "MYSORE",
+      "parts": 248,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "218": {
+      "name": "Narasimharaja",
+      "nameKn": "ನರಸಿಂಹರಾಜ",
+      "district": "MYSORE",
+      "parts": 283,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "219": {
+      "name": "Varuna",
+      "nameKn": "ವರುಣ",
+      "district": "MYSORE",
+      "parts": 267,
+      "partsDone": 0,
+      "electors": 0
+    },
+    "220": {
+      "name": "T. Narasipur",
+      "nameKn": "ಟಿ.ನರಸೀಪುರ",
+      "district": "MYSORE",
+      "parts": 232,
+      "partsDone": 0,
+      "electors": 0
     }
   }
 }
