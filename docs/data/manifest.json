@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T19:26:39.741Z",
+  "builtAt": "2026-08-24T19:31:27.607Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 2023968,
+  "electors": 2053343,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 3161,
-  "coverage": 15.96,
+  "partsDone": 3208,
+  "coverage": 16.2,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -377,8 +377,8 @@
       "nameKn": "ಆನೇಕಲ್‌",
       "district": "BANGALORE URBAN",
       "parts": 384,
-      "partsDone": 200,
-      "electors": 120960
+      "partsDone": 247,
+      "electors": 150335
     },
     "178": {
       "name": "Hosakote",
