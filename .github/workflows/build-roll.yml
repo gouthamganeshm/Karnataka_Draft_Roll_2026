@@ -39,12 +39,12 @@ concurrency:
 jobs:
   discover:
     name: Discover constituencies
-    # Testing whether the CDN's 406 is specific to Azure-hosted Linux/Windows
-    # runners: macOS runners sit on different infrastructure (not Azure VMs),
-    # so a different IP range/ASN. ubuntu-24.04 and windows-latest were ruled
-    # out first since both are still Azure and would very likely repeat the
-    # same block. Revert to ubuntu-latest once this is answered either way.
-    runs-on: macos-latest
+    # macos-latest was tried 2026-08-25 on the theory that the CDN's 406 was
+    # specific to Azure-hosted runner IPs (ubuntu/windows). It 406'd too —
+    # GitHub publishes IP ranges for every hosted-runner flavor, and this CDN
+    # appears to block the whole published set, not just Azure. See HANDOFF.md
+    # section 5. No hosted-runner flavor reaches this CDN; do not retry this.
+    runs-on: ubuntu-latest
     outputs:
       acs: ${{ steps.list.outputs.acs }}
       count: ${{ steps.list.outputs.count }}

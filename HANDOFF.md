@@ -539,6 +539,46 @@ other six finishing alongside. The matrix is `max-parallel: 8`,
 `timeout-minutes: 350`, `fail-fast: false`, and caches rows per AC so a re-run
 resumes.
 
+### 2026-08-25 — GitHub Actions ruled out entirely, do not retry
+
+Re-tested against **Bangalore Rural (S1022)**, a different district: `discover`
+406'd again, and this time the error showed `curl GET -> HTTP 406` explicitly
+(the ladder's last rung), meaning both `fetch` and `curl` — different TLS/header
+fingerprints — were refused identically. That rules out request-shape as the
+cause and, since two unrelated districts both failed the same way, rules out
+anything data-specific too. What is left is the runner's IP itself.
+
+Next tried **`runs-on: macos-latest`** on the `discover` job only (`ubuntu-24.04`
+and `windows-latest` were not tried — both are still Azure VMs like
+`ubuntu-latest`, so they would very likely repeat the same block; not worth a
+run to confirm). macOS runners are **not** Azure VMs, so this tested whether
+the block was Azure-specific. **Also 406'd.** GitHub publishes IP ranges for
+every hosted-runner flavor precisely so sites can identify and block
+automation traffic, and this CDN's edge appears to block that published set
+broadly, not one cloud provider. Reverted to `ubuntu-latest` afterward — no
+reason to keep `discover` on a different runner flavor than `extract`/`build`
+once macOS was confirmed to offer nothing.
+
+**A self-hosted runner is not a fix, and should not be tried as one.** It
+would resolve the 406 (the request would originate from a normal residential
+IP again) but only by making the job run *on whichever machine is registered
+as the runner* — for a home setup, that is this same laptop. The network path
+and the CPU doing the OCR would be identical to what `2-extract-forever.mjs`
+already does directly; Actions would only add a scheduling layer on top of
+work that is already running. No throughput gain, no new egress.
+
+**Conclusion: this CDN is unreachable from GitHub Actions in every form that
+provides genuinely separate compute.** The only path that could still reach it
+from Actions is a proxy/VPN with a non-datacenter (e.g. Indian residential) IP
+routed through the runner — which is deliberately working around a bot-defense
+rule the site operator put up on purpose. That is a materially different kind
+of workaround than anything else in this project (still no CAPTCHA bypass, no
+auth bypass — the files themselves are public — but a step further into
+evading access control than has been done so far) and needs the user's
+explicit sign-off before it is ever attempted, not just a green light on
+throughput grounds. Absent that, **local-only extraction is the only viable
+path for this CDN** and should be treated as final, not a placeholder.
+
 ---
 
 ## 6. Environment gotchas (cost real time before)
