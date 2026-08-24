@@ -71,6 +71,17 @@ def _tesseract_cmd() -> str:
 
 TESSERACT = None
 
+# The pipeline gets its parallelism from running many Tesseract *processes* at
+# once (one per part, via ProcessPoolExecutor) — but Tesseract's LSTM engine
+# also spawns its own OpenMP thread pool inside each call unless told not to.
+# Left alone, 11 worker processes each opening a handful of threads means 30+
+# threads contending for 12 cores: busy-looking CPU (measured 60-86%) that is
+# actually thrashing on context switches rather than doing 11x the work. This
+# pins every Tesseract call to one thread so the process-level parallelism —
+# which is real, since each part is independent — is what the cores spend
+# their time on.
+TESS_ENV = {**os.environ, 'OMP_THREAD_LIMIT': '1'}
+
 
 def ocr_lines(img: Image.Image, psm: int = 6) -> list[str]:
     """Run Tesseract once over an image and return its non-empty lines.
@@ -90,7 +101,7 @@ def ocr_lines(img: Image.Image, psm: int = 6) -> list[str]:
     proc = subprocess.run(
         [TESSERACT, 'stdin', 'stdout', '--psm', str(psm)],
         input=buf.getvalue(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-        check=True,
+        check=True, env=TESS_ENV,
     )
     return [ln.strip() for ln in proc.stdout.decode('utf8', 'replace').split('\n') if ln.strip()]
 
@@ -400,7 +411,7 @@ def reread_serial(crop: Image.Image | None) -> str:
         [TESSERACT, 'stdin', 'stdout', '--psm', '8',
          '-c', 'tessedit_char_whitelist=0123456789'],
         input=buf.getvalue(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-        check=True,
+        check=True, env=TESS_ENV,
     )
     return ''.join(proc.stdout.decode('utf8', 'replace').split())
 

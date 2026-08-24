@@ -174,6 +174,47 @@ that were already right, which is why it is safe.
 
 ---
 
+## 4e. Throughput investigation — 2026-08-25, ~9-10 parts/min is a hard ceiling
+
+The user asked whether OCR could be sped up with more parallelism. Measured,
+in order:
+
+1. **Tesseract's own threading was uncapped.** Each of 11 worker *processes*
+   spawns a Tesseract subprocess per OCR call, and Tesseract's LSTM engine
+   also opens its own OpenMP thread pool inside each call unless told not to
+   — 11 processes each opening a handful of threads means 30+ threads
+   contending for 12 cores. Fixed: `TESS_ENV = {**os.environ,
+   'OMP_THREAD_LIMIT': '1'}` in `scripts/ocr/roll_ocr.py`, passed to both
+   `subprocess.run` call sites. Correct to have either way, but **measured
+   effect was flat**: 100 parts before vs after, both ~9.6 parts/min.
+2. **Tried 20 workers instead of 11.** Also flat — 9.4 parts/min — and
+   per-part latency actually got *worse* (69s -> 128s effective, at 11 vs 20
+   workers respectively) while total throughput did not move. That is the
+   signature of a ceiling independent of local concurrency, not a resource
+   this machine can add more of.
+3. **Ruled out the two obvious local causes.** A single isolated fetch (no
+   contention) pulled a 7.7MB part in 1.55s — ~33 Mbps, far above the ~1.2MB/s
+   aggregate implied by 9.5 parts/min, so it is not this connection's
+   bandwidth. Windows Defender real-time protection is disabled on this
+   machine (`Get-MpComputerStatus`), so it is not per-process AV scanning
+   either — a live theory until checked, since spawning hundreds of short-lived
+   `tesseract.exe` processes is exactly the shape of workload AV scanning
+   hits hardest.
+4. **Most likely explanation, not fully proven**: the ECI CDN itself throttles
+   aggregate throughput per client, independent of how many local connections
+   ask for it. Consistent with the rest of this project's experience of that
+   edge — it already treats `fetch` vs `curl` differently and blocked GitHub's
+   runners outright (section 5) — so a soft per-client cap on total bandwidth
+   would not be a surprising addition to that pattern.
+
+**Decision: left at the default 11 workers**, not 20. Pushing concurrency
+further bought nothing in the test and risks provoking the same kind of edge
+pushback documented in section 5, for no measured benefit. If this is
+revisited, the highest-value untried lever is probably eliminating Tesseract's
+per-call *process-spawn* cost itself (persistent OCR via `tesserocr` instead
+of shelling out per call) rather than more parallelism — but that is a new
+build dependency and a real architecture change, not attempted here.
+
 ## 4d. Scope expansion — 2026-08-24, priority queue now 8 districts / 68 ACs
 
 The user's instruction, verbatim: finish all Bengaluru districts, then Hassan,
