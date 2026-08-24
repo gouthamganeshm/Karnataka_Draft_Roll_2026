@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T16:25:14.214Z",
+  "builtAt": "2026-08-24T16:29:51.283Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 1030526,
+  "electors": 1056215,
   "constituencies": 7,
   "parts": 3354,
-  "partsDone": 1599,
-  "coverage": 47.67,
+  "partsDone": 1650,
+  "coverage": 49.19,
   "acs": {
     "150": {
       "name": "Yelahanka",
@@ -41,8 +41,8 @@
       "nameKn": "ದಾಸರಹಳ್ಳಿ",
       "district": "BANGALORE URBAN",
       "parts": 419,
-      "partsDone": 184,
-      "electors": 109102
+      "partsDone": 235,
+      "electors": 134791
     },
     "174": {
       "name": "Mahadevapura",
