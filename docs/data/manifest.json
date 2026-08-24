@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T17:52:29.400Z",
+  "builtAt": "2026-08-24T17:57:26.510Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 1492346,
+  "electors": 1519194,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 2347,
-  "coverage": 11.85,
+  "partsDone": 2384,
+  "coverage": 12.04,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -353,8 +353,8 @@
       "nameKn": "ಮಹದೇವಪುರ",
       "district": "BANGALORE URBAN",
       "parts": 533,
-      "partsDone": 513,
-      "electors": 355132
+      "partsDone": 533,
+      "electors": 370533
     },
     "175": {
       "name": "Bommanahalli",
@@ -369,8 +369,8 @@
       "nameKn": "ಬೆಂಗಳೂರು ದಕ್ಷಿಣ",
       "district": "BANGALORE URBAN",
       "parts": 605,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 17,
+      "electors": 11447
     },
     "177": {
       "name": "Anekal",
