@@ -100,6 +100,8 @@ empty name. (Open item — see section 7.)
                              cache/rows/<ac>.jsonl; PDF bytes never hit disk
     scripts/3-build-data.mjs SHA-256 hash buckets  ->  data/
     scripts/4-upload-r2.mjs  optional Cloudflare R2 upload
+    scripts/5-publish.mjs    rebuild into docs/data, commit, push  <- how the
+                             site is now updated; Actions is not involved
     scripts/probe-cdn.mjs    diagnostic only, not part of the pipeline: can this
                              host read the PDFs at all?  (see section 5)
     docs/                    the static site
@@ -171,6 +173,38 @@ that were already right, which is why it is safe.
 - Measured local throughput: **6.45 parts/min** (26 parts in 242 s).
 
 ---
+
+## 4b. Publishing — decided 2026-08-24, supersedes the Actions plan
+
+The user's call after the runner kept returning 406: **"process the data locally
+and push the json, part by part, instead of depending on GitHub Actions."**
+
+So `docs/data/` is now **committed**, and `.gitignore` carries an explicit
+`!docs/data/`. This is a deliberate, narrow relaxation of standing constraint 3
+in section 1 — *no PDFs* still holds absolutely, and `cache/` and `data/` are
+still ignored. Only the built JSON travels.
+
+Measured, not estimated: **8.2 MB across 260 files at 14.0% coverage**, so the
+finished district is **~58 MB in ~4,100 files**. That is well inside Pages' 1 GB
+cap, and `scripts/4-upload-r2.mjs` stays unused until the scope grows.
+
+Two things to know before republishing often:
+
+- Stage 3 **clears its output directory and rewrites every bucket**, so each
+  publish is a whole-tree churn in git history, not a delta. Publish at
+  checkpoints — per constituency finished — not per part.
+- `shardDepth` is derived from the row count and **flips from 2 to 3 at ~614,400
+  rows** (16^2.5 x 600). At that point every bucket path changes from
+  `roll/ab.json` to `roll/ab/c.json`. Expect one commit that rewrites the
+  entire tree; it is correct, not a bug. The client reads `shardDepth` from the
+  manifest, so old and new both work as long as manifest and buckets ship
+  together — which they do, in one commit.
+
+**Pages source must be `Deploy from a branch` -> `main` / `/docs`**, not
+`GitHub Actions`. That is what removes the workflow from the path entirely.
+
+Verified end-to-end against the published tree: `AAH4480430` -> `[092b831c, 177,
+3, 1]`, and a bogus `ZZZ9999999` returns nothing.
 
 ## 5. THE ACTIVE BLOCKER — read this first
 

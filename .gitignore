@@ -3,6 +3,11 @@ cache/
 cache-*/
 data/
 data-*/
-docs/data/
 *.log
 __pycache__/
+
+# docs/data IS committed. The ingest cannot run on GitHub Actions — the roll CDN
+# answers a hosted runner with 406 — so the OCR runs on a desktop and the built
+# JSON is pushed from there. It is the only build output in git, and it is
+# ~55 MB of four-value records; the PDFs it came from are ~31 GB and stay out.
+!docs/data/
