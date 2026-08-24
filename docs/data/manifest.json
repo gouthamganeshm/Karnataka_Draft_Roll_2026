@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T17:08:20.109Z",
+  "builtAt": "2026-08-24T17:13:30.146Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 1247749,
+  "electors": 1275825,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 1975,
-  "coverage": 9.97,
+  "partsDone": 2016,
+  "coverage": 10.18,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -353,8 +353,8 @@
       "nameKn": "ಮಹದೇವಪುರ",
       "district": "BANGALORE URBAN",
       "parts": 533,
-      "partsDone": 141,
-      "electors": 110535
+      "partsDone": 182,
+      "electors": 138611
     },
     "175": {
       "name": "Bommanahalli",
