@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T21:32:16.652Z",
+  "builtAt": "2026-08-24T21:38:02.361Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 2678692,
+  "electors": 2710863,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 4285,
-  "coverage": 21.64,
+  "partsDone": 4342,
+  "coverage": 21.93,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -193,8 +193,8 @@
       "nameKn": "ರಾಜರಾಜೇಶ್ವರಿನಗರ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 437,
-      "partsDone": 90,
-      "electors": 50570
+      "partsDone": 147,
+      "electors": 82741
     },
     "155": {
       "name": "Dasarahalli",
