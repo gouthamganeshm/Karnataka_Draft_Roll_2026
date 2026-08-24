@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-24T22:30:55.497Z",
+  "builtAt": "2026-08-24T22:36:26.190Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3000454,
+  "electors": 3031902,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 4814,
-  "coverage": 24.31,
+  "partsDone": 4859,
+  "coverage": 24.54,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -257,16 +257,16 @@
       "nameKn": "ಶಿವಾಜಿನಗರ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 191,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 34,
+      "electors": 22515
     },
     "163": {
       "name": "Shantinagar",
       "nameKn": "ಶಾಂತಿನಗರ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 193,
-      "partsDone": 182,
-      "electors": 112686
+      "partsDone": 193,
+      "electors": 121619
     },
     "164": {
       "name": "Gandhinagar",
