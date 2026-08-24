@@ -229,11 +229,22 @@ that a known-missing part still 404s, prints the egress IP, and ends with a
 one-line VERDICT. It **exits non-zero when nothing worked**, so the red X is the
 answer without reading the log.
 
-Do not change transport code before reading that verdict — guessing between the
-two causes above is what has already cost two runs.
-
 `scripts/probe-cdn.mjs` runs locally too (`node scripts/probe-cdn.mjs`), which is
 how the baseline above was measured.
+
+**`1-discover.mjs` now also answers this on its own.** Its probe ladder is
+`fetch HEAD -> fetch GET -> curl GET`, and the transport that failed is named in
+the error. So a plain `build-roll` run is self-diagnosing:
+
+- `curl GET -> HTTP 406` in the error -> **both** clients refused, so it is the
+  IP. No transport change helps; the run needs a different egress.
+- discover **succeeds** where it used to fail -> it was undici's fingerprint, and
+  `2-extract.py` needs the same curl fallback for its `urllib` downloads before
+  the extract stage can work on a runner. That change is **not** written yet.
+
+Verified locally, both paths, identical output — 3,354 parts, 0 failed, via
+`fetch` and again via `ROLL_PROBE=curl`. The env var exists only to exercise the
+fallback on a host where `fetch` is fine; it is not needed in normal use.
 
 Separately, before any run with `deploy = true`: **Settings -> Pages -> Source:
 GitHub Actions** must be set, or the `deploy` job fails at the *end* of a long

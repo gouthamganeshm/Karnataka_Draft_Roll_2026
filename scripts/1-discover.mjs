@@ -30,6 +30,7 @@
  *   node scripts/1-discover.mjs --roll-type S10-2026-SIR-DR
  */
 
+import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import {
@@ -74,6 +75,20 @@ const partUrl = (ac, part) =>
  *    with neither 200 nor 404. So an inconclusive HEAD is retried as a
  *    one-byte ranged GET, which costs nothing and is an ordinary read.
  *
+ * And one the edge cares about that no header can express: **which HTTP client
+ * is asking.** On a GitHub-hosted runner every shape above came back `406 Not
+ * Acceptable`, while the gateway API on a different host answered the same
+ * runner fine — so the refusal is this edge's, and it is either the runner's IP
+ * or its client fingerprint. Node's `fetch` (undici) differs from curl in TLS
+ * handshake, ALPN and header casing — undici lower-cases header names, browsers
+ * and curl do not — and edge bot rules key on exactly that. So a request that
+ * undici cannot get a straight answer to is tried once more through curl.
+ *
+ * curl is a fallback, never the default: on a host where `fetch` works it never
+ * runs, so the local path is unchanged and stays free of a subprocess per probe.
+ * If curl succeeds where `fetch` was refused, that is the fingerprint answer and
+ * `2-extract.py` needs the same treatment for its `urllib` downloads.
+ *
  * The status of the last inconclusive answer is carried into the thrown error,
  * because a WAF challenge, a geo-block and an origin timeout are all "not 404"
  * and only the number distinguishes them.
@@ -87,27 +102,68 @@ const PROBE_HEADERS = {
   referer: 'https://voters.eci.gov.in/'
 };
 
-async function probe(url, method) {
+/* Set ROLL_PROBE=curl to skip undici entirely. Only used to exercise the
+ * fallback on a machine where `fetch` works perfectly well. */
+const forcedTransport = process.env.ROLL_PROBE ?? '';
+
+const verdict = (status) =>
+  status === 404 ? { exists: false }
+    : status >= 200 && status < 300 ? { exists: true }
+      : { status };
+
+async function probeFetch(url, method) {
   const headers = { ...PROBE_HEADERS };
   if (method === 'GET') headers.range = 'bytes=0-0';
   const res = await fetch(url, { method, headers, redirect: 'follow' });
-  if (res.status === 404) return { exists: false };
-  if (res.ok) return { exists: true };
-  return { status: `${res.status} ${res.statusText}` };
+  return verdict(res.status);
 }
+
+/* Same request, spoken by curl. `-o /dev/null -w %{http_code}` because the
+ * status is the entire answer — a part probe never wants the bytes. */
+function probeCurl(url, method) {
+  const args = ['-s', '-L', '-o', '/dev/null', '-w', '%{http_code}', '--max-time', '60'];
+  args.push(...(method === 'HEAD' ? ['-I'] : ['-r', 'bytes=0-0']));
+  for (const [k, v] of Object.entries(PROBE_HEADERS)) args.push('-H', `${k}: ${v}`);
+  args.push(url);
+
+  return new Promise((resolve, reject) => {
+    let out = '';
+    let err = '';
+    const p = spawn('curl', args);
+    p.stdout.on('data', (d) => { out += d; });
+    p.stderr.on('data', (d) => { err += d; });
+    p.on('error', (e) => reject(new Error(`curl unavailable: ${e.message}`)));
+    p.on('close', () => {
+      const status = Number(out.trim().slice(-3));
+      if (!Number.isFinite(status) || status === 0) {
+        reject(new Error(err.trim().split('\n').pop() || 'curl gave no status'));
+      } else {
+        resolve(verdict(status));
+      }
+    });
+  });
+}
+
+/* The ladder, cheapest and most likely first. A HEAD over undici answers on any
+ * healthy host; the ranged GET covers an edge that dislikes HEAD; curl covers an
+ * edge that dislikes undici. Only the first attempt is cheap-only — once
+ * something has already come back inconclusive, every transport is worth trying
+ * before a constituency is written off. */
+const LADDER = forcedTransport === 'curl'
+  ? [['curl', probeCurl, 'HEAD'], ['curl', probeCurl, 'GET']]
+  : [['fetch', probeFetch, 'HEAD'], ['fetch', probeFetch, 'GET'], ['curl', probeCurl, 'GET']];
 
 async function partExists(ac, part, tries = 3) {
   const url = partUrl(ac, part);
   let last = 'no response';
   for (let attempt = 1; attempt <= tries; attempt++) {
-    // HEAD first; fall back to a ranged GET once HEAD has proved unhelpful.
-    for (const method of attempt === 1 ? ['HEAD'] : ['HEAD', 'GET']) {
+    for (const [name, transport, method] of attempt === 1 ? LADDER.slice(0, 1) : LADDER) {
       try {
-        const r = await probe(url, method);
+        const r = await transport(url, method);
         if (r.exists !== undefined) return r.exists;
-        last = `${method} -> HTTP ${r.status}`;
+        last = `${name} ${method} -> HTTP ${r.status}`;
       } catch (err) {
-        last = `${method} -> ${err.message}`;
+        last = `${name} ${method} -> ${err.message}`;
       }
     }
     if (attempt < tries) await new Promise((r) => setTimeout(r, 500 * attempt * attempt));
