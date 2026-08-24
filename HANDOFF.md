@@ -174,6 +174,140 @@ that were already right, which is why it is safe.
 
 ---
 
+## 4d. Scope expansion — 2026-08-24, priority queue now 8 districts / 68 ACs
+
+The user's instruction, verbatim: finish all Bengaluru districts, then Hassan,
+then one North Karnataka + one South Karnataka district as a statewide taste,
+then queue the rest of the state later. "Keep your intervention minimal,
+interrupt only when necessary."
+
+North/South picks were a judgment call, not asked for by name: **Belgaum**
+(S1001, 18 ACs — the largest North Karnataka district) and **Mysore** (S1028,
+11 ACs — the largest South Karnataka one, after Bengaluru). Flagged to the
+user, not yet confirmed either way.
+
+District codes (verified against the live gateway, not assumed from an older
+note — BBMP turned out to be three codes separate from Bangalore Urban, not a
+subset of it):
+
+| Priority | District | Code | ACs |
+|---|---|---|---|
+| 1 (in progress) | Bangalore Urban | S1034 | 7 |
+| 2 | BBMP Central | S1031 | 7 |
+| 3 | BBMP North | S1032 | 7 |
+| 4 | BBMP South | S1033 | 7 |
+| 5 | Bangalore Rural | S1022 | 4 |
+| 6 | Hassan | S1025 | 7 |
+| 7 | Belgaum | S1001 | 18 |
+| 8 | Mysore | S1028 | 11 |
+
+**Total: 68 ACs, 19,801 parts** (was 7 ACs / 3,354 parts). At the measured
+9 parts/min this is roughly **36 hours of continuous OCR**, not a few — said
+plainly here since nobody should discover that by watching a progress bar.
+
+### How the queue is actually implemented — read this before changing scope again
+
+Two bugs in `1-discover.mjs` would have broken this quietly if left as they
+were, both fixed in the same pass:
+
+1. **AC discovery order used to depend on network timing.** Each district's
+   ACs were pushed into one shared array from inside a concurrent `pool()`
+   worker; whichever district's API call happened to land first won that
+   position, regardless of `--district` order. Fixed by having each worker
+   *return* its list and flattening after `pool()` resolves, which preserves
+   input order regardless of completion order.
+2. **`1-discover.mjs` used to overwrite `cache/manifest.json` outright.**
+   Running it again for the next district would have erased Bangalore Urban's
+   entry — not the OCR'd rows themselves (`cache/rows/`, `cache/done/` are
+   untouched), but the coverage math in `3-build-data.mjs` reads constituency
+   totals from the manifest, so the site would have silently undercounted a
+   district that was, in reality, already ~51% done. **A scoped `--district`
+   run now merges into the existing manifest**, keeping every previously
+   discovered AC in its position and appending new ones in the order
+   `--district` named them — full behavior and header comment in the file.
+   A bare run with no `--district` (whole state) is unchanged: it still
+   replaces the file, since there is no prior scope to protect.
+
+`2-extract.py` reads `cache/manifest.json`'s `constituencies` array in file
+order and (per `ProcessPoolExecutor`'s roughly-FIFO submission) works through
+it close to that order. **That ordering — not a separate scheduler — is the
+priority queue.** Verified in a scratch cache dir before touching the real
+one: district order came out `S1034,S1031,S1032,S1033,S1022,S1025,S1001,S1028`
+exactly as requested, and every one of S1034's 7 ACs kept its original part
+count untouched.
+
+### `2-extract.py` is one-shot — `scripts/2-extract-forever.mjs` supervises it
+
+This was the actual gap between "grow the manifest" and "the automation
+workflow has this queue" that the user asked for. `2-extract.py` reads the
+manifest once at startup and exits when its job list is empty — it does not
+notice the manifest growing later. Left alone, finishing Bangalore Urban would
+have meant the pipeline going idle until someone noticed and re-ran it by
+hand, the opposite of "minimal intervention."
+
+`scripts/2-extract-forever.mjs` restarts `2-extract.py` every time it exits,
+so a finished batch leads straight into re-checking the manifest. It stops
+once a restart genuinely finds nothing left. This **is** the resumable local
+ledger the user asked for on top of the per-part one: `cache/manifest.json`
+(what's in scope, grown additively) + `cache/done/<ac>.txt` (what's finished,
+already existed) together mean a crash anywhere — mid-part, mid-AC, or the
+whole machine — loses at most the parts that were literally in flight.
+
+Running now: the old one-shot `2-extract.py` invocation was stopped cleanly
+(`cache/done/` proves only one in-flight part was lost) and replaced with the
+supervisor. **First bug caught immediately**: forgot `PYTHONUNBUFFERED=1` on
+the first attempt — workers were provably running (rising memory in
+`tasklist`) but stdout was stuck in Python's block-buffer since it is now
+redirected to a file, not a TTY. Harmless (done-markers are `flush()`'d
+independent of stdout) but made a many-hour run indistinguishable from a
+hang, so it was worth a restart before the run got long. Fixed and confirmed:
+restarted, job count printed immediately (`17879 parts to read` — exactly
+19,801 minus the 1,922 already done).
+
+**A pre-existing OCR gap, not caused by this change**: the 6 parts of AC 152
+that were already stuck before this session (436/442 done) fail with
+`ValueError: Coordinate 'right' is less than 'left'` — a crop geometry bug on
+some page shape `find_grid`/`card_header` do not handle, most likely a
+supplementary or oddly-laid-out page. These do not get marked done, so every
+future round will keep retrying and keep failing on exactly these 6 — AC 152
+will plateau at 436/442 until someone fixes the geometry case. 6 of 19,801
+parts (0.03%); not chased further this session, flagged here so it is not
+mistaken for a new regression.
+
+`6-auto-publish.mjs` needed **no changes** — it already watches `cache/done/`
+generically. Confirmed: first publish after the scope grew came out correct
+on its own, `1,922/19,801 booths (9.7%), 68 ACs` — the moment work spans 68
+ACs instead of 7, the coverage math picked it up with zero intervention.
+
+### Verification — `scripts/7-verify.mjs`, spot-checks a finished AC
+
+Added because the user asked specifically to be the one doing testing while
+automation does the OCR. Two independent layers: (1) samples rows from
+`cache/rows/<ac>.jsonl` and confirms the live site's real lookup path
+(SHA-256 -> bucket -> binary search, over actual HTTP) returns the same
+AC/part/serial; (2) for a few of those, re-fetches the source PDF from the
+CDN and re-runs the pipeline's own OCR reader against it, independent of
+whatever the original pass produced.
+
+    node scripts/7-verify.mjs --ac 150,153 --sample 15 --pdf-checks 3
+
+**Both already-complete ACs verified clean**, first run for this project:
+AC 150 (29/30 site matches — the one miss was a GitHub Pages CDN propagation
+race, confirmed resolved by re-querying seconds later, not a data bug) and
+AC 153 (15/15, 3/3 PDF re-reads). One record, AC150 part 15 serial 182
+(`XTE5125596`), was additionally confirmed by rendering the actual page and
+reading the printed card by eye rather than trusting any automated OCR path.
+
+Hardened after the first run crashed the whole batch on one dropped
+connection (`ECONNABORTED` fetching a PDF) — a multi-megabyte fetch over a
+long loop hits the occasional reset that has nothing to do with the data
+being checked. Now retries a PDF fetch once and wraps each AC's checks so one
+network hiccup fails that AC, not the whole batch.
+
+Not yet run against every AC as it completes automatically — that is what the
+`/loop` running alongside this conversation is for; see its own state for
+what it has and has not gotten to.
+
 ## 4c. Name, age, gender — tried, declined 2026-08-24, do not re-raise lightly
 
 Asked for explicitly, then declined by the user in the same conversation once

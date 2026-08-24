@@ -27,7 +27,17 @@
  *
  *   node scripts/1-discover.mjs
  *   node scripts/1-discover.mjs --district S1002
+ *   node scripts/1-discover.mjs --district S1031,S1032,S1033
  *   node scripts/1-discover.mjs --roll-type S10-2026-SIR-DR
+ *
+ * A run scoped with --district is additive: it merges into any existing
+ * cache/manifest.json rather than replacing it, so growing the state one
+ * priority batch at a time never forgets a district discovered earlier.
+ * `2-extract.py` reads constituencies from that manifest in array order, so
+ * the merge keeps every earlier district ahead of whatever this run adds —
+ * that ordering *is* the extraction queue, with no separate scheduler needed.
+ * A bare run with no --district is the one exception: it means "the whole
+ * state", so it replaces the file outright rather than merging into it.
  */
 
 import { spawn } from 'node:child_process';
@@ -45,7 +55,7 @@ const argValue = (flag) => {
   const i = args.indexOf(flag);
   return i === -1 ? null : args[i + 1];
 };
-const onlyDistrict = argValue('--district');
+const onlyDistricts = argValue('--district')?.split(',').map((s) => s.trim()).filter(Boolean) ?? null;
 const concurrency = Number(argValue('--concurrency') ?? 4);
 
 // The publication being indexed. The portal lists this as "SIR DraftRoll - 2026"
@@ -176,34 +186,44 @@ await mkdir(CACHE, { recursive: true });
 // ------------------------------------------------------------ districts + ACs
 
 log('Listing districts…');
-const districts = (await getJson(`${GATEWAY}/common/districts/${STATE}`))
-  .filter((d) => !onlyDistrict || d.districtCd === onlyDistrict)
+let districts = (await getJson(`${GATEWAY}/common/districts/${STATE}`))
+  .filter((d) => !onlyDistricts || onlyDistricts.includes(d.districtCd))
   .map((d) => ({
     districtCd: d.districtCd,
     districtNo: +d.districtNo,
     name: d.districtValue.trim(),
     nameKn: (d.districtValueHindi ?? '').trim()
-  }))
-  .sort((a, b) => a.districtNo - b.districtNo);
+  }));
+// A whole-state run has no priority to preserve, so it keeps the old,
+// predictable districtNo order. A scoped run's order IS the extraction queue
+// (see the file header), so it is sorted to match --district exactly as typed
+// rather than however the gateway happened to list them.
+districts = onlyDistricts
+  ? onlyDistricts.map((cd) => districts.find((d) => d.districtCd === cd)).filter(Boolean)
+  : districts.sort((a, b) => a.districtNo - b.districtNo);
 log(`  ${districts.length} districts`);
 
 log('Listing assembly constituencies…');
-const acs = [];
-await pool(districts, concurrency, async (d) => {
+// Each worker RETURNS its district's ACs rather than pushing into a shared
+// array — `pool` resolves in input order regardless of which fetch lands
+// first, but a side-effecting push does not, and with several districts
+// racing over the network that was silently reshuffling the queue.
+const acsByDistrict = await pool(districts, concurrency, async (d) => {
   const list = await getJson(`${GATEWAY}/common/acs/${d.districtCd}`);
-  for (const a of list) {
-    acs.push({
-      acNumber: +a.asmblyNo,
-      name: (a.asmblyName ?? '').trim(),
-      nameKn: (a.asmblyNameL1 ?? '').trim(),
-      category: (a.category ?? '').trim(),
-      districtCd: d.districtCd,
-      district: d.name
-    });
-  }
-}, (done, total) => progress(`  ${done}/${total} districts, ${acs.length} ACs`));
+  return list.map((a) => ({
+    acNumber: +a.asmblyNo,
+    name: (a.asmblyName ?? '').trim(),
+    nameKn: (a.asmblyNameL1 ?? '').trim(),
+    category: (a.category ?? '').trim(),
+    districtCd: d.districtCd,
+    district: d.name
+  }));
+}, (done, total) => progress(`  ${done}/${total} districts`));
 progress('');
-acs.sort((a, b) => a.acNumber - b.acNumber);
+const acs = acsByDistrict.flat();
+// Same split as above: a scoped run's district-then-AC order is the queue and
+// must survive; a whole-state run keeps the old flat acNumber order.
+if (!onlyDistricts) acs.sort((a, b) => a.acNumber - b.acNumber);
 log(`  ${acs.length} constituencies`);
 
 if (!acs.length) {
@@ -294,18 +314,44 @@ if (stillEmpty.length) {
 
 // ------------------------------------------------------------ write
 
+/* A scoped run merges into whatever is already on disk instead of replacing
+ * it: keep every previously-discovered district and AC in its existing
+ * position (their part counts and any in-flight extraction they represent
+ * are still valid), update entries this run re-discovered, and append
+ * anything genuinely new in the order --district named it. That ordering is
+ * the extraction queue (see the file header) — a whole-state run has no
+ * "previous" scope to protect, so it still replaces the file outright. */
+const mergeByKey = (prevList, freshList, key) => {
+  const fresh = new Map(freshList.map((x) => [x[key], x]));
+  const kept = prevList.map((x) => fresh.get(x[key]) ?? x);
+  const known = new Set(prevList.map((x) => x[key]));
+  return [...kept, ...freshList.filter((x) => !known.has(x[key]))];
+};
+
+const finalDistricts = onlyDistricts && previous?.districts
+  ? mergeByKey(previous.districts, districts, 'districtCd')
+  : districts;
+const finalConstituencies = onlyDistricts && previous?.constituencies
+  ? mergeByKey(previous.constituencies, results, 'acNumber')
+  : results;
+
 await writeJson(resolve(CACHE, 'manifest.json'), {
   state: STATE,
   rollType,
   discoveredAt: new Date().toISOString(),
-  districts,
-  constituencies: results
+  districts: finalDistricts,
+  constituencies: finalConstituencies
 });
 
 // A compact index for the site, so the AC picker does not need the part tree.
-await writeJson(resolve(CACHE, 'ac-index.json'), results.map((r) => ({
+// Built from the merged list — the site's picker needs every district
+// discovered so far, not just the ones this particular run touched.
+await writeJson(resolve(CACHE, 'ac-index.json'), finalConstituencies.map((r) => ({
   ac: r.acNumber, name: r.name, nameKn: r.nameKn, district: r.district,
   districtCd: r.districtCd, parts: r.parts.length
 })), true);
 
-log(`\nWrote cache/manifest.json — ${districts.length} districts, ${acs.length} ACs, ${listed} parts.`);
+const totalParts = finalConstituencies.reduce((n, c) => n + c.parts.length, 0);
+log(`\nWrote cache/manifest.json — ${finalDistricts.length} districts, ` +
+    `${finalConstituencies.length} ACs, ${totalParts} parts total ` +
+    `(this run added ${listed} parts across ${districts.length} district(s)).`);
