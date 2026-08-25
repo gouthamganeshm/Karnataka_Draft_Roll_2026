@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T09:12:23.145Z",
+  "builtAt": "2026-08-25T09:17:38.247Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 6554575,
+  "electors": 6581828,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 10770,
-  "coverage": 17.68,
+  "partsDone": 10810,
+  "coverage": 17.74,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1569,8 +1569,8 @@
       "nameKn": "ಬೇಲೂರು",
       "district": "HASSAN",
       "parts": 276,
-      "partsDone": 57,
-      "electors": 35390
+      "partsDone": 97,
+      "electors": 62643
     },
     "196": {
       "name": "Hassan",
