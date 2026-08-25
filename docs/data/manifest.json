@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T14:57:10.833Z",
+  "builtAt": "2026-08-25T15:07:34.920Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8411026,
+  "electors": 8469835,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 13477,
-  "coverage": 22.12,
+  "partsDone": 13560,
+  "coverage": 22.26,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -97,8 +97,8 @@
       "nameKn": "ಬೆಳಗಾವಿ ಉತ್ತರ",
       "district": "BELGAUM",
       "parts": 260,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 53,
+      "electors": 36115
     },
     "12": {
       "name": "Belgaum Dakshin",
@@ -113,8 +113,8 @@
       "nameKn": "ಬೆಳಗಾವಿ ಗ್ರಾಮಾಂತರ",
       "district": "BELGAUM",
       "parts": 299,
-      "partsDone": 268,
-      "electors": 200492
+      "partsDone": 298,
+      "electors": 223186
     },
     "14": {
       "name": "Khanapur",
