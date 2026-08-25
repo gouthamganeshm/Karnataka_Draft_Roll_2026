@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T01:27:40.280Z",
+  "builtAt": "2026-08-25T01:33:46.109Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3959919,
+  "electors": 3991621,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 6527,
-  "coverage": 32.96,
+  "partsDone": 6583,
+  "coverage": 33.25,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -217,8 +217,8 @@
       "nameKn": "ಮಲ್ಲೇಶ್ವರಂ",
       "district": "B.B.M.P(NORTH)",
       "parts": 207,
-      "partsDone": 199,
-      "electors": 108447
+      "partsDone": 207,
+      "electors": 113781
     },
     "158": {
       "name": "Hebbal",
@@ -233,8 +233,8 @@
       "nameKn": "ಪುಲಕೇಶಿನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 228,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 48,
+      "electors": 26368
     },
     "160": {
       "name": "Sarvagnanagar",
