@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T00:40:20.743Z",
+  "builtAt": "2026-08-25T00:47:26.933Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3694825,
+  "electors": 3733626,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 6048,
-  "coverage": 30.54,
+  "partsDone": 6118,
+  "coverage": 30.9,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -169,8 +169,8 @@
       "nameKn": "ಕೆ.ಆರ್‌.ಪುರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 509,
-      "partsDone": 503,
-      "electors": 283193
+      "partsDone": 507,
+      "electors": 285377
     },
     "152": {
       "name": "Byatarayanapura",
@@ -209,8 +209,8 @@
       "nameKn": "ಮಹಾಲಕ್ಷ್ಮಿ ಬಡಾವಣೆ",
       "district": "B.B.M.P(NORTH)",
       "parts": 276,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 66,
+      "electors": 36617
     },
     "157": {
       "name": "Malleshwaram",
