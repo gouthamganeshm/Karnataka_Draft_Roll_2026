@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T05:04:22.524Z",
+  "builtAt": "2026-08-25T05:08:56.104Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 5170827,
+  "electors": 5194929,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 8628,
-  "coverage": 14.16,
+  "partsDone": 8667,
+  "coverage": 14.23,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1377,8 +1377,8 @@
       "nameKn": "ಪದ್ಮನಾಭನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 279,
-      "partsDone": 198,
-      "electors": 110561
+      "partsDone": 237,
+      "electors": 134663
     },
     "172": {
       "name": "B.T.M Layout",
