@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T07:21:18.228Z",
+  "builtAt": "2026-08-25T07:27:30.148Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 5940282,
+  "electors": 5976628,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 9862,
-  "coverage": 16.19,
+  "partsDone": 9918,
+  "coverage": 16.28,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1457,8 +1457,8 @@
       "nameKn": "ನೆಲಮಂಗಲ",
       "district": "BANGALORE RURAL",
       "parts": 281,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 56,
+      "electors": 36346
     },
     "182": {
       "name": "Magadi",
