@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T01:53:54.078Z",
+  "builtAt": "2026-08-25T02:00:03.094Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4105625,
+  "electors": 4139746,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 6744,
-  "coverage": 34.06,
+  "partsDone": 6793,
+  "coverage": 34.31,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -233,16 +233,16 @@
       "nameKn": "ಪುಲಕೇಶಿನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 228,
-      "partsDone": 209,
-      "electors": 140372
+      "partsDone": 228,
+      "electors": 152590
     },
     "160": {
       "name": "Sarvagnanagar",
       "nameKn": "ಸರ್ವಜ್ಞ ನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 337,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 30,
+      "electors": 21903
     },
     "161": {
       "name": "C.V. RamannNagar",
