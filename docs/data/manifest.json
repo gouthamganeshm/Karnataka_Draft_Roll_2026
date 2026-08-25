@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T10:30:13.026Z",
+  "builtAt": "2026-08-25T10:36:13.503Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 6982983,
+  "electors": 7014993,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 11453,
-  "coverage": 18.8,
+  "partsDone": 11512,
+  "coverage": 18.9,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1585,8 +1585,8 @@
       "nameKn": "ಹೊಳೇನರಸೀಪುರ",
       "district": "HASSAN",
       "parts": 330,
-      "partsDone": 183,
-      "electors": 106749
+      "partsDone": 242,
+      "electors": 138759
     },
     "198": {
       "name": "Arakalgud",
