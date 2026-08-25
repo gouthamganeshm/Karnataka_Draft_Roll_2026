@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T08:19:32.459Z",
+  "builtAt": "2026-08-25T08:25:31.587Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 6262967,
+  "electors": 6294297,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 10345,
-  "coverage": 16.98,
+  "partsDone": 10390,
+  "coverage": 17.05,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1593,8 +1593,8 @@
       "nameKn": "ಅರಕಲಗೂಡು",
       "district": "HASSAN",
       "parts": 292,
-      "partsDone": 203,
-      "electors": 140547
+      "partsDone": 248,
+      "electors": 171877
     },
     "199": {
       "name": "Sakaleshpur",
