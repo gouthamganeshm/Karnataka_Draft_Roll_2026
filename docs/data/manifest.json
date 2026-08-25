@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T09:01:22.701Z",
+  "builtAt": "2026-08-25T09:06:37.043Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 6492266,
+  "electors": 6519185,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 10677,
-  "coverage": 17.53,
+  "partsDone": 10713,
+  "coverage": 17.58,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1561,8 +1561,8 @@
       "nameKn": "ಅರಸೀಕೆರೆ",
       "district": "HASSAN",
       "parts": 281,
-      "partsDone": 243,
-      "electors": 166860
+      "partsDone": 279,
+      "electors": 193779
     },
     "195": {
       "name": "Belur",
