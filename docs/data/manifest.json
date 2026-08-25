@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T17:17:30.854Z",
+  "builtAt": "2026-08-25T17:26:08.197Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 9184410,
+  "electors": 9230420,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 14518,
-  "coverage": 23.83,
+  "partsDone": 14578,
+  "coverage": 23.93,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -41,8 +41,8 @@
       "nameKn": "ಕಾಗವಾಡ",
       "district": "BELGAUM",
       "parts": 238,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 25,
+      "electors": 18063
     },
     "5": {
       "name": "Kudachi",
@@ -65,8 +65,8 @@
       "nameKn": "ಹುಕ್ಕೇರಿ",
       "district": "BELGAUM",
       "parts": 234,
-      "partsDone": 199,
-      "electors": 155400
+      "partsDone": 234,
+      "electors": 183347
     },
     "8": {
       "name": "Arabhavi",
