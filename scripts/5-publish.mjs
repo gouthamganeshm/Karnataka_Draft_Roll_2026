@@ -21,7 +21,7 @@
  * they always have; `data/` and `cache/` remain ignored.
  */
 
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { ROOT, log, readJson } from './lib/common.mjs';
 
@@ -40,6 +40,41 @@ const run = (cmd, argv, opts = {}) => {
   return r;
 };
 const git = (...argv) => run('git', argv);
+
+/* `git push` has stalled for 30-40+ minutes at a time on this connection —
+ * still transferring real bytes (confirmed via live throughput checks), just
+ * crawling, not actually dead. `spawnSync`'s own `timeout` only signals the
+ * immediate child; on Windows that leaves `git-remote-https.exe` and its own
+ * children running detached, still holding the upload, which defeats the
+ * point. `taskkill /T` kills the whole subtree, so a stall self-heals into a
+ * normal "publish FAILED, retry next cycle" instead of needing a human to
+ * notice and kill it by hand. */
+function pushWithTimeout(timeoutMs) {
+  return new Promise((resolvePromise) => {
+    const child = spawn('git', ['push', 'origin', 'HEAD'], { cwd: ROOT });
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (d) => { out += d; });
+    child.stderr.on('data', (d) => { err += d; });
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      if (process.platform === 'win32') {
+        spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F']);
+      } else {
+        child.kill('SIGKILL');
+      }
+    }, timeoutMs);
+    child.on('close', (status) => {
+      clearTimeout(timer);
+      resolvePromise({
+        status: timedOut ? 1 : status,
+        stdout: out,
+        stderr: timedOut ? `${err}\n(killed after ${Math.round(timeoutMs / 1000)}s — push had stalled)` : err
+      });
+    });
+  });
+}
 
 // ------------------------------------------------------------------- build
 
@@ -116,7 +151,7 @@ if (noPush) {
 
 // ---------------------------------------------------------------------- push
 
-const push = git('push', 'origin', 'HEAD');
+const push = await pushWithTimeout(3 * 60 * 1000);
 log(push.stdout || push.stderr);
 if (push.status !== 0) {
   log('Push failed. The commit is local; re-run `git push` when ready.');
