@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T15:34:45.140Z",
+  "builtAt": "2026-08-25T15:45:28.878Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8615329,
+  "electors": 8685589,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 13765,
-  "coverage": 22.59,
+  "partsDone": 13856,
+  "coverage": 22.74,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -25,8 +25,8 @@
       "nameKn": "ಚಿಕ್ಕೋಡಿ-ಸದಲಗಾ",
       "district": "BELGAUM",
       "parts": 255,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 89,
+      "electors": 68665
     },
     "3": {
       "name": "Athani",
@@ -97,8 +97,8 @@
       "nameKn": "ಬೆಳಗಾವಿ ಉತ್ತರ",
       "district": "BELGAUM",
       "parts": 260,
-      "partsDone": 258,
-      "electors": 181609
+      "partsDone": 260,
+      "electors": 183204
     },
     "12": {
       "name": "Belgaum Dakshin",
