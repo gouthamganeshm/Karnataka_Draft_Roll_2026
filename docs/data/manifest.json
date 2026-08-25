@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T14:05:25.977Z",
+  "builtAt": "2026-08-25T14:15:35.335Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8128666,
+  "electors": 8183701,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 13096,
-  "coverage": 21.5,
+  "partsDone": 13171,
+  "coverage": 21.62,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -105,8 +105,8 @@
       "nameKn": "ಬೆಳಗಾವಿ  ದಕ್ಷಿಣ",
       "district": "BELGAUM",
       "parts": 260,
-      "partsDone": 145,
-      "electors": 101368
+      "partsDone": 220,
+      "electors": 156403
     },
     "13": {
       "name": "Belgaum Rural",
