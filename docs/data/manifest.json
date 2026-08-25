@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T06:03:44.858Z",
+  "builtAt": "2026-08-25T06:47:18.191Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 5496956,
+  "electors": 5756044,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 9200,
-  "coverage": 15.1,
+  "partsDone": 9601,
+  "coverage": 15.76,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1433,24 +1433,24 @@
       "nameKn": "ಹೊಸಕೋಟೆ",
       "district": "BANGALORE RURAL",
       "parts": 298,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 36,
+      "electors": 22900
     },
     "179": {
       "name": "Devanahalli",
       "nameKn": "ದೇವನಹಳ್ಳಿ",
       "district": "BANGALORE RURAL",
       "parts": 296,
-      "partsDone": 207,
-      "electors": 129619
+      "partsDone": 294,
+      "electors": 183450
     },
     "180": {
       "name": "Doddaballapur",
       "nameKn": "ದೊಡ್ಡಬಳ್ಳಾಪುರ",
       "district": "BANGALORE RURAL",
       "parts": 279,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 278,
+      "electors": 182357
     },
     "181": {
       "name": "Nelamangala",
