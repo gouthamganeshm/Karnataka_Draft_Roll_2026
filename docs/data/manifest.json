@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T03:21:56.534Z",
+  "builtAt": "2026-08-25T04:05:14.908Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4580697,
+  "electors": 4836547,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 7562,
-  "coverage": 12.41,
+  "partsDone": 8036,
+  "coverage": 13.19,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1337,8 +1337,8 @@
       "nameKn": "ಗೋವಿಂದರಾಜ ನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 269,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 84,
+      "electors": 46025
     },
     "167": {
       "name": "Vijayanagar",
@@ -1409,8 +1409,8 @@
       "nameKn": "ಬೊಮ್ಮನಹಳ್ಳಿ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 390,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 390,
+      "electors": 209826
     },
     "176": {
       "name": "Bangalore South",
@@ -1426,7 +1426,7 @@
       "district": "BANGALORE URBAN",
       "parts": 384,
       "partsDone": 383,
-      "electors": 240453
+      "electors": 240452
     },
     "178": {
       "name": "Hosakote",
