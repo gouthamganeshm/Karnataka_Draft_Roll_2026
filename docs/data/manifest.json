@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T17:33:45.252Z",
+  "builtAt": "2026-08-25T17:41:06.282Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 9273053,
+  "electors": 9313622,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 14633,
-  "coverage": 24.02,
+  "partsDone": 14691,
+  "coverage": 24.11,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -41,8 +41,8 @@
       "nameKn": "ಕಾಗವಾಡ",
       "district": "BELGAUM",
       "parts": 238,
-      "partsDone": 80,
-      "electors": 60696
+      "partsDone": 138,
+      "electors": 101265
     },
     "5": {
       "name": "Kudachi",
