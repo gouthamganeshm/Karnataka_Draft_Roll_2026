@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T12:53:47.245Z",
+  "builtAt": "2026-08-25T13:00:27.976Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 7770927,
+  "electors": 7802173,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 12614,
-  "coverage": 20.7,
+  "partsDone": 12655,
+  "coverage": 20.77,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -33,8 +33,8 @@
       "nameKn": "ಅಥಣಿ",
       "district": "BELGAUM",
       "parts": 270,
-      "partsDone": 158,
-      "electors": 123080
+      "partsDone": 199,
+      "electors": 154326
     },
     "4": {
       "name": "Kagwad",
