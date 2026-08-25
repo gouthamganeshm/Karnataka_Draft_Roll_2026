@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T11:51:12.150Z",
+  "builtAt": "2026-08-25T11:57:17.538Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 7428379,
+  "electors": 7462619,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 12162,
-  "coverage": 19.96,
+  "partsDone": 12204,
+  "coverage": 20.03,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -73,8 +73,8 @@
       "nameKn": "ಅರಭಾವಿ",
       "district": "BELGAUM",
       "parts": 290,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 37,
+      "electors": 30290
     },
     "9": {
       "name": "Gokak",
@@ -1553,8 +1553,8 @@
       "nameKn": "ಶ್ರವಣಬೆಳಗೊಳ",
       "district": "HASSAN",
       "parts": 272,
-      "partsDone": 267,
-      "electors": 179218
+      "partsDone": 272,
+      "electors": 183168
     },
     "194": {
       "name": "Arsikere",
