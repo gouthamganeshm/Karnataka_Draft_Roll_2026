@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T07:11:53.063Z",
+  "builtAt": "2026-08-25T07:16:20.305Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 5888495,
+  "electors": 5915578,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 9792,
-  "coverage": 16.07,
+  "partsDone": 9828,
+  "coverage": 16.13,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1433,8 +1433,8 @@
       "nameKn": "ಹೊಸಕೋಟೆ",
       "district": "BANGALORE RURAL",
       "parts": 298,
-      "partsDone": 227,
-      "electors": 155353
+      "partsDone": 263,
+      "electors": 182436
     },
     "179": {
       "name": "Devanahalli",
