@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T04:11:52.883Z",
+  "builtAt": "2026-08-25T04:54:31.664Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4875828,
+  "electors": 5118697,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 8112,
-  "coverage": 13.32,
+  "partsDone": 8535,
+  "coverage": 14.01,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1337,8 +1337,8 @@
       "nameKn": "ಗೋವಿಂದರಾಜ ನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 269,
-      "partsDone": 160,
-      "electors": 85306
+      "partsDone": 268,
+      "electors": 149214
     },
     "167": {
       "name": "Vijayanagar",
@@ -1377,8 +1377,8 @@
       "nameKn": "ಪದ್ಮನಾಭನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 279,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 105,
+      "electors": 58431
     },
     "172": {
       "name": "B.T.M Layout",
@@ -1393,8 +1393,8 @@
       "nameKn": "ಜಯನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 210,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 210,
+      "electors": 120531
     },
     "174": {
       "name": "Mahadevapura",
@@ -1418,7 +1418,7 @@
       "district": "BANGALORE URBAN",
       "parts": 605,
       "partsDone": 602,
-      "electors": 399435
+      "electors": 399434
     },
     "177": {
       "name": "Anekal",
