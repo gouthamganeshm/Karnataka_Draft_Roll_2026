@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T10:42:47.758Z",
+  "builtAt": "2026-08-25T10:48:24.288Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 7053050,
+  "electors": 7081966,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 11571,
-  "coverage": 18.99,
+  "partsDone": 11621,
+  "coverage": 19.07,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1585,8 +1585,8 @@
       "nameKn": "ಹೊಳೇನರಸೀಪುರ",
       "district": "HASSAN",
       "parts": 330,
-      "partsDone": 301,
-      "electors": 176816
+      "partsDone": 330,
+      "electors": 194346
     },
     "198": {
       "name": "Arakalgud",
@@ -1601,8 +1601,8 @@
       "nameKn": "ಸಕಲೇಶಪುರ",
       "district": "HASSAN",
       "parts": 295,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 21,
+      "electors": 11386
     },
     "200": {
       "name": "Belthangady",
