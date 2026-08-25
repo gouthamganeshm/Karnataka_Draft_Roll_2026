@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T16:05:01.885Z",
+  "builtAt": "2026-08-25T16:11:39.462Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8789431,
+  "electors": 8818275,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 13989,
-  "coverage": 22.96,
+  "partsDone": 14022,
+  "coverage": 23.02,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -25,8 +25,8 @@
       "nameKn": "ಚಿಕ್ಕೋಡಿ-ಸದಲಗಾ",
       "district": "BELGAUM",
       "parts": 255,
-      "partsDone": 222,
-      "electors": 172507
+      "partsDone": 255,
+      "electors": 201351
     },
     "3": {
       "name": "Athani",
