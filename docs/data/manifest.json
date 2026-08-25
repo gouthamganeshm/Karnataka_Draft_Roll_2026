@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T01:40:45.410Z",
+  "builtAt": "2026-08-25T01:47:02.212Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4029713,
+  "electors": 4067338,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 6634,
-  "coverage": 33.5,
+  "partsDone": 6689,
+  "coverage": 33.78,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -233,8 +233,8 @@
       "nameKn": "ಪುಲಕೇಶಿನಗರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 228,
-      "partsDone": 99,
-      "electors": 64460
+      "partsDone": 154,
+      "electors": 102085
     },
     "160": {
       "name": "Sarvagnanagar",
