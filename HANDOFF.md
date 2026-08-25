@@ -315,6 +315,82 @@ will plateau at 436/442 until someone fixes the geometry case. 6 of 19,801
 parts (0.03%); not chased further this session, flagged here so it is not
 mistaken for a new regression.
 
+## 4f. Full-state queue — 2026-08-25, ascending by booth count, all 34 districts
+
+The user's instruction, verbatim: after Hassan, queue every remaining district
+in ascending order of booth count, lowest to highest, and make sure every
+district is covered — superseding the earlier "Belgaum + Mysore as one
+North/South taste" judgment call from 4d, which was explicitly flagged there as
+not yet confirmed.
+
+There is no cheap API for a district's booth count — `1-discover.mjs`'s own
+header explains why (parts are recovered by binary-search probing the CDN, not
+read from an endpoint). So sizing the remaining 28 districts required actually
+running discovery for all of them first, in a scratch `ROLL_CACHE` dir
+(`/tmp/scratch-discover`, same isolation pattern as 4d), before touching the
+real manifest — otherwise there would be no way to know the right order to
+commit them in.
+
+That scratch run (`--concurrency 8`, 185 ACs, 0 failed) gave the true ascending
+order:
+
+| District | Code | ACs | Parts |
+|---|---|---|---|
+| Kodagu | S1027 | 2 | 567 |
+| Gadag | S1008 | 4 | 983 |
+| Chamarajnagar | S1029 | 4 | 1,030 |
+| Yadgir | S1035 | 4 | 1,162 |
+| Ramanagaram | S1023 | 4 | 1,183 |
+| Udupi | S1016 | 5 | 1,244 |
+| Chikkmagalur | S1017 | 5 | 1,255 |
+| Bellary | S1012 | 5 | 1,260 |
+| Vijayanagara | S1036 | 5 | 1,301 |
+| Koppal | S1007 | 5 | 1,352 |
+| Chikkaballapur | S1019 | 5 | 1,361 |
+| Uttara Kannada | S1010 | 6 | 1,523 |
+| Haveri | S1011 | 6 | 1,559 |
+| Kolar | S1020 | 6 | 1,578 |
+| Bidar | S1005 | 6 | 1,579 |
+| Dharwad | S1009 | 7 | 1,707 |
+| Chitradurga | S1013 | 6 | 1,764 |
+| Davangere | S1014 | 7 | 1,808 |
+| Bagalkot | S1002 | 7 | 1,855 |
+| Shimoga | S1015 | 7 | 1,886 |
+| Mandya | S1024 | 7 | 1,889 |
+| Raichur | S1006 | 7 | 1,892 |
+| Dakshina Kannada | S1026 | 8 | 2,019 |
+| Bijapur | S1003 | 8 | 2,159 |
+| Gulbarga | S1004 | 9 | 2,461 |
+| Tumkur | S1018 | 11 | 2,745 |
+| Mysore | S1028 | 11 | 2,967 |
+| Belgaum | S1001 | 18 | 4,644 |
+
+**A real bug, caught before it reached the extraction pool.** `S1001` and
+`S1028` were already sitting in `cache/manifest.json` from the earlier
+judgment call, positioned right after Hassan. Running `1-discover.mjs
+--district <the other 28, ascending>` correctly appended those 28 in order —
+but merge-and-append means *already-present* districts keep their *existing*
+position, so Belgaum and Mysore stayed at the front of the new block instead
+of sliding into their correct ascending slots (18-AC Belgaum would have run
+right after Hassan, ahead of 2-AC Kodagu — exactly backwards). Fixed with a
+one-off in-place sort of `constituencies` (and `districts`) by a rank map built
+from the full target order above; no re-fetch needed, since all 34 districts'
+data was already sitting in the manifest by that point. Verified after: the
+district sequence reads `S1034,S1031,S1032,S1033,S1022,S1025` then the 28-row
+table above in exact order, `S1001` (Belgaum) last.
+
+**Final state: 34 districts, 224 ACs, 60,923 parts** — matches the number
+`1-discover.mjs`'s own header comment cites as the true statewide total (vs.
+the stale CEO CSV's 43,398), so this is confirmed full coverage, not a partial
+scope that happens to look complete.
+
+At the measured ~9.5 parts/min and 7,486 parts already done at the time of this
+expansion, the remaining ~53,437 parts are roughly **94 hours** of continuous
+OCR — said plainly for the same reason 4d said it: nobody should discover the
+real timeline by watching a progress bar. `2-extract-forever.mjs` needs no
+changes — it re-reads `cache/manifest.json` on every restart, and this was a
+reorder of an already-additive file, not a new mechanism.
+
 `6-auto-publish.mjs` needed **no changes** — it already watches `cache/done/`
 generically. Confirmed: first publish after the scope grew came out correct
 on its own, `1,922/19,801 booths (9.7%), 68 ACs` — the moment work spans 68
