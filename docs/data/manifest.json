@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T09:43:12.395Z",
+  "builtAt": "2026-08-25T09:51:48.925Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 6725650,
+  "electors": 6771144,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 11039,
-  "coverage": 18.12,
+  "partsDone": 11105,
+  "coverage": 18.23,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1577,8 +1577,8 @@
       "nameKn": "ಹಾಸನ",
       "district": "HASSAN",
       "parts": 282,
-      "partsDone": 51,
-      "electors": 29817
+      "partsDone": 117,
+      "electors": 75311
     },
     "197": {
       "name": "Holenarasipur",
