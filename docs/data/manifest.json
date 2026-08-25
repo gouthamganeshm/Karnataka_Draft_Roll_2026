@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T11:29:27.586Z",
+  "builtAt": "2026-08-25T11:38:47.380Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 7306649,
+  "electors": 7358498,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 11984,
-  "coverage": 19.67,
+  "partsDone": 12060,
+  "coverage": 19.8,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1553,8 +1553,8 @@
       "nameKn": "ಶ್ರವಣಬೆಳಗೊಳ",
       "district": "HASSAN",
       "parts": 272,
-      "partsDone": 89,
-      "electors": 57487
+      "partsDone": 165,
+      "electors": 109336
     },
     "194": {
       "name": "Arsikere",
