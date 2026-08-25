@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T00:21:35.315Z",
+  "builtAt": "2026-08-25T00:27:31.065Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3592206,
+  "electors": 3623758,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 5859,
-  "coverage": 29.59,
+  "partsDone": 5914,
+  "coverage": 29.87,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -169,8 +169,8 @@
       "nameKn": "ಕೆ.ಆರ್‌.ಪುರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 509,
-      "partsDone": 314,
-      "electors": 180571
+      "partsDone": 369,
+      "electors": 212123
     },
     "152": {
       "name": "Byatarayanapura",
