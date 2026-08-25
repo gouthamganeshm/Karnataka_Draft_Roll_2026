@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T04:05:14.908Z",
+  "builtAt": "2026-08-25T04:11:52.883Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4836547,
+  "electors": 4875828,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 8036,
-  "coverage": 13.19,
+  "partsDone": 8112,
+  "coverage": 13.32,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1337,8 +1337,8 @@
       "nameKn": "ಗೋವಿಂದರಾಜ ನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 269,
-      "partsDone": 84,
-      "electors": 46025
+      "partsDone": 160,
+      "electors": 85306
     },
     "167": {
       "name": "Vijayanagar",
