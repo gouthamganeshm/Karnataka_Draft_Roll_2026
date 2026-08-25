@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T00:47:26.933Z",
+  "builtAt": "2026-08-25T00:53:45.734Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 3733626,
+  "electors": 3767713,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 6118,
-  "coverage": 30.9,
+  "partsDone": 6181,
+  "coverage": 31.22,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -209,8 +209,8 @@
       "nameKn": "ಮಹಾಲಕ್ಷ್ಮಿ ಬಡಾವಣೆ",
       "district": "B.B.M.P(NORTH)",
       "parts": 276,
-      "partsDone": 66,
-      "electors": 36617
+      "partsDone": 129,
+      "electors": 70705
     },
     "157": {
       "name": "Malleshwaram",
@@ -306,7 +306,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 216,
       "partsDone": 215,
-      "electors": 136299
+      "electors": 136298
     },
     "169": {
       "name": "Chickpet",
