@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T16:32:01.626Z",
+  "builtAt": "2026-08-25T16:41:08.803Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8937877,
+  "electors": 8987685,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 14196,
-  "coverage": 23.3,
+  "partsDone": 14265,
+  "coverage": 23.41,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -81,8 +81,8 @@
       "nameKn": "ಗೋಕಾಕ",
       "district": "BELGAUM",
       "parts": 297,
-      "partsDone": 174,
-      "electors": 119602
+      "partsDone": 243,
+      "electors": 169410
     },
     "10": {
       "name": "Yemkanamardi",
