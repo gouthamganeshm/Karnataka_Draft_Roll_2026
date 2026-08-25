@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T03:00:02.412Z",
+  "builtAt": "2026-08-25T03:07:13.284Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 4468970,
+  "electors": 4505897,
   "constituencies": 68,
   "parts": 19801,
-  "partsDone": 7354,
-  "coverage": 37.14,
+  "partsDone": 7427,
+  "coverage": 37.51,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -321,8 +321,8 @@
       "nameKn": "ಬಸವನಗುಡಿ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 220,
-      "partsDone": 12,
-      "electors": 5992
+      "partsDone": 85,
+      "electors": 42919
     },
     "171": {
       "name": "Padmanabanagar",
