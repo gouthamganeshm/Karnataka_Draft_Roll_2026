@@ -23,9 +23,7 @@ separate repos with separate data lifecycles.
 
 ## Where the data comes from
 
-Two publishers serve the same rolls, and only one of them can be crawled.
-
-### The ECI portal — a dead end for bulk access
+### The ECI portal's own form — a dead end for bulk access
 
 `voters.eci.gov.in/download-eroll?stateCode=S10` is the official download page,
 and the CEO's own "Electoral Roll 2025/2026" menu item redirects to it. It
@@ -40,37 +38,52 @@ the portal's own bundle (`/static/js/main.*.js`):
   bodies are ciphertext, which is why a plain JSON payload gets a bare `400`.
 
 Two endpoints on the same gateway *are* open, take plain GETs, and are used by
-this pipeline for the constituency tree:
+this pipeline for the district/constituency tree:
 
 | Endpoint | Gives |
 |---|---|
-| `GET /api/v1/common/districts/S10` | 34 districts, English + Kannada names |
-| `GET /api/v1/common/acs/<districtCd>` | that district's ACs: number, name, Kannada name, category |
+| `GET https://gateway-voters.eci.gov.in/api/v1/common/districts/S10` | 34 districts, English + Kannada names |
+| `GET https://gateway-voters.eci.gov.in/api/v1/common/acs/<districtCd>` | that district's ACs: number, name, Kannada name, category |
 
 Both need the `origin`/`referer` pair in `ECI_HEADERS` or they answer `401`.
 
-### The CEO mirror — the actual source
+### ECI's own CDN — the actual source, no CAPTCHA, publicly reachable
 
-`ceo.karnataka.gov.in` republishes rolls as **direct PDFs with no CAPTCHA**, at
-a predictable path. That is how the 2002 roll is served today:
+The CEO's `ceo.karnataka.gov.in` mirror (used for the 2002 roll, at
+`/uploads/<DISTRICT>/AC%20<n>/A<ac4><part4>.pdf`) turned out **not** to carry
+the SIR draft — its part cascade CSV (`ac_names.csv`) is stale: 43,398 parts
+statewide against the draft's 60,923, and it's missing whole booths (AC 196
+part 227 isn't in it at all despite being real). It is not used by this
+pipeline; do not fall back to it.
+
+The actual source is **ECI's own CDN**, and every published part PDF sits at a
+predictable, unauthenticated, no-CAPTCHA path:
 
 ```
-https://ceo.karnataka.gov.in/uploads/<DISTRICT>/AC%20<n>/A<ac4><part4>.pdf
-                                     BIDAR       AC 1     A0010001.pdf
+https://voters.eci.gov.in/eroll/2026/s10/sir-draftroll/<ac>/2026-EROLLGEN-S10-<ac>-SIR-DraftRoll-Revision1-KAN-<part>-WI.pdf
+                                                        150                    150                                1   227
 ```
 
-and the full part cascade — every AC and every polling part in the state, 43,398
-rows — is a single flat CSV at `ceo.karnataka.gov.in/ac_names.csv`:
+- `<ac>` — the assembly constituency number (repeated once as a path segment,
+  once in the filename).
+- `Revision1` — the only revision ECI has published so far (`Revision0` and
+  `Revision2` both 404 as of 2026-08-25). Hardcoded in `partUrl()` in both
+  `scripts/1-discover.mjs` and `source_url()` in `scripts/2-extract.py`; if ECI
+  ever ships a `Revision2` this needs updating in both places, or lookups will
+  silently serve the stale revision instead of erroring (see `HANDOFF.md` §9).
+- `KAN` — Kannada. ENG is published too at the same path with `ENG` swapped
+  in, but OCR only needs the EPIC and serial (both ASCII in either language),
+  so KAN is a canonical-source choice, not an accuracy one.
+- `<part>` — the polling part number. There is no API that lists how many
+  parts a constituency has; `1-discover.mjs` finds `N` with a binary-search
+  probe (about a dozen `HEAD`/`GET` requests per AC) since parts are confirmed
+  to run contiguously `1..N` with no gaps.
 
-```
-AC_NO,AC_NAME,PART_NO,PART_NAME_EN
-1,Aurad ,1,Government H.P. School Building Chondimukheda
-```
-
-**Open question until 24-08-2026:** whether the SIR draft is mirrored here in
-the same shape. Everything in `2-extract.mjs` is written against this pattern
-because it is the only crawlable one; if the draft lands at a different path the
-change is confined to `sourceUrl()` in that file.
+No API and no CAPTCHA gate this path — a plain `GET` returns the PDF directly,
+confirmed via both `fetch` and `curl` from a residential/India-based IP. It is
+**not** reachable from GitHub Actions hosted runners regardless of OS flavor
+(`406 Not Acceptable` from every one tried — see `HANDOFF.md` §5), which is why
+extraction runs locally rather than in CI.
 
 ---
 
@@ -266,7 +279,7 @@ bucket URL.
 | Stage | Script | Does |
 |---|---|---|
 | 1 | `1-discover.mjs` | District → AC → part tree into `cache/manifest.json`. |
-| 2 | `2-extract.mjs` | Streams each part PDF and OCRs it **in memory**, keeping only rows. Resumable. |
+| 2 | `2-extract.py` | Streams each part PDF and OCRs it **in memory**, keeping only rows. Resumable. |
 | 3 | `3-build-data.mjs` | Rows → hash buckets, per-AC search index, `manifest.json`. |
 | 4 | `4-upload-r2.mjs` | Syncs `data/` to the R2 bucket. |
 

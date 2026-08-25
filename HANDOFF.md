@@ -707,3 +707,35 @@ path for this CDN** and should be treated as final, not a placeholder.
 - Example record: EPIC **`NMD4011391`**, name ಗೌತಮ್ ಗಣೇಶ್ ಎಂ ಹೆಚ್, **AC 196,
   part 227**. This is the calibration record the OCR was validated against.
 - Lookup smoke test: **`AAH4480430`** -> AC 177, part 3, serial 1.
+
+---
+
+## 9. PDF freshness — checked 2026-08-25, revisit if ECI republishes
+
+The part URL (`scripts/1-discover.mjs` / `scripts/2-extract.py`) hardcodes
+`Revision1` in the path:
+`.../sir-draftroll/<ac>/2026-EROLLGEN-S10-<ac>-SIR-DraftRoll-Revision1-KAN-<part>-WI.pdf`
+
+Checked directly against the CDN on 2026-08-25 across 7 ACs spread across
+districts (1, 100, 150, 153, 175, 199, 224):
+- Every part returns **`Last-Modified: Mon, 24 Aug 2026`** — the whole roll was
+  published/updated as one batch that day, so everything extracted so far is
+  current, not a stale leftover copy.
+- **No `Revision2` exists** (404) and no `Revision0` either (404) —
+  `Revision1` is the only revision ECI has published, so the hardcoded path is
+  safe *for now*.
+- Every response was `X-Cache: MISS`, `Age: 0` — these are live origin hits,
+  not a stale edge-cached copy.
+
+**The risk**: if ECI ever publishes a `Revision2`, the pipeline's hardcoded
+`Revision1` URL will keep returning `200 OK` with the now-stale file — nothing
+will error, so this would fail silently. There is currently no freshness check
+built into the pipeline to catch that.
+
+**Deferred, not forgotten** (explicit user decision, 2026-08-25): add a
+periodic `Revision2`-existence probe (`HEAD` on the same path with
+`Revision2` substituted, for a small AC sample) to the verification loop, so
+a real ECI revision would surface automatically instead of requiring someone
+to think to re-check by hand. Not yet implemented — pick this up if revisiting
+verification tooling, or if EPIC lookups ever start looking suspicious for
+reasons unexplained by the known OCR-geometry bug (section on AC152/AC172).
