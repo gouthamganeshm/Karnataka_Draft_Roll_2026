@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T13:08:28.443Z",
+  "builtAt": "2026-08-25T13:15:04.615Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 7842609,
+  "electors": 7867186,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 12707,
-  "coverage": 20.86,
+  "partsDone": 12740,
+  "coverage": 20.91,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -33,8 +33,8 @@
       "nameKn": "ಅಥಣಿ",
       "district": "BELGAUM",
       "parts": 270,
-      "partsDone": 251,
-      "electors": 194762
+      "partsDone": 270,
+      "electors": 209381
     },
     "4": {
       "name": "Kagwad",
@@ -137,8 +137,8 @@
       "nameKn": "ಬೈಲಹೊಂಗಲ",
       "district": "BELGAUM",
       "parts": 225,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 14,
+      "electors": 9958
     },
     "17": {
       "name": "Saundatti Yellamma",
