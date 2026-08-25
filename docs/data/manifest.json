@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T14:50:09.796Z",
+  "builtAt": "2026-08-25T14:57:10.833Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "electors": 8374016,
+  "electors": 8411026,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 13429,
-  "coverage": 22.04,
+  "partsDone": 13477,
+  "coverage": 22.12,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -113,8 +113,8 @@
       "nameKn": "ಬೆಳಗಾವಿ ಗ್ರಾಮಾಂತರ",
       "district": "BELGAUM",
       "parts": 299,
-      "partsDone": 220,
-      "electors": 163482
+      "partsDone": 268,
+      "electors": 200492
     },
     "14": {
       "name": "Khanapur",
