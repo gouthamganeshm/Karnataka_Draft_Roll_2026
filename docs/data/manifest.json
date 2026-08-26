@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T22:54:50.125Z",
+  "builtAt": "2026-08-26T23:30:43.896Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 17798551,
+  "electors": 17968492,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 26593,
-  "coverage": 43.65,
+  "partsDone": 26819,
+  "coverage": 44.02,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -753,8 +753,8 @@
       "nameKn": "ಬಳ್ಳಾರಿ",
       "district": "BELLARY",
       "parts": 238,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 122,
+      "electors": 98442
     },
     "94": {
       "name": "Bellary City",
@@ -1017,8 +1017,8 @@
       "nameKn": "ತರೀಕೆರೆ",
       "district": "CHIKKMAGALUR",
       "parts": 237,
-      "partsDone": 133,
-      "electors": 92992
+      "partsDone": 237,
+      "electors": 164491
     },
     "127": {
       "name": "Kadur",
