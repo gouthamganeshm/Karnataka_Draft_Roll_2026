@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T11:59:50.243Z",
+  "builtAt": "2026-08-26T12:48:42.834Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 14598587,
+  "electors": 14777799,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 22015,
-  "coverage": 36.14,
+  "partsDone": 22276,
+  "coverage": 36.56,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -305,8 +305,8 @@
       "nameKn": "ಶಹಾಪೂರ",
       "district": "YADGIR",
       "parts": 275,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 126,
+      "electors": 88739
     },
     "38": {
       "name": "Yadgir",
@@ -321,8 +321,8 @@
       "nameKn": "ಗುರುಮಿಟಕಲ್‌",
       "district": "YADGIR",
       "parts": 289,
-      "partsDone": 154,
-      "electors": 107842
+      "partsDone": 289,
+      "electors": 198315
     },
     "40": {
       "name": "Chittapur",
