@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T10:22:07.729Z",
+  "builtAt": "2026-08-26T11:25:01.125Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 14113783,
+  "electors": 14419708,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 21353,
-  "coverage": 35.05,
+  "partsDone": 21769,
+  "coverage": 35.73,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1777,16 +1777,16 @@
       "nameKn": "ಹನೂರು",
       "district": "CHAMARAJNAGAR",
       "parts": 269,
-      "partsDone": 6,
-      "electors": 3279
+      "partsDone": 269,
+      "electors": 192991
     },
     "222": {
       "name": "Kollegal",
       "nameKn": "ಕೊಳ್ಳೇಗಾಲ",
       "district": "CHAMARAJNAGAR",
       "parts": 245,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 153,
+      "electors": 116213
     },
     "223": {
       "name": "Chamarajanagar",
