@@ -235,4 +235,11 @@ for (const ac of acList) {
   }
 }
 
-process.exit(exitCode);
+// Not `process.exit()`: forcing the process down while fetch's keep-alive
+// sockets are still open crashes Node on Windows (`Assertion failed:
+// !(handle->flags & UV_HANDLE_CLOSING)`) — reproduced reliably on a run that
+// only fetched a manifest and skipped every AC. Setting `exitCode` and
+// letting the event loop drain exits the same way once idle, without racing
+// undici's connection teardown — and without risking a real failure's `1`
+// getting lost in the crash instead of reported.
+process.exitCode = exitCode;

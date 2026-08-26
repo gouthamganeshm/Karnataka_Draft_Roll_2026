@@ -104,6 +104,15 @@ empty name. (Open item — see section 7.)
                              site is now updated; Actions is not involved
     scripts/probe-cdn.mjs    diagnostic only, not part of the pipeline: can this
                              host read the PDFs at all?  (see section 5)
+    scripts/8-remaining.mjs  diagnostic: diffs cache/manifest.json against every
+                             cache/done/<ac>.txt and writes cache/remaining-parts.json
+                             -> which booths are not yet OCR'd, per AC, so the
+                             tail end of the statewide pass can be finished with
+                             `--ac`-targeted reruns instead of rescanning
+                             everything. `2-extract.py` is already resumable on
+                             its own (skips anything in the done ledgers), so
+                             this changes nothing about how extraction runs —
+                             it only tells you where to point it.
     docs/                    the static site
 
 **Resumability**: every finished part is recorded in `cache/done/<ac>.txt` and
