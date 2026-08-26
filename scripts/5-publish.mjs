@@ -41,14 +41,18 @@ const run = (cmd, argv, opts = {}) => {
 };
 const git = (...argv) => run('git', argv);
 
-/* `git push` has stalled for 30-40+ minutes at a time on this connection —
- * still transferring real bytes (confirmed via live throughput checks), just
- * crawling, not actually dead. `spawnSync`'s own `timeout` only signals the
- * immediate child; on Windows that leaves `git-remote-https.exe` and its own
- * children running detached, still holding the upload, which defeats the
- * point. `taskkill /T` kills the whole subtree, so a stall self-heals into a
- * normal "publish FAILED, retry next cycle" instead of needing a human to
- * notice and kill it by hand. */
+/* This connection's measured upload speed is ~544 KB/s (2026-08-26), so a
+ * push carrying docs/data's full bucket tree (hundreds of MB when a lot has
+ * changed since the last successful push) can genuinely need 15+ minutes —
+ * that is real transfer, not a stall, and a short timeout was killing
+ * healthy pushes before they could finish. `spawnSync`'s own `timeout` only
+ * signals the immediate child; on Windows that leaves `git-remote-https.exe`
+ * and its own children running detached, still holding the upload, which
+ * defeats the point. `taskkill /T` kills the whole subtree, so a genuine
+ * stall still self-heals into "publish FAILED, retry next cycle" instead of
+ * needing a human to notice and kill it by hand — the timeout here just
+ * needs to be long enough that it only fires for an actual stall, not for
+ * this connection's normal transfer time. */
 function pushWithTimeout(timeoutMs) {
   return new Promise((resolvePromise) => {
     const child = spawn('git', ['push', 'origin', 'HEAD'], { cwd: ROOT });
@@ -126,7 +130,12 @@ if (!git('diff', '--cached', '--quiet').status) {
 }
 
 const stat = git('diff', '--cached', '--shortstat').stdout.trim();
-const fileCount = git('ls-files', '--', 'docs/data').stdout.trim().split('\n').length;
+/* Used to be `git ls-files -- docs/data`, but at 65,536 buckets that list is
+ * large enough that spawnSync's pipe crashes with ENOBUFS on Windows instead
+ * of just being slow — a hard crash, not a graceful failure, so it took the
+ * publish loop down entirely rather than retrying next cycle. The file count
+ * is already in `stat`'s first line; no second git call needed. */
+const fileCount = Number(stat.match(/(\d+) files? changed/)?.[1] ?? 0);
 
 const message =
   `Publish roll data — ${coverage.toFixed(1)}% of booths read\n\n` +
@@ -151,7 +160,7 @@ if (noPush) {
 
 // ---------------------------------------------------------------------- push
 
-const push = await pushWithTimeout(3 * 60 * 1000);
+const push = await pushWithTimeout(20 * 60 * 1000);
 log(push.stdout || push.stderr);
 if (push.status !== 0) {
   log('Push failed. The commit is local; re-run `git push` when ready.');
