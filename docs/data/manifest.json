@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T04:17:34.343Z",
+  "builtAt": "2026-08-26T08:23:07.951Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 12428119,
+  "electors": 13550085,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 19041,
-  "coverage": 31.25,
+  "partsDone": 20580,
+  "coverage": 33.78,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -529,32 +529,32 @@
       "nameKn": "ಶಿರಹಟ್ಟಿ",
       "district": "GADAG",
       "parts": 259,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 8,
+      "electors": 5918
     },
     "66": {
       "name": "Gadag",
       "nameKn": "ಗದಗ",
       "district": "GADAG",
       "parts": 227,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 227,
+      "electors": 189393
     },
     "67": {
       "name": "Ron",
       "nameKn": "ರೋಣ",
       "district": "GADAG",
       "parts": 271,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 271,
+      "electors": 197892
     },
     "68": {
       "name": "Nargund",
       "nameKn": "ನರಗುಂದ",
       "district": "GADAG",
       "parts": 226,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 226,
+      "electors": 166964
     },
     "69": {
       "name": "Navalgund",
@@ -1433,16 +1433,16 @@
       "nameKn": "ಹೊಸಕೋಟೆ",
       "district": "BANGALORE RURAL",
       "parts": 298,
-      "partsDone": 297,
-      "electors": 207140
+      "partsDone": 298,
+      "electors": 208281
     },
     "179": {
       "name": "Devanahalli",
       "nameKn": "ದೇವನಹಳ್ಳಿ",
       "district": "BANGALORE RURAL",
       "parts": 296,
-      "partsDone": 294,
-      "electors": 183448
+      "partsDone": 296,
+      "electors": 184966
     },
     "180": {
       "name": "Doddaballapur",
@@ -1673,24 +1673,24 @@
       "nameKn": "ಮಡಿಕೇರಿ",
       "district": "KODAGU",
       "parts": 285,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 283,
+      "electors": 197635
     },
     "209": {
       "name": "Virajpet",
       "nameKn": "ವೀರಾಜಪೇಟೆ",
       "district": "KODAGU",
       "parts": 282,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 282,
+      "electors": 187749
     },
     "210": {
       "name": "Piriyapatna",
       "nameKn": "ಪಿರಿಯಾಪಟ್ಟಣ",
       "district": "MYSORE",
       "parts": 240,
-      "partsDone": 11,
-      "electors": 7177
+      "partsDone": 185,
+      "electors": 131463
     },
     "211": {
       "name": "Krishnarajanagara",
@@ -1761,8 +1761,8 @@
       "nameKn": "ವರುಣ",
       "district": "MYSORE",
       "parts": 267,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 65,
+      "electors": 49470
     },
     "220": {
       "name": "T. Narasipur",
