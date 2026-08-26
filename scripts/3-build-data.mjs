@@ -209,10 +209,12 @@ if (!canIncremental) {
   for (const file of rowFiles) {
     const acNo = +file.replace('.jsonl', '');
     const parts = {};
+    let acLines = 0;
 
     const rl = createInterface({ input: createReadStream(resolve(ROWS, file)), crlfDelay: Infinity });
     for await (const line of rl) {
       if (!line.trim()) continue;
+      acLines++;
       const row = JSON.parse(line);
       const epic = String(row.epic ?? '').trim().toUpperCase();
       const partNo = +row.part || 0;
@@ -249,6 +251,13 @@ if (!canIncremental) {
     if (!onlyAcs || onlyAcs.includes(acNo)) {
       await writeJson(resolve(DATA, 'parts', `${acNo}.json`), parts);
     }
+
+    // Extraction can append more rows to this file between the line-count
+    // pass above and this actual read — use what was truly read just now,
+    // not the earlier estimate, so the checkpoint never under-records and
+    // causes the same rows to be reprocessed (and double-counted as
+    // duplicates) next cycle.
+    lineCounts[acNo] = acLines;
   }
   progress('');
 
@@ -331,7 +340,12 @@ if (!canIncremental) {
         partName: row.partName ? String(row.partName).trim() : ''
       });
     }
-    state.acLineCounts[ac] = lineCounts[ac];
+    // Extraction can append more rows between the line-count pass at the top
+    // of the script and this actual read — use what was truly read just now
+    // (lineIdx), not the earlier estimate, so the checkpoint never
+    // under-records and causes the same rows to be reprocessed (and
+    // double-counted as duplicates) next cycle.
+    state.acLineCounts[ac] = lineIdx;
   }
 
   log(`Merging ${candidatesByPrefix.size} touched buckets (of ${16 ** shardDepth})…`);
