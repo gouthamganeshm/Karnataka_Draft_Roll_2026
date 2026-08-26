@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T22:21:01.262Z",
+  "builtAt": "2026-08-26T22:54:50.125Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 17609616,
+  "electors": 17798551,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 26279,
-  "coverage": 43.13,
+  "partsDone": 26593,
+  "coverage": 43.65,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -993,8 +993,8 @@
       "nameKn": "ಶೃಂಗೇರಿ",
       "district": "CHIKKMAGALUR",
       "parts": 261,
-      "partsDone": 80,
-      "electors": 52958
+      "partsDone": 261,
+      "electors": 148901
     },
     "124": {
       "name": "Mudigere",
@@ -1017,8 +1017,8 @@
       "nameKn": "ತರೀಕೆರೆ",
       "district": "CHIKKMAGALUR",
       "parts": 237,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 133,
+      "electors": 92992
     },
     "127": {
       "name": "Kadur",
