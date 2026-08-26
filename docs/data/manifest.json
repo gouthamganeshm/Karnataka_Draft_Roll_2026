@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-26T19:16:27.860Z",
+  "builtAt": "2026-08-26T19:53:38.965Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 16716544,
+  "electors": 16899922,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 25022,
-  "coverage": 41.07,
+  "partsDone": 25247,
+  "coverage": 41.44,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -961,16 +961,16 @@
       "nameKn": "ಕುಂದಾಪುರ",
       "district": "UDUPI",
       "parts": 238,
-      "partsDone": 61,
-      "electors": 47626
+      "partsDone": 237,
+      "electors": 190596
     },
     "120": {
       "name": "Udupi",
       "nameKn": "ಉಡುಪಿ",
       "district": "UDUPI",
       "parts": 247,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 49,
+      "electors": 40408
     },
     "121": {
       "name": "Kaup",
