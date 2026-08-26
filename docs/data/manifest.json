@@ -3,22 +3,22 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-25T17:41:06.282Z",
-  "shardDepth": 3,
+  "builtAt": "2026-08-26T01:13:04.477Z",
+  "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 9313622,
+  "electors": 11638653,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 14691,
-  "coverage": 24.11,
+  "partsDone": 17933,
+  "coverage": 29.44,
   "acs": {
     "1": {
       "name": "Nippani",
       "nameKn": "ನಿಪ್ಪಾಣಿ",
       "district": "BELGAUM",
       "parts": 259,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 258,
+      "electors": 199095
     },
     "2": {
       "name": "Chikkodi-Sadalga",
@@ -41,24 +41,24 @@
       "nameKn": "ಕಾಗವಾಡ",
       "district": "BELGAUM",
       "parts": 238,
-      "partsDone": 138,
-      "electors": 101265
+      "partsDone": 238,
+      "electors": 176518
     },
     "5": {
       "name": "Kudachi",
       "nameKn": "ಕುಡಚಿ",
       "district": "BELGAUM",
       "parts": 227,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 227,
+      "electors": 165856
     },
     "6": {
       "name": "Raybag",
       "nameKn": "ರಾಯಭಾಗ",
       "district": "BELGAUM",
       "parts": 246,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 246,
+      "electors": 184664
     },
     "7": {
       "name": "Hukkeri",
@@ -89,8 +89,8 @@
       "nameKn": "ಯಮಕನಮರಡಿ",
       "district": "BELGAUM",
       "parts": 243,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 243,
+      "electors": 182891
     },
     "11": {
       "name": "Belgaum Uttar",
@@ -121,16 +121,16 @@
       "nameKn": "ಖಾನಾಪೂರ",
       "district": "BELGAUM",
       "parts": 319,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 319,
+      "electors": 188130
     },
     "15": {
       "name": "Kittur",
       "nameKn": "ಕಿತ್ತೂರು",
       "district": "BELGAUM",
       "parts": 232,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 232,
+      "electors": 173488
     },
     "16": {
       "name": "Bailahongal",
@@ -138,23 +138,23 @@
       "district": "BELGAUM",
       "parts": 225,
       "partsDone": 225,
-      "electors": 170071
+      "electors": 170070
     },
     "17": {
       "name": "Saundatti Yellamma",
       "nameKn": "ಸವದತ್ತಿ ಯಲ್ಲಮ್ಮ",
       "district": "BELGAUM",
       "parts": 238,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 238,
+      "electors": 176289
     },
     "18": {
       "name": "Ramdurg",
       "nameKn": "ರಾಮದುರ್ಗ",
       "district": "BELGAUM",
       "parts": 252,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 252,
+      "electors": 179583
     },
     "19": {
       "name": "Mudhol",
@@ -1705,16 +1705,16 @@
       "nameKn": "ಹುಣಸೂರು",
       "district": "MYSORE",
       "parts": 285,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 241,
+      "electors": 177086
     },
     "213": {
       "name": "Heggadadevankote",
       "nameKn": "ಹೆಗ್ಗಡದೇವನಕೋಟೆ",
       "district": "MYSORE",
       "parts": 288,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 287,
+      "electors": 191549
     },
     "214": {
       "name": "Nanjangud",
@@ -1729,8 +1729,8 @@
       "nameKn": "ಚಾಮುಂಡೇಶ್ವರಿ",
       "district": "MYSORE",
       "parts": 351,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 351,
+      "electors": 262420
     },
     "216": {
       "name": "Krishnaraja",
@@ -1745,8 +1745,8 @@
       "nameKn": "ಚಾಮರಾಜ",
       "district": "MYSORE",
       "parts": 248,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 248,
+      "electors": 168728
     },
     "218": {
       "name": "Narasimharaja",
