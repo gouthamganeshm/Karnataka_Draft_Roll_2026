@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T05:09:06.047Z",
+  "builtAt": "2026-08-27T05:39:43.384Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 19721213,
+  "electors": 19886097,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 29185,
-  "coverage": 47.9,
+  "partsDone": 29405,
+  "coverage": 48.27,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -505,8 +505,8 @@
       "nameKn": "ಗಂಗಾವತಿ",
       "district": "KOPPAL",
       "parts": 240,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 149,
+      "electors": 110754
     },
     "63": {
       "name": "Yelburga",
@@ -729,8 +729,8 @@
       "nameKn": "ವಿಜಯನಗರ",
       "district": "VIJAYANAGARA",
       "parts": 271,
-      "partsDone": 200,
-      "electors": 147275
+      "partsDone": 271,
+      "electors": 201405
     },
     "91": {
       "name": "Kampli",
