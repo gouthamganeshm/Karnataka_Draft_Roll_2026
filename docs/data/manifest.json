@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T00:03:34.500Z",
+  "builtAt": "2026-08-27T00:36:21.913Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 18141724,
+  "electors": 18309444,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 27044,
-  "coverage": 44.39,
+  "partsDone": 27272,
+  "coverage": 44.76,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -737,8 +737,8 @@
       "nameKn": "ಕಂಪ್ಲಿ",
       "district": "BELLARY",
       "parts": 253,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 76,
+      "electors": 55424
     },
     "92": {
       "name": "Siraguppa",
@@ -761,8 +761,8 @@
       "nameKn": "ಬಳ್ಳಾರಿ ನಗರ",
       "district": "BELLARY",
       "parts": 261,
-      "partsDone": 109,
-      "electors": 81076
+      "partsDone": 261,
+      "electors": 193372
     },
     "95": {
       "name": "Sandur",
