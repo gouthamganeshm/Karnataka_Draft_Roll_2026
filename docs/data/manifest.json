@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T16:33:58.284Z",
+  "builtAt": "2026-08-27T17:10:20.720Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 23219170,
+  "electors": 23406268,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 34138,
-  "coverage": 56.03,
+  "partsDone": 34393,
+  "coverage": 56.45,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -681,8 +681,8 @@
       "nameKn": "ಹಾವೇರಿ",
       "district": "HAVERI",
       "parts": 272,
-      "partsDone": 154,
-      "electors": 114938
+      "partsDone": 272,
+      "electors": 204078
     },
     "85": {
       "name": "Byadgi",
@@ -697,8 +697,8 @@
       "nameKn": "ಹಿರೇಕೆರೂರು",
       "district": "HAVERI",
       "parts": 235,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 137,
+      "electors": 97958
     },
     "87": {
       "name": "Ranebennur",
