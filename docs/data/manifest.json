@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T08:48:57.945Z",
+  "builtAt": "2026-08-27T09:18:09.122Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 20876820,
+  "electors": 21043056,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 30796,
-  "coverage": 50.55,
+  "partsDone": 31043,
+  "coverage": 50.95,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1129,16 +1129,16 @@
       "nameKn": "ಬಾಗೇಪಲ್ಲಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 194,
-      "electors": 116613
+      "partsDone": 281,
+      "electors": 174782
     },
     "141": {
       "name": "Chikkaballapur",
       "nameKn": "ಚಿಕ್ಕಬಳ್ಳಾಪುರ",
       "district": "CHIKKABALLAPUR",
       "parts": 271,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 160,
+      "electors": 108067
     },
     "142": {
       "name": "Sidlaghatta",
