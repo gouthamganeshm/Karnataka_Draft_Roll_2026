@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T03:07:54.442Z",
+  "builtAt": "2026-08-27T03:36:15.990Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 19083610,
+  "electors": 19231188,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 28302,
-  "coverage": 46.46,
+  "partsDone": 28503,
+  "coverage": 46.79,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -721,8 +721,8 @@
       "nameKn": "ಹಗರಿಬೊಮ್ಮನಹಳ್ಳಿ",
       "district": "VIJAYANAGARA",
       "parts": 275,
-      "partsDone": 120,
-      "electors": 89289
+      "partsDone": 275,
+      "electors": 204542
     },
     "90": {
       "name": "Vijayanagara",
@@ -841,8 +841,8 @@
       "nameKn": "ಹರಪನಹಳ್ಳಿ",
       "district": "VIJAYANAGARA",
       "parts": 265,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 46,
+      "electors": 32325
     },
     "105": {
       "name": "Harihar",
