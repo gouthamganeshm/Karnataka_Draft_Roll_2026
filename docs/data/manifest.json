@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T02:42:10.797Z",
+  "builtAt": "2026-08-27T03:07:54.442Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 18945902,
+  "electors": 19083610,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 28118,
-  "coverage": 46.15,
+  "partsDone": 28302,
+  "coverage": 46.46,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -713,16 +713,16 @@
       "nameKn": "ಹಡಗಲಿ",
       "district": "VIJAYANAGARA",
       "parts": 226,
-      "partsDone": 161,
-      "electors": 117010
+      "partsDone": 225,
+      "electors": 165429
     },
     "89": {
       "name": "Hagaribommanahalli",
       "nameKn": "ಹಗರಿಬೊಮ್ಮನಹಳ್ಳಿ",
       "district": "VIJAYANAGARA",
       "parts": 275,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 120,
+      "electors": 89289
     },
     "90": {
       "name": "Vijayanagara",
