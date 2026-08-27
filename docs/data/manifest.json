@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T14:43:59.254Z",
+  "builtAt": "2026-08-27T15:19:37.978Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 22639284,
+  "electors": 22828714,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 33359,
-  "coverage": 54.76,
+  "partsDone": 33615,
+  "coverage": 55.18,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -657,8 +657,8 @@
       "nameKn": "ಯಲ್ಲಾಪುರ",
       "district": "UTTARA KANNADA",
       "parts": 246,
-      "partsDone": 128,
-      "electors": 81520
+      "partsDone": 246,
+      "electors": 165095
     },
     "82": {
       "name": "Hangal",
@@ -689,8 +689,8 @@
       "nameKn": "ಬ್ಯಾಡಗಿ",
       "district": "HAVERI",
       "parts": 251,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 138,
+      "electors": 105855
     },
     "86": {
       "name": "Hirekerur",
