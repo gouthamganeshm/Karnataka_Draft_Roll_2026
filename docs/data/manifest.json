@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T04:07:12.558Z",
+  "builtAt": "2026-08-27T04:38:25.761Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 19386937,
+  "electors": 19553409,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 28720,
-  "coverage": 47.14,
+  "partsDone": 28956,
+  "coverage": 47.53,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -777,8 +777,8 @@
       "nameKn": "ಕೂಡ್ಲಿಗಿ",
       "district": "VIJAYANAGARA",
       "parts": 264,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 234,
+      "electors": 164611
     },
     "97": {
       "name": "Molakalmuru",
@@ -841,8 +841,8 @@
       "nameKn": "ಹರಪನಹಳ್ಳಿ",
       "district": "VIJAYANAGARA",
       "parts": 265,
-      "partsDone": 263,
-      "electors": 188074
+      "partsDone": 265,
+      "electors": 189935
     },
     "105": {
       "name": "Harihar",
