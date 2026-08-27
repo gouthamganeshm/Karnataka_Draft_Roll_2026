@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T09:46:23.707Z",
+  "builtAt": "2026-08-27T10:16:20.649Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 21190046,
+  "electors": 21344051,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 31270,
-  "coverage": 51.33,
+  "partsDone": 31500,
+  "coverage": 51.7,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1121,8 +1121,8 @@
       "nameKn": "ಗೌರಿಬಿದನೂರು",
       "district": "CHIKKABALLAPUR",
       "parts": 271,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 65,
+      "electors": 40689
     },
     "140": {
       "name": "Bagepalli",
@@ -1153,8 +1153,8 @@
       "nameKn": "ಚಿಂತಾಮಣಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 116,
-      "electors": 72494
+      "partsDone": 281,
+      "electors": 185810
     },
     "144": {
       "name": "Srinivasapur",
