@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T21:13:05.243Z",
+  "builtAt": "2026-08-27T21:48:29.439Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 24684741,
+  "electors": 24868130,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 36209,
-  "coverage": 59.43,
+  "partsDone": 36500,
+  "coverage": 59.91,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1161,16 +1161,16 @@
       "nameKn": "ಶ್ರೀನಿವಾಸಪುರ",
       "district": "KOLAR",
       "parts": 288,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 175,
+      "electors": 114756
     },
     "145": {
       "name": "Mulbagal",
       "nameKn": "ಮುಳಬಾಗಿಲು",
       "district": "KOLAR",
       "parts": 274,
-      "partsDone": 158,
-      "electors": 105157
+      "partsDone": 274,
+      "electors": 173790
     },
     "146": {
       "name": "Kolar Gold Field",
