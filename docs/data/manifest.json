@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T12:45:29.684Z",
+  "builtAt": "2026-08-27T13:25:20.811Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 22075246,
+  "electors": 22266407,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 32542,
-  "coverage": 53.41,
+  "partsDone": 32807,
+  "coverage": 53.85,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -625,16 +625,16 @@
       "nameKn": "ಕಾರವಾರ",
       "district": "UTTARA KANNADA",
       "parts": 265,
-      "partsDone": 75,
-      "electors": 52506
+      "partsDone": 260,
+      "electors": 185209
     },
     "78": {
       "name": "Kumta",
       "nameKn": "ಕುಮಟಾ",
       "district": "UTTARA KANNADA",
       "parts": 227,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 80,
+      "electors": 58458
     },
     "79": {
       "name": "Bhatkal",
