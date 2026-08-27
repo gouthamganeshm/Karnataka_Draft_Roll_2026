@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T07:46:44.398Z",
+  "builtAt": "2026-08-27T08:18:40.400Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 20550206,
+  "electors": 20715583,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 30322,
-  "coverage": 49.77,
+  "partsDone": 30544,
+  "coverage": 50.14,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -489,8 +489,8 @@
       "nameKn": "ಕುಷ್ಟಗಿ",
       "district": "KOPPAL",
       "parts": 282,
-      "partsDone": 259,
-      "electors": 185087
+      "partsDone": 281,
+      "electors": 198809
     },
     "61": {
       "name": "Kanakagiri",
@@ -513,8 +513,8 @@
       "nameKn": "ಯಲಬುರ್ಗಾ",
       "district": "KOPPAL",
       "parts": 259,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 200,
+      "electors": 151655
     },
     "64": {
       "name": "Koppal",
