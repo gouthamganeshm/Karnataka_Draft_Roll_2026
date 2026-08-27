@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T09:18:09.122Z",
+  "builtAt": "2026-08-27T09:46:23.707Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 21043056,
+  "electors": 21190046,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 31043,
-  "coverage": 50.95,
+  "partsDone": 31270,
+  "coverage": 51.33,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1137,8 +1137,8 @@
       "nameKn": "ಚಿಕ್ಕಬಳ್ಳಾಪುರ",
       "district": "CHIKKABALLAPUR",
       "parts": 271,
-      "partsDone": 160,
-      "electors": 108067
+      "partsDone": 271,
+      "electors": 182563
     },
     "142": {
       "name": "Sidlaghatta",
@@ -1153,8 +1153,8 @@
       "nameKn": "ಚಿಂತಾಮಣಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 116,
+      "electors": 72494
     },
     "144": {
       "name": "Srinivasapur",
