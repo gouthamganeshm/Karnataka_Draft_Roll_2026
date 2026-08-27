@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T18:20:39.314Z",
+  "builtAt": "2026-08-27T18:55:18.128Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 23783427,
+  "electors": 23962133,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 34895,
-  "coverage": 57.28,
+  "partsDone": 35151,
+  "coverage": 57.7,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -673,8 +673,8 @@
       "nameKn": "ಶಿಗ್ಗಾಂವ",
       "district": "HAVERI",
       "parts": 276,
-      "partsDone": 135,
-      "electors": 104434
+      "partsDone": 276,
+      "electors": 208195
     },
     "84": {
       "name": "Haveri",
@@ -1185,8 +1185,8 @@
       "nameKn": "ಬಂಗಾರಪೇಟೆ",
       "district": "KOLAR",
       "parts": 259,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 115,
+      "electors": 74945
     },
     "148": {
       "name": "Kolar",
