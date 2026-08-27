@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T12:06:03.561Z",
+  "builtAt": "2026-08-27T12:45:29.684Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 21885565,
+  "electors": 22075246,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 32268,
-  "coverage": 52.97,
+  "partsDone": 32542,
+  "coverage": 53.41,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -617,16 +617,16 @@
       "nameKn": "ಹಳಿಯಾಳ",
       "district": "UTTARA KANNADA",
       "parts": 234,
-      "partsDone": 34,
-      "electors": 21831
+      "partsDone": 233,
+      "electors": 159006
     },
     "77": {
       "name": "Karwar",
       "nameKn": "ಕಾರವಾರ",
       "district": "UTTARA KANNADA",
       "parts": 265,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 75,
+      "electors": 52506
     },
     "78": {
       "name": "Kumta",
