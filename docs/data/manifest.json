@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T06:40:28.268Z",
+  "builtAt": "2026-08-27T07:11:37.554Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 20216166,
+  "electors": 20383169,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 29857,
-  "coverage": 49.01,
+  "partsDone": 30091,
+  "coverage": 49.39,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -489,8 +489,8 @@
       "nameKn": "ಕುಷ್ಟಗಿ",
       "district": "KOPPAL",
       "parts": 282,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 28,
+      "electors": 18050
     },
     "61": {
       "name": "Kanakagiri",
@@ -521,8 +521,8 @@
       "nameKn": "ಕೊಪ್ಪಳ",
       "district": "KOPPAL",
       "parts": 294,
-      "partsDone": 87,
-      "electors": 66629
+      "partsDone": 293,
+      "electors": 215582
     },
     "65": {
       "name": "Shirahatti",
