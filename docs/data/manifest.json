@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T08:18:40.400Z",
+  "builtAt": "2026-08-27T08:48:57.945Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 20715583,
+  "electors": 20876820,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 30544,
-  "coverage": 50.14,
+  "partsDone": 30796,
+  "coverage": 50.55,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -513,8 +513,8 @@
       "nameKn": "ಯಲಬುರ್ಗಾ",
       "district": "KOPPAL",
       "parts": 259,
-      "partsDone": 200,
-      "electors": 151655
+      "partsDone": 258,
+      "electors": 196279
     },
     "64": {
       "name": "Koppal",
@@ -1129,8 +1129,8 @@
       "nameKn": "ಬಾಗೇಪಲ್ಲಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 194,
+      "electors": 116613
     },
     "141": {
       "name": "Chikkaballapur",
