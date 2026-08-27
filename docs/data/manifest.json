@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T15:56:58.726Z",
+  "builtAt": "2026-08-27T16:33:58.284Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 23008467,
+  "electors": 23219170,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 33860,
-  "coverage": 55.58,
+  "partsDone": 34138,
+  "coverage": 56.03,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -665,8 +665,8 @@
       "nameKn": "ಹಾನಗಲ್",
       "district": "HAVERI",
       "parts": 256,
-      "partsDone": 132,
-      "electors": 97221
+      "partsDone": 256,
+      "electors": 192986
     },
     "83": {
       "name": "Shiggaon",
@@ -681,8 +681,8 @@
       "nameKn": "ಹಾವೇರಿ",
       "district": "HAVERI",
       "parts": 272,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 154,
+      "electors": 114938
     },
     "85": {
       "name": "Byadgi",
