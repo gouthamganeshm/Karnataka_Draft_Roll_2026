@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T22:21:48.553Z",
+  "builtAt": "2026-08-27T22:55:55.273Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 25058177,
+  "electors": 25233696,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 36771,
-  "coverage": 60.36,
+  "partsDone": 37006,
+  "coverage": 60.74,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -385,8 +385,8 @@
       "nameKn": "ಬಸವಕಲ್ಯಾಣ",
       "district": "BIDAR",
       "parts": 286,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 133,
+      "electors": 102609
     },
     "48": {
       "name": "Humnabad",
@@ -425,8 +425,8 @@
       "nameKn": "ಔರಾದ",
       "district": "BIDAR",
       "parts": 260,
-      "partsDone": 158,
-      "electors": 116345
+      "partsDone": 260,
+      "electors": 189255
     },
     "53": {
       "name": "Raichur Rural",
