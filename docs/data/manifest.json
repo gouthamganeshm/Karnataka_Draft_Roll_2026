@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T20:03:05.580Z",
+  "builtAt": "2026-08-27T20:37:45.876Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 24322925,
+  "electors": 24507378,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 35680,
-  "coverage": 58.57,
+  "partsDone": 35945,
+  "coverage": 59,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1177,8 +1177,8 @@
       "nameKn": "ಕೆ.ಜಿ.ಎಫ್‌",
       "district": "KOLAR",
       "parts": 224,
-      "partsDone": 102,
-      "electors": 68851
+      "partsDone": 224,
+      "electors": 155891
     },
     "147": {
       "name": "Bangarapet",
@@ -1201,8 +1201,8 @@
       "nameKn": "ಮಾಲೂರು",
       "district": "KOLAR",
       "parts": 249,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 143,
+      "electors": 97413
     },
     "150": {
       "name": "Yelahanka",
