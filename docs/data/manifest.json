@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-27T14:05:02.501Z",
+  "builtAt": "2026-08-27T14:43:59.254Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 22451992,
+  "electors": 22639284,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 33066,
-  "coverage": 54.28,
+  "partsDone": 33359,
+  "coverage": 54.76,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -649,16 +649,16 @@
       "nameKn": "ಸಿರ್ಸಿ",
       "district": "UTTARA KANNADA",
       "parts": 278,
-      "partsDone": 112,
-      "electors": 75036
+      "partsDone": 277,
+      "electors": 180808
     },
     "81": {
       "name": "Yellapur",
       "nameKn": "ಯಲ್ಲಾಪುರ",
       "district": "UTTARA KANNADA",
       "parts": 246,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 128,
+      "electors": 81520
     },
     "82": {
       "name": "Hangal",
