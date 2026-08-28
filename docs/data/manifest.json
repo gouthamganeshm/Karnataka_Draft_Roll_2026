@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T17:00:39.415Z",
+  "builtAt": "2026-08-28T17:41:18.203Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 30735360,
+  "electors": 30953199,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 44726,
-  "coverage": 73.41,
+  "partsDone": 45014,
+  "coverage": 73.89,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -161,8 +161,8 @@
       "nameKn": "ಮುಧೋಳ",
       "district": "BAGALKOT",
       "parts": 222,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 170,
+      "electors": 133600
     },
     "20": {
       "name": "Terdal",
@@ -177,8 +177,8 @@
       "nameKn": "ಜಮಖಂಡಿ",
       "district": "BAGALKOT",
       "parts": 253,
-      "partsDone": 135,
-      "electors": 100016
+      "partsDone": 253,
+      "electors": 184255
     },
     "22": {
       "name": "Bilgi",
