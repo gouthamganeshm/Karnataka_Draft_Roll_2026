@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T18:26:41.599Z",
+  "builtAt": "2026-08-28T19:07:46.630Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 31168795,
+  "electors": 31389258,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 45289,
-  "coverage": 74.34,
+  "partsDone": 45626,
+  "coverage": 74.89,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -169,8 +169,8 @@
       "nameKn": "ತೇರದಾಳ",
       "district": "BAGALKOT",
       "parts": 253,
-      "partsDone": 223,
-      "electors": 173235
+      "partsDone": 253,
+      "electors": 196686
     },
     "21": {
       "name": "Jamkhandi",
@@ -905,8 +905,8 @@
       "nameKn": "ಭದ್ರಾವತಿ",
       "district": "SHIMOGA",
       "parts": 257,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 257,
+      "electors": 165605
     },
     "113": {
       "name": "Shimoga",
@@ -945,8 +945,8 @@
       "nameKn": "ಸಾಗರ",
       "district": "SHIMOGA",
       "parts": 289,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 50,
+      "electors": 31407
     },
     "118": {
       "name": "Baindur",
