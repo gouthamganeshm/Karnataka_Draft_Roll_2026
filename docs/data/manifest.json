@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T00:09:58.982Z",
+  "builtAt": "2026-08-28T00:48:10.353Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 25624027,
+  "electors": 25826122,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 37541,
-  "coverage": 61.62,
+  "partsDone": 37824,
+  "coverage": 62.08,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -401,16 +401,16 @@
       "nameKn": "ಬೀದರ್‌ ದಕ್ಷಿಣ",
       "district": "BIDAR",
       "parts": 236,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 139,
+      "electors": 103319
     },
     "50": {
       "name": "Bidar",
       "nameKn": "ಬೀದರ್‌",
       "district": "BIDAR",
       "parts": 252,
-      "partsDone": 108,
-      "electors": 77231
+      "partsDone": 252,
+      "electors": 176007
     },
     "51": {
       "name": "Bhalki",
