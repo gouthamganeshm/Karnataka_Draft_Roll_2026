@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T15:34:22.339Z",
+  "builtAt": "2026-08-28T16:17:59.422Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 30303314,
+  "electors": 30522277,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 44123,
-  "coverage": 72.42,
+  "partsDone": 44432,
+  "coverage": 72.93,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -185,8 +185,8 @@
       "nameKn": "ಬೀಳಗಿ",
       "district": "BAGALKOT",
       "parts": 273,
-      "partsDone": 69,
-      "electors": 48333
+      "partsDone": 273,
+      "electors": 198785
     },
     "23": {
       "name": "Badami",
@@ -209,8 +209,8 @@
       "nameKn": "ಹುನಗುಂದ",
       "district": "BAGALKOT",
       "parts": 264,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 105,
+      "electors": 68511
     },
     "26": {
       "name": "Muddebihal",
