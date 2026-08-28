@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T19:07:46.630Z",
+  "builtAt": "2026-08-28T19:52:34.803Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 31389258,
+  "electors": 31600388,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 45626,
-  "coverage": 74.89,
+  "partsDone": 45957,
+  "coverage": 75.43,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -929,8 +929,8 @@
       "nameKn": "ಶಿಕಾರಿಪುರ",
       "district": "SHIMOGA",
       "parts": 247,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 92,
+      "electors": 61399
     },
     "116": {
       "name": "Sorab",
@@ -945,8 +945,8 @@
       "nameKn": "ಸಾಗರ",
       "district": "SHIMOGA",
       "parts": 289,
-      "partsDone": 50,
-      "electors": 31407
+      "partsDone": 289,
+      "electors": 181138
     },
     "118": {
       "name": "Baindur",
