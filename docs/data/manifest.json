@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T14:51:35.773Z",
+  "builtAt": "2026-08-28T15:34:22.339Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 30081080,
+  "electors": 30303314,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 43766,
-  "coverage": 71.84,
+  "partsDone": 44123,
+  "coverage": 72.42,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -185,8 +185,8 @@
       "nameKn": "ಬೀಳಗಿ",
       "district": "BAGALKOT",
       "parts": 273,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 69,
+      "electors": 48333
     },
     "23": {
       "name": "Badami",
@@ -201,8 +201,8 @@
       "nameKn": "ಬಾಗಲಕೋಟೆ",
       "district": "BAGALKOT",
       "parts": 319,
-      "partsDone": 31,
-      "electors": 20155
+      "partsDone": 319,
+      "electors": 194056
     },
     "25": {
       "name": "Hungund",
