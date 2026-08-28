@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T22:02:03.185Z",
+  "builtAt": "2026-08-28T22:47:20.843Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 32270074,
+  "electors": 32485731,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 46911,
-  "coverage": 77,
+  "partsDone": 47252,
+  "coverage": 77.56,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -921,8 +921,8 @@
       "nameKn": "ತೀರ್ಥಹಳ್ಳಿ",
       "district": "SHIMOGA",
       "parts": 270,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 270,
+      "electors": 168211
     },
     "115": {
       "name": "Shikaripura",
@@ -937,8 +937,8 @@
       "nameKn": "ಸೊರಬ",
       "district": "SHIMOGA",
       "parts": 256,
-      "partsDone": 232,
-      "electors": 157141
+      "partsDone": 255,
+      "electors": 173218
     },
     "117": {
       "name": "Sagar",
@@ -1545,8 +1545,8 @@
       "nameKn": "ಕೆ.ಆರ್‌ .ಪೇಟೆ",
       "district": "MANDYA",
       "parts": 276,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 48,
+      "electors": 31369
     },
     "193": {
       "name": "Shravanabelagola",
