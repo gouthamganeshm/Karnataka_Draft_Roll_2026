@@ -42,6 +42,8 @@ const STRINGS = {
     footerSource: 'Source: the draft electoral roll published by the Chief Electoral Officer, Karnataka for the Special Intensive Revision 2026. This site is an independent, unofficial reformatting of those documents. Always confirm with your BLO or voters.eci.gov.in before acting.',
     footerLink: 'Official draft roll download on voters.eci.gov.in',
     footerCeo: 'Chief Electoral Officer, Karnataka',
+    footerOfficialStats: 'Official count as of 28 August 2026: 4,46,35,948 electors statewide (Chief Electoral Officer, Karnataka).',
+    footerOfficialStatsLink: 'Read the official press note (PDF) ↗',
 
     errFormat: 'That does not look like an EPIC number. It is 3 letters followed by 7 digits, like ABC1234567.',
     errNetwork: 'Could not load the data files. Check your connection and try again.',
@@ -85,6 +87,8 @@ const STRINGS = {
     footerSource: 'ಮೂಲ: ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ ಪ್ರಕಟಿಸಿದ ಎಸ್‌ಐಆರ್ ೨೦೨೬ ಕರಡು ಮತದಾರರ ಪಟ್ಟಿ. ಇದು ಅನಧಿಕೃತ ಮರುರಚನೆ. ಕ್ರಮ ಕೈಗೊಳ್ಳುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ voters.eci.gov.in ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
     footerLink: 'voters.eci.gov.in ನಲ್ಲಿ ಅಧಿಕೃತ ಕರಡು ಪಟ್ಟಿ',
     footerCeo: 'ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ',
+    footerOfficialStats: '೨೮ ಆಗಸ್ಟ್ ೨೦೨೬ರಂತೆ ಅಧಿಕೃತ ಎಣಿಕೆ: ರಾಜ್ಯಾದ್ಯಂತ ೪,೪೬,೩೫,೯೪೮ ಮತದಾರರು (ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ).',
+    footerOfficialStatsLink: 'ಅಧಿಕೃತ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಿ (ಪಿಡಿಎಫ್) ↗',
 
     errFormat: 'ಇದು ಇಪಿಐಸಿ ಸಂಖ್ಯೆಯಂತೆ ಕಾಣುತ್ತಿಲ್ಲ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು, ಉದಾ. ABC1234567.',
     errNetwork: 'ದತ್ತಾಂಶ ಕಡತಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
