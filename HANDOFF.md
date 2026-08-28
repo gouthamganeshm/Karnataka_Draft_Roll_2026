@@ -472,6 +472,72 @@ the publication-shape problem. Test-driving `kan.traineddata` against a larger
 sample before touching `roll_ocr.py` would have caught the accuracy problem
 before the harder question needed asking at all.
 
+### Study, not implementation — 2026-08-28, revisit-when-final-rolls-drop numbers
+
+Asked again as a study only ("don't implement, may be we can take this up when
+final rolls r released") — no code or pipeline changes made. Numbers below are
+grounded in the live statewide run, for whenever this gets re-raised.
+
+**Geometry is not the hard part.** The four extra card lines (name /
+father's-husband's name / house number / age+gender) were already located
+cleanly in the 2026-08-24 scratch test, symmetric to the existing header-box
+detection.
+
+**Compute cost**, from this run's real throughput: statewide is 224 ACs,
+60,923 parts, ~41.7M electors (projected from 26.26M published at 63.03%
+coverage on 2026-08-28). EPIC+serial-only runs ~7 parts/min sustained on 11
+Tesseract workers on one machine → a from-scratch statewide pass is ~145h
+(~6 days), matching what's actually been observed. Full-card OCR, per this
+file's own ~5x-cost estimate for reading the whole card, projects to
+**~30 days of continuous compute** at the same worker count for a from-scratch
+statewide pass. Scales down roughly linearly with more workers/machines.
+
+**Accuracy is the real unknown.** Even the two easy, grammar-correctable
+fields aren't clean today: 1,352,780 rows (4.9% of ~27.6M scanned) are
+withheld as low-confidence, plus 23,318 duplicate EPICs, *despite*
+`coerce_epic` and serial-sequence repair actively fixing most OCR slips.
+Names have no equivalent correction mechanism, so expect a materially higher
+unreadable/wrong rate — the 2026-08-24 test already saw garbage on several of
+the first 8 cards. The cheap next step, if this gets re-raised, is exactly
+what the paragraph above already recommends: OCR a few hundred cached name
+crops and hand-check them against the source PDF, before touching
+`roll_ocr.py` — that produces a real number instead of an estimate, and
+still touches nothing live.
+
+**The publication-shape objection is unresolved, not obsolete.** A middle
+ground not considered on 2026-08-24: show full detail only after an *exact*
+EPIC match, never in bucket/browse results — brute-forcing one known EPIC
+isn't the same as browsing a booth's full roll. Worth raising explicitly if
+this comes back, since it changes the scrapeable-directory calculus that
+drove the original decline.
+
+**Addendum, same day: English rolls as the OCR source, aimed at duplicate
+detection specifically.** ECI publishes an ENG PDF at the same CDN path per
+part (swap `KAN`→`ENG` in the filename; confirmed live, no captcha, ~7%
+larger file than the KAN version for AC2 part4). Tesseract's `eng` model is
+mature and already installed, unlike the Kannada model that produced garbage
+on names — a real reason to expect materially better name-OCR accuracy than
+the 2026-08-24 attempt, though still unverified without a sample test. Caveat:
+English is ECI's transliteration, not the canonical Kannada source this
+project deliberately chose, so it's a source for *matching*, not for
+authoritatively publishing "this is the elector's name."
+
+Duplicate detection (same-booth and, harder, cross-booth/cross-AC) is
+standard record-linkage once name/age/gender/relative's-name exist: block on
+soundex(name)+age±1+gender, fuzzy-score with Jaro-Winkler, threshold for
+review — days of work with `recordlinkage`/`dedupe`, not weeks. OCR compute
+is still the dominant cost and doesn't drop much by switching language
+(~5x header-only, ~30 days continuous compute statewide at current scale).
+Importantly, a duplicate-finder's *output* doesn't need to publish PII at
+all — flagged EPIC pairs or per-AC duplicate counts sidestep the
+scrapeable-registry objection that killed the name-search idea, since the
+output is a review list, not a lookup tool. This is a materially easier
+product decision than the original ask.
+
+Next cheap step if revisited: OCR ~50-100 cached English-roll name crops and
+hand-check against the source PDF — turns the accuracy question from an
+estimate into a real number. Not run yet; still just study.
+
 ## 4b. Publishing — decided 2026-08-24, supersedes the Actions plan
 
 The user's call after the runner kept returning 406: **"process the data locally
