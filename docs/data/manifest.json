@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T09:00:09.027Z",
+  "builtAt": "2026-08-28T09:37:54.741Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 28351698,
+  "electors": 28543594,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 41271,
-  "coverage": 67.74,
+  "partsDone": 41539,
+  "coverage": 68.18,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -785,8 +785,8 @@
       "nameKn": "ಮೊಳಕಾಲ್ಮೂರು",
       "district": "CHITRADURGA",
       "parts": 311,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 190,
+      "electors": 134576
     },
     "98": {
       "name": "Challakere",
@@ -817,8 +817,8 @@
       "nameKn": "ಹೊಸದುರ್ಗ",
       "district": "CHITRADURGA",
       "parts": 258,
-      "partsDone": 180,
-      "electors": 123950
+      "partsDone": 258,
+      "electors": 181270
     },
     "102": {
       "name": "Holalkere",
