@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T07:42:55.435Z",
+  "builtAt": "2026-08-28T08:22:31.890Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 27933029,
+  "electors": 28154828,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 40665,
-  "coverage": 66.75,
+  "partsDone": 40986,
+  "coverage": 67.28,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -809,8 +809,8 @@
       "nameKn": "ಹಿರಿಯೂರು",
       "district": "CHITRADURGA",
       "parts": 300,
-      "partsDone": 189,
-      "electors": 129706
+      "partsDone": 300,
+      "electors": 211877
     },
     "101": {
       "name": "Hosadurga",
@@ -825,8 +825,8 @@
       "nameKn": "ಹೊಳಲ್ಕೆರೆ",
       "district": "CHITRADURGA",
       "parts": 315,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 210,
+      "electors": 139628
     },
     "103": {
       "name": "Jagalur",
