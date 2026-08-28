@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T14:05:35.159Z",
+  "builtAt": "2026-08-28T14:51:35.773Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 29856643,
+  "electors": 30081080,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 43449,
-  "coverage": 71.32,
+  "partsDone": 43766,
+  "coverage": 71.84,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -193,16 +193,16 @@
       "nameKn": "ಬಾದಾಮಿ",
       "district": "BAGALKOT",
       "parts": 271,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 271,
+      "electors": 193341
     },
     "24": {
       "name": "Bagalkot",
       "nameKn": "ಬಾಗಲಕೋಟೆ",
       "district": "BAGALKOT",
       "parts": 319,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 31,
+      "electors": 20155
     },
     "25": {
       "name": "Hungund",
@@ -873,8 +873,8 @@
       "nameKn": "ಮಾಯಕೊಂಡ",
       "district": "DAVANGERE",
       "parts": 248,
-      "partsDone": 233,
-      "electors": 165258
+      "partsDone": 248,
+      "electors": 176199
     },
     "109": {
       "name": "Channagiri",
