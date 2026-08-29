@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T05:25:39.080Z",
+  "builtAt": "2026-08-29T06:02:29.504Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 36001159,
+  "electors": 36271515,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 49942,
-  "coverage": 81.98,
+  "partsDone": 50308,
+  "coverage": 82.58,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -441,8 +441,8 @@
       "nameKn": "ರಾಯಚೂರು",
       "district": "RAICHUR",
       "parts": 254,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 127,
+      "electors": 87574
     },
     "55": {
       "name": "Manvi",
@@ -481,8 +481,8 @@
       "nameKn": "ಮಸ್ಕಿ",
       "district": "RAICHUR",
       "parts": 239,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 239,
+      "electors": 182782
     },
     "60": {
       "name": "Kushtagi",
