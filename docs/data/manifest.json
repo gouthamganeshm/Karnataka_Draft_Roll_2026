@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T22:39:12.832Z",
+  "builtAt": "2026-08-29T23:37:18.700Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 41096314,
+  "electors": 41389595,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 56537,
-  "coverage": 92.8,
+  "partsDone": 56946,
+  "coverage": 93.47,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -353,8 +353,8 @@
       "nameKn": "ಗುಲಬರ್ಗಾ ಗ್ರಾಮಾಂತರ",
       "district": "GULBARGA",
       "parts": 304,
-      "partsDone": 18,
-      "electors": 12640
+      "partsDone": 304,
+      "electors": 221069
     },
     "44": {
       "name": "Gulbarga Dakshin",
@@ -369,8 +369,8 @@
       "nameKn": "ಗುಲಬರ್ಗಾ ಉತ್ತರ",
       "district": "GULBARGA",
       "parts": 308,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 123,
+      "electors": 84852
     },
     "46": {
       "name": "Aland",
