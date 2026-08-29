@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T07:15:34.503Z",
+  "builtAt": "2026-08-29T07:52:54.377Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 36685823,
+  "electors": 36883348,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 50891,
-  "coverage": 83.53,
+  "partsDone": 51140,
+  "coverage": 83.94,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -473,8 +473,8 @@
       "nameKn": "ಸಿಂಧನೂರು",
       "district": "RAICHUR",
       "parts": 272,
-      "partsDone": 178,
-      "electors": 124961
+      "partsDone": 272,
+      "electors": 197609
     },
     "59": {
       "name": "Maski",
@@ -1649,8 +1649,8 @@
       "nameKn": "ಬಂಟ್ವಾಳ",
       "district": "DAKSHINA KANNADA",
       "parts": 261,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 155,
+      "electors": 124877
     },
     "206": {
       "name": "Puttur",
