@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T16:43:08.798Z",
+  "builtAt": "2026-08-29T17:55:05.758Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 39288965,
+  "electors": 39581603,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 54182,
-  "coverage": 88.94,
+  "partsDone": 54555,
+  "coverage": 89.55,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -217,8 +217,8 @@
       "nameKn": "ಮುದ್ದೇಬಿಹಾಳ",
       "district": "BIJAPUR",
       "parts": 254,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 172,
+      "electors": 131000
     },
     "27": {
       "name": "Devara Hippargi",
@@ -265,8 +265,8 @@
       "nameKn": "ಇಂಡಿ",
       "district": "BIJAPUR",
       "parts": 277,
-      "partsDone": 76,
-      "electors": 64125
+      "partsDone": 277,
+      "electors": 225763
     },
     "33": {
       "name": "Sindgi",
