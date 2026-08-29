@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T11:14:00.088Z",
+  "builtAt": "2026-08-29T12:35:02.399Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 37962760,
+  "electors": 38178134,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 52475,
-  "coverage": 86.13,
+  "partsDone": 52741,
+  "coverage": 86.57,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1617,8 +1617,8 @@
       "nameKn": "ಮೂಡಬಿದ್ರಿ",
       "district": "DAKSHINA KANNADA",
       "parts": 245,
-      "partsDone": 143,
-      "electors": 113753
+      "partsDone": 245,
+      "electors": 193140
     },
     "202": {
       "name": "Mangalore City North",
@@ -1657,8 +1657,8 @@
       "nameKn": "ಪುತ್ತೂರು",
       "district": "DAKSHINA KANNADA",
       "parts": 245,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 164,
+      "electors": 135987
     },
     "207": {
       "name": "Sullia",
