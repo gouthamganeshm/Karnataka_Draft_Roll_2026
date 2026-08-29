@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T00:54:01.759Z",
+  "builtAt": "2026-08-29T05:25:39.080Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 33136587,
+  "electors": 36001159,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 48162,
-  "coverage": 79.05,
+  "partsDone": 49942,
+  "coverage": 81.98,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -18,7 +18,7 @@
       "district": "BELGAUM",
       "parts": 259,
       "partsDone": 258,
-      "electors": 199095
+      "electors": 208959
     },
     "2": {
       "name": "Chikkodi-Sadalga",
@@ -26,7 +26,7 @@
       "district": "BELGAUM",
       "parts": 255,
       "partsDone": 255,
-      "electors": 201351
+      "electors": 211351
     },
     "3": {
       "name": "Athani",
@@ -34,7 +34,7 @@
       "district": "BELGAUM",
       "parts": 270,
       "partsDone": 270,
-      "electors": 209381
+      "electors": 219713
     },
     "4": {
       "name": "Kagwad",
@@ -42,7 +42,7 @@
       "district": "BELGAUM",
       "parts": 238,
       "partsDone": 238,
-      "electors": 176518
+      "electors": 185251
     },
     "5": {
       "name": "Kudachi",
@@ -50,7 +50,7 @@
       "district": "BELGAUM",
       "parts": 227,
       "partsDone": 227,
-      "electors": 165856
+      "electors": 174060
     },
     "6": {
       "name": "Raybag",
@@ -58,7 +58,7 @@
       "district": "BELGAUM",
       "parts": 246,
       "partsDone": 246,
-      "electors": 184664
+      "electors": 193855
     },
     "7": {
       "name": "Hukkeri",
@@ -66,7 +66,7 @@
       "district": "BELGAUM",
       "parts": 234,
       "partsDone": 234,
-      "electors": 183347
+      "electors": 192285
     },
     "8": {
       "name": "Arabhavi",
@@ -74,7 +74,7 @@
       "district": "BELGAUM",
       "parts": 290,
       "partsDone": 289,
-      "electors": 215518
+      "electors": 225990
     },
     "9": {
       "name": "Gokak",
@@ -82,7 +82,7 @@
       "district": "BELGAUM",
       "parts": 297,
       "partsDone": 297,
-      "electors": 210735
+      "electors": 220669
     },
     "10": {
       "name": "Yemkanamardi",
@@ -90,7 +90,7 @@
       "district": "BELGAUM",
       "parts": 243,
       "partsDone": 243,
-      "electors": 182891
+      "electors": 191622
     },
     "11": {
       "name": "Belgaum Uttar",
@@ -98,7 +98,7 @@
       "district": "BELGAUM",
       "parts": 260,
       "partsDone": 260,
-      "electors": 183204
+      "electors": 191968
     },
     "12": {
       "name": "Belgaum Dakshin",
@@ -106,7 +106,7 @@
       "district": "BELGAUM",
       "parts": 260,
       "partsDone": 258,
-      "electors": 183236
+      "electors": 191856
     },
     "13": {
       "name": "Belgaum Rural",
@@ -114,7 +114,7 @@
       "district": "BELGAUM",
       "parts": 299,
       "partsDone": 298,
-      "electors": 223186
+      "electors": 233871
     },
     "14": {
       "name": "Khanapur",
@@ -122,7 +122,7 @@
       "district": "BELGAUM",
       "parts": 319,
       "partsDone": 319,
-      "electors": 188130
+      "electors": 196333
     },
     "15": {
       "name": "Kittur",
@@ -130,7 +130,7 @@
       "district": "BELGAUM",
       "parts": 232,
       "partsDone": 232,
-      "electors": 173488
+      "electors": 181813
     },
     "16": {
       "name": "Bailahongal",
@@ -138,7 +138,7 @@
       "district": "BELGAUM",
       "parts": 225,
       "partsDone": 225,
-      "electors": 170070
+      "electors": 178343
     },
     "17": {
       "name": "Saundatti Yellamma",
@@ -146,7 +146,7 @@
       "district": "BELGAUM",
       "parts": 238,
       "partsDone": 238,
-      "electors": 176289
+      "electors": 185231
     },
     "18": {
       "name": "Ramdurg",
@@ -154,7 +154,7 @@
       "district": "BELGAUM",
       "parts": 252,
       "partsDone": 252,
-      "electors": 179583
+      "electors": 188090
     },
     "19": {
       "name": "Mudhol",
@@ -162,7 +162,7 @@
       "district": "BAGALKOT",
       "parts": 222,
       "partsDone": 222,
-      "electors": 175961
+      "electors": 184229
     },
     "20": {
       "name": "Terdal",
@@ -170,7 +170,7 @@
       "district": "BAGALKOT",
       "parts": 253,
       "partsDone": 253,
-      "electors": 196686
+      "electors": 205746
     },
     "21": {
       "name": "Jamkhandi",
@@ -178,7 +178,7 @@
       "district": "BAGALKOT",
       "parts": 253,
       "partsDone": 253,
-      "electors": 184255
+      "electors": 193026
     },
     "22": {
       "name": "Bilgi",
@@ -186,7 +186,7 @@
       "district": "BAGALKOT",
       "parts": 273,
       "partsDone": 273,
-      "electors": 198785
+      "electors": 207988
     },
     "23": {
       "name": "Badami",
@@ -194,7 +194,7 @@
       "district": "BAGALKOT",
       "parts": 271,
       "partsDone": 271,
-      "electors": 193341
+      "electors": 202314
     },
     "24": {
       "name": "Bagalkot",
@@ -202,7 +202,7 @@
       "district": "BAGALKOT",
       "parts": 319,
       "partsDone": 319,
-      "electors": 194056
+      "electors": 202447
     },
     "25": {
       "name": "Hungund",
@@ -210,7 +210,7 @@
       "district": "BAGALKOT",
       "parts": 264,
       "partsDone": 264,
-      "electors": 181578
+      "electors": 189548
     },
     "26": {
       "name": "Muddebihal",
@@ -298,7 +298,7 @@
       "district": "YADGIR",
       "parts": 325,
       "partsDone": 325,
-      "electors": 231857
+      "electors": 242801
     },
     "37": {
       "name": "Shahapur",
@@ -306,7 +306,7 @@
       "district": "YADGIR",
       "parts": 275,
       "partsDone": 275,
-      "electors": 195914
+      "electors": 204972
     },
     "38": {
       "name": "Yadgir",
@@ -314,7 +314,7 @@
       "district": "YADGIR",
       "parts": 273,
       "partsDone": 273,
-      "electors": 197406
+      "electors": 206498
     },
     "39": {
       "name": "Gurmitkal",
@@ -322,7 +322,7 @@
       "district": "YADGIR",
       "parts": 289,
       "partsDone": 289,
-      "electors": 198315
+      "electors": 207385
     },
     "40": {
       "name": "Chittapur",
@@ -386,7 +386,7 @@
       "district": "BIDAR",
       "parts": 286,
       "partsDone": 286,
-      "electors": 213356
+      "electors": 223248
     },
     "48": {
       "name": "Humnabad",
@@ -394,7 +394,7 @@
       "district": "BIDAR",
       "parts": 271,
       "partsDone": 271,
-      "electors": 210641
+      "electors": 220519
     },
     "49": {
       "name": "Bidar South",
@@ -402,7 +402,7 @@
       "district": "BIDAR",
       "parts": 236,
       "partsDone": 236,
-      "electors": 173397
+      "electors": 181510
     },
     "50": {
       "name": "Bidar",
@@ -410,7 +410,7 @@
       "district": "BIDAR",
       "parts": 252,
       "partsDone": 252,
-      "electors": 176007
+      "electors": 184100
     },
     "51": {
       "name": "Bhalki",
@@ -418,7 +418,7 @@
       "district": "BIDAR",
       "parts": 274,
       "partsDone": 274,
-      "electors": 202353
+      "electors": 211715
     },
     "52": {
       "name": "Aurad",
@@ -426,7 +426,7 @@
       "district": "BIDAR",
       "parts": 260,
       "partsDone": 260,
-      "electors": 189255
+      "electors": 197737
     },
     "53": {
       "name": "Raichur Rural",
@@ -449,24 +449,24 @@
       "nameKn": "ಮಾನ್ವಿ",
       "district": "RAICHUR",
       "parts": 280,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 280,
+      "electors": 199225
     },
     "56": {
       "name": "Devadurga",
       "nameKn": "ದೇವದುರ್ಗ",
       "district": "RAICHUR",
       "parts": 275,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 275,
+      "electors": 210452
     },
     "57": {
       "name": "Lingsugur",
       "nameKn": "ಲಿಂಗಸುಗೂರು",
       "district": "RAICHUR",
       "parts": 294,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 294,
+      "electors": 222436
     },
     "58": {
       "name": "Sindhanur",
@@ -490,7 +490,7 @@
       "district": "KOPPAL",
       "parts": 282,
       "partsDone": 281,
-      "electors": 198809
+      "electors": 207829
     },
     "61": {
       "name": "Kanakagiri",
@@ -498,7 +498,7 @@
       "district": "KOPPAL",
       "parts": 277,
       "partsDone": 274,
-      "electors": 197204
+      "electors": 206198
     },
     "62": {
       "name": "Gangavathi",
@@ -506,7 +506,7 @@
       "district": "KOPPAL",
       "parts": 240,
       "partsDone": 240,
-      "electors": 176990
+      "electors": 185151
     },
     "63": {
       "name": "Yelburga",
@@ -514,7 +514,7 @@
       "district": "KOPPAL",
       "parts": 259,
       "partsDone": 258,
-      "electors": 196279
+      "electors": 205162
     },
     "64": {
       "name": "Koppal",
@@ -522,7 +522,7 @@
       "district": "KOPPAL",
       "parts": 294,
       "partsDone": 293,
-      "electors": 215582
+      "electors": 225788
     },
     "65": {
       "name": "Shirahatti",
@@ -530,7 +530,7 @@
       "district": "GADAG",
       "parts": 259,
       "partsDone": 259,
-      "electors": 191281
+      "electors": 200110
     },
     "66": {
       "name": "Gadag",
@@ -538,7 +538,7 @@
       "district": "GADAG",
       "parts": 227,
       "partsDone": 227,
-      "electors": 189393
+      "electors": 198024
     },
     "67": {
       "name": "Ron",
@@ -546,7 +546,7 @@
       "district": "GADAG",
       "parts": 271,
       "partsDone": 271,
-      "electors": 197892
+      "electors": 207135
     },
     "68": {
       "name": "Nargund",
@@ -554,7 +554,7 @@
       "district": "GADAG",
       "parts": 226,
       "partsDone": 226,
-      "electors": 166964
+      "electors": 174847
     },
     "69": {
       "name": "Navalgund",
@@ -562,7 +562,7 @@
       "district": "DHARWAD",
       "parts": 242,
       "partsDone": 241,
-      "electors": 183055
+      "electors": 191955
     },
     "70": {
       "name": "Kundgol",
@@ -570,7 +570,7 @@
       "district": "DHARWAD",
       "parts": 219,
       "partsDone": 219,
-      "electors": 167355
+      "electors": 175035
     },
     "71": {
       "name": "Dharwad",
@@ -578,7 +578,7 @@
       "district": "DHARWAD",
       "parts": 247,
       "partsDone": 246,
-      "electors": 183710
+      "electors": 192598
     },
     "72": {
       "name": "Hubli-Dharwad-East",
@@ -586,7 +586,7 @@
       "district": "DHARWAD",
       "parts": 227,
       "partsDone": 227,
-      "electors": 172756
+      "electors": 181118
     },
     "73": {
       "name": "Hubli-Dharwad-Central",
@@ -594,7 +594,7 @@
       "district": "DHARWAD",
       "parts": 267,
       "partsDone": 267,
-      "electors": 194104
+      "electors": 203254
     },
     "74": {
       "name": "Hubli-Dharwad-West",
@@ -602,7 +602,7 @@
       "district": "DHARWAD",
       "parts": 267,
       "partsDone": 267,
-      "electors": 206292
+      "electors": 216458
     },
     "75": {
       "name": "Kalaghatgi",
@@ -610,7 +610,7 @@
       "district": "DHARWAD",
       "parts": 238,
       "partsDone": 238,
-      "electors": 178385
+      "electors": 186455
     },
     "76": {
       "name": "Haliyal",
@@ -618,7 +618,7 @@
       "district": "UTTARA KANNADA",
       "parts": 234,
       "partsDone": 233,
-      "electors": 159006
+      "electors": 166391
     },
     "77": {
       "name": "Karwar",
@@ -626,7 +626,7 @@
       "district": "UTTARA KANNADA",
       "parts": 265,
       "partsDone": 260,
-      "electors": 185209
+      "electors": 193932
     },
     "78": {
       "name": "Kumta",
@@ -634,7 +634,7 @@
       "district": "UTTARA KANNADA",
       "parts": 227,
       "partsDone": 227,
-      "electors": 169007
+      "electors": 176868
     },
     "79": {
       "name": "Bhatkal",
@@ -642,7 +642,7 @@
       "district": "UTTARA KANNADA",
       "parts": 273,
       "partsDone": 273,
-      "electors": 203479
+      "electors": 213239
     },
     "80": {
       "name": "Sirsi",
@@ -650,7 +650,7 @@
       "district": "UTTARA KANNADA",
       "parts": 278,
       "partsDone": 277,
-      "electors": 180808
+      "electors": 189745
     },
     "81": {
       "name": "Yellapur",
@@ -658,7 +658,7 @@
       "district": "UTTARA KANNADA",
       "parts": 246,
       "partsDone": 246,
-      "electors": 165095
+      "electors": 172824
     },
     "82": {
       "name": "Hangal",
@@ -666,7 +666,7 @@
       "district": "HAVERI",
       "parts": 256,
       "partsDone": 256,
-      "electors": 192986
+      "electors": 201740
     },
     "83": {
       "name": "Shiggaon",
@@ -674,7 +674,7 @@
       "district": "HAVERI",
       "parts": 276,
       "partsDone": 276,
-      "electors": 208195
+      "electors": 217894
     },
     "84": {
       "name": "Haveri",
@@ -682,7 +682,7 @@
       "district": "HAVERI",
       "parts": 272,
       "partsDone": 272,
-      "electors": 204078
+      "electors": 213789
     },
     "85": {
       "name": "Byadgi",
@@ -690,7 +690,7 @@
       "district": "HAVERI",
       "parts": 251,
       "partsDone": 251,
-      "electors": 188387
+      "electors": 197191
     },
     "86": {
       "name": "Hirekerur",
@@ -698,7 +698,7 @@
       "district": "HAVERI",
       "parts": 235,
       "partsDone": 235,
-      "electors": 167387
+      "electors": 175086
     },
     "87": {
       "name": "Ranebennur",
@@ -706,7 +706,7 @@
       "district": "HAVERI",
       "parts": 269,
       "partsDone": 269,
-      "electors": 203296
+      "electors": 212637
     },
     "88": {
       "name": "Hadagali",
@@ -714,7 +714,7 @@
       "district": "VIJAYANAGARA",
       "parts": 226,
       "partsDone": 225,
-      "electors": 165429
+      "electors": 173373
     },
     "89": {
       "name": "Hagaribommanahalli",
@@ -722,7 +722,7 @@
       "district": "VIJAYANAGARA",
       "parts": 275,
       "partsDone": 275,
-      "electors": 204542
+      "electors": 214353
     },
     "90": {
       "name": "Vijayanagara",
@@ -730,7 +730,7 @@
       "district": "VIJAYANAGARA",
       "parts": 271,
       "partsDone": 271,
-      "electors": 201405
+      "electors": 210636
     },
     "91": {
       "name": "Kampli",
@@ -738,7 +738,7 @@
       "district": "BELLARY",
       "parts": 253,
       "partsDone": 253,
-      "electors": 194854
+      "electors": 204333
     },
     "92": {
       "name": "Siraguppa",
@@ -746,7 +746,7 @@
       "district": "BELLARY",
       "parts": 244,
       "partsDone": 244,
-      "electors": 186602
+      "electors": 195699
     },
     "93": {
       "name": "Bellary",
@@ -754,7 +754,7 @@
       "district": "BELLARY",
       "parts": 238,
       "partsDone": 238,
-      "electors": 190598
+      "electors": 199611
     },
     "94": {
       "name": "Bellary City",
@@ -762,7 +762,7 @@
       "district": "BELLARY",
       "parts": 261,
       "partsDone": 261,
-      "electors": 193372
+      "electors": 202233
     },
     "95": {
       "name": "Sandur",
@@ -770,7 +770,7 @@
       "district": "BELLARY",
       "parts": 264,
       "partsDone": 264,
-      "electors": 193416
+      "electors": 202299
     },
     "96": {
       "name": "Kudligi",
@@ -778,7 +778,7 @@
       "district": "VIJAYANAGARA",
       "parts": 264,
       "partsDone": 263,
-      "electors": 185140
+      "electors": 193669
     },
     "97": {
       "name": "Molakalmuru",
@@ -786,7 +786,7 @@
       "district": "CHITRADURGA",
       "parts": 311,
       "partsDone": 311,
-      "electors": 221827
+      "electors": 232023
     },
     "98": {
       "name": "Challakere",
@@ -794,7 +794,7 @@
       "district": "CHITRADURGA",
       "parts": 278,
       "partsDone": 278,
-      "electors": 191158
+      "electors": 199972
     },
     "99": {
       "name": "Chitradurga",
@@ -802,7 +802,7 @@
       "district": "CHITRADURGA",
       "parts": 302,
       "partsDone": 301,
-      "electors": 219667
+      "electors": 229691
     },
     "100": {
       "name": "Hiriyur",
@@ -810,7 +810,7 @@
       "district": "CHITRADURGA",
       "parts": 300,
       "partsDone": 300,
-      "electors": 211877
+      "electors": 221574
     },
     "101": {
       "name": "Hosadurga",
@@ -818,7 +818,7 @@
       "district": "CHITRADURGA",
       "parts": 258,
       "partsDone": 258,
-      "electors": 181270
+      "electors": 189423
     },
     "102": {
       "name": "Holalkere",
@@ -826,7 +826,7 @@
       "district": "CHITRADURGA",
       "parts": 315,
       "partsDone": 315,
-      "electors": 212548
+      "electors": 222136
     },
     "103": {
       "name": "Jagalur",
@@ -834,7 +834,7 @@
       "district": "DAVANGERE",
       "parts": 269,
       "partsDone": 269,
-      "electors": 173254
+      "electors": 180718
     },
     "104": {
       "name": "Harapanahalli",
@@ -842,7 +842,7 @@
       "district": "VIJAYANAGARA",
       "parts": 265,
       "partsDone": 265,
-      "electors": 189935
+      "electors": 198864
     },
     "105": {
       "name": "Harihar",
@@ -850,7 +850,7 @@
       "district": "DAVANGERE",
       "parts": 236,
       "partsDone": 236,
-      "electors": 180167
+      "electors": 188506
     },
     "106": {
       "name": "Davanagere North",
@@ -858,7 +858,7 @@
       "district": "DAVANGERE",
       "parts": 258,
       "partsDone": 258,
-      "electors": 189918
+      "electors": 198722
     },
     "107": {
       "name": "Davanagere South",
@@ -866,7 +866,7 @@
       "district": "DAVANGERE",
       "parts": 284,
       "partsDone": 281,
-      "electors": 165496
+      "electors": 172520
     },
     "108": {
       "name": "Mayakonda",
@@ -874,7 +874,7 @@
       "district": "DAVANGERE",
       "parts": 248,
       "partsDone": 248,
-      "electors": 176199
+      "electors": 184302
     },
     "109": {
       "name": "Channagiri",
@@ -882,7 +882,7 @@
       "district": "DAVANGERE",
       "parts": 265,
       "partsDone": 265,
-      "electors": 177310
+      "electors": 185373
     },
     "110": {
       "name": "Honnali",
@@ -890,7 +890,7 @@
       "district": "DAVANGERE",
       "parts": 248,
       "partsDone": 247,
-      "electors": 174395
+      "electors": 182607
     },
     "111": {
       "name": "Shimoga Rural",
@@ -898,7 +898,7 @@
       "district": "SHIMOGA",
       "parts": 270,
       "partsDone": 270,
-      "electors": 192201
+      "electors": 201203
     },
     "112": {
       "name": "Bhadravathi",
@@ -906,7 +906,7 @@
       "district": "SHIMOGA",
       "parts": 257,
       "partsDone": 257,
-      "electors": 165605
+      "electors": 173622
     },
     "113": {
       "name": "Shimoga",
@@ -914,7 +914,7 @@
       "district": "SHIMOGA",
       "parts": 297,
       "partsDone": 297,
-      "electors": 210101
+      "electors": 220164
     },
     "114": {
       "name": "Tirthahalli",
@@ -922,7 +922,7 @@
       "district": "SHIMOGA",
       "parts": 270,
       "partsDone": 270,
-      "electors": 168211
+      "electors": 176545
     },
     "115": {
       "name": "Shikaripura",
@@ -930,7 +930,7 @@
       "district": "SHIMOGA",
       "parts": 247,
       "partsDone": 247,
-      "electors": 171642
+      "electors": 179638
     },
     "116": {
       "name": "Sorab",
@@ -938,7 +938,7 @@
       "district": "SHIMOGA",
       "parts": 256,
       "partsDone": 255,
-      "electors": 173218
+      "electors": 181257
     },
     "117": {
       "name": "Sagar",
@@ -946,7 +946,7 @@
       "district": "SHIMOGA",
       "parts": 289,
       "partsDone": 289,
-      "electors": 181138
+      "electors": 189598
     },
     "118": {
       "name": "Baindur",
@@ -954,7 +954,7 @@
       "district": "UDUPI",
       "parts": 294,
       "partsDone": 293,
-      "electors": 215841
+      "electors": 226015
     },
     "119": {
       "name": "Kundapur",
@@ -962,7 +962,7 @@
       "district": "UDUPI",
       "parts": 238,
       "partsDone": 237,
-      "electors": 190596
+      "electors": 199535
     },
     "120": {
       "name": "Udupi",
@@ -970,7 +970,7 @@
       "district": "UDUPI",
       "parts": 247,
       "partsDone": 244,
-      "electors": 191855
+      "electors": 200772
     },
     "121": {
       "name": "Kaup",
@@ -978,7 +978,7 @@
       "district": "UDUPI",
       "parts": 231,
       "partsDone": 230,
-      "electors": 175011
+      "electors": 183297
     },
     "122": {
       "name": "Karkala",
@@ -986,7 +986,7 @@
       "district": "UDUPI",
       "parts": 234,
       "partsDone": 233,
-      "electors": 174381
+      "electors": 182613
     },
     "123": {
       "name": "Sringeri",
@@ -994,7 +994,7 @@
       "district": "CHIKKMAGALUR",
       "parts": 261,
       "partsDone": 261,
-      "electors": 148901
+      "electors": 156046
     },
     "124": {
       "name": "Mudigere",
@@ -1002,7 +1002,7 @@
       "district": "CHIKKMAGALUR",
       "parts": 233,
       "partsDone": 233,
-      "electors": 143026
+      "electors": 149632
     },
     "125": {
       "name": "Chickamagalur",
@@ -1010,7 +1010,7 @@
       "district": "CHIKKMAGALUR",
       "parts": 270,
       "partsDone": 270,
-      "electors": 183237
+      "electors": 191899
     },
     "126": {
       "name": "Tarikere",
@@ -1018,7 +1018,7 @@
       "district": "CHIKKMAGALUR",
       "parts": 237,
       "partsDone": 237,
-      "electors": 164491
+      "electors": 172062
     },
     "127": {
       "name": "Kadur",
@@ -1026,7 +1026,7 @@
       "district": "CHIKKMAGALUR",
       "parts": 254,
       "partsDone": 254,
-      "electors": 179026
+      "electors": 187254
     },
     "128": {
       "name": "Chikknayakanhalli",
@@ -1122,7 +1122,7 @@
       "district": "CHIKKABALLAPUR",
       "parts": 271,
       "partsDone": 271,
-      "electors": 180679
+      "electors": 188907
     },
     "140": {
       "name": "Bagepalli",
@@ -1130,7 +1130,7 @@
       "district": "CHIKKABALLAPUR",
       "parts": 282,
       "partsDone": 281,
-      "electors": 174782
+      "electors": 182546
     },
     "141": {
       "name": "Chikkaballapur",
@@ -1138,7 +1138,7 @@
       "district": "CHIKKABALLAPUR",
       "parts": 271,
       "partsDone": 271,
-      "electors": 182563
+      "electors": 190980
     },
     "142": {
       "name": "Sidlaghatta",
@@ -1146,7 +1146,7 @@
       "district": "CHIKKABALLAPUR",
       "parts": 255,
       "partsDone": 255,
-      "electors": 176214
+      "electors": 184669
     },
     "143": {
       "name": "Chintamani",
@@ -1154,7 +1154,7 @@
       "district": "CHIKKABALLAPUR",
       "parts": 282,
       "partsDone": 281,
-      "electors": 185810
+      "electors": 194276
     },
     "144": {
       "name": "Srinivasapur",
@@ -1162,7 +1162,7 @@
       "district": "KOLAR",
       "parts": 288,
       "partsDone": 288,
-      "electors": 188458
+      "electors": 196696
     },
     "145": {
       "name": "Mulbagal",
@@ -1170,7 +1170,7 @@
       "district": "KOLAR",
       "parts": 274,
       "partsDone": 274,
-      "electors": 173790
+      "electors": 181107
     },
     "146": {
       "name": "Kolar Gold Field",
@@ -1178,7 +1178,7 @@
       "district": "KOLAR",
       "parts": 224,
       "partsDone": 224,
-      "electors": 155891
+      "electors": 163004
     },
     "147": {
       "name": "Bangarapet",
@@ -1186,7 +1186,7 @@
       "district": "KOLAR",
       "parts": 259,
       "partsDone": 259,
-      "electors": 172801
+      "electors": 180547
     },
     "148": {
       "name": "Kolar",
@@ -1194,7 +1194,7 @@
       "district": "KOLAR",
       "parts": 284,
       "partsDone": 283,
-      "electors": 194085
+      "electors": 202655
     },
     "149": {
       "name": "Malur",
@@ -1202,7 +1202,7 @@
       "district": "KOLAR",
       "parts": 249,
       "partsDone": 249,
-      "electors": 169619
+      "electors": 177462
     },
     "150": {
       "name": "Yelahanka",
@@ -1210,7 +1210,7 @@
       "district": "BANGALORE URBAN",
       "parts": 418,
       "partsDone": 418,
-      "electors": 290059
+      "electors": 303429
     },
     "151": {
       "name": "K.R. Pura",
@@ -1218,7 +1218,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 509,
       "partsDone": 507,
-      "electors": 285377
+      "electors": 298108
     },
     "152": {
       "name": "Byatarayanapura",
@@ -1226,7 +1226,7 @@
       "district": "BANGALORE URBAN",
       "parts": 442,
       "partsDone": 436,
-      "electors": 301774
+      "electors": 316293
     },
     "153": {
       "name": "Yeshwanthapura",
@@ -1234,7 +1234,7 @@
       "district": "BANGALORE URBAN",
       "parts": 553,
       "partsDone": 553,
-      "electors": 325412
+      "electors": 340144
     },
     "154": {
       "name": "Rajarajeshwarinagar",
@@ -1242,7 +1242,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 437,
       "partsDone": 437,
-      "electors": 259649
+      "electors": 271410
     },
     "155": {
       "name": "Dasarahalli",
@@ -1250,7 +1250,7 @@
       "district": "BANGALORE URBAN",
       "parts": 419,
       "partsDone": 419,
-      "electors": 215790
+      "electors": 224984
     },
     "156": {
       "name": "Mahalakshmi Layout",
@@ -1258,7 +1258,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 276,
       "partsDone": 276,
-      "electors": 154464
+      "electors": 161452
     },
     "157": {
       "name": "Malleshwaram",
@@ -1266,7 +1266,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 207,
       "partsDone": 207,
-      "electors": 113781
+      "electors": 119116
     },
     "158": {
       "name": "Hebbal",
@@ -1274,7 +1274,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 285,
       "partsDone": 285,
-      "electors": 162537
+      "electors": 170061
     },
     "159": {
       "name": "Pulakeshinagar",
@@ -1282,7 +1282,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 228,
       "partsDone": 228,
-      "electors": 152590
+      "electors": 159739
     },
     "160": {
       "name": "Sarvagnanagar",
@@ -1290,7 +1290,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 337,
       "partsDone": 337,
-      "electors": 216067
+      "electors": 226776
     },
     "161": {
       "name": "C.V. RamannNagar",
@@ -1298,7 +1298,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 244,
       "partsDone": 244,
-      "electors": 127358
+      "electors": 133030
     },
     "162": {
       "name": "Shivajinagar",
@@ -1306,7 +1306,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 191,
       "partsDone": 191,
-      "electors": 112354
+      "electors": 117521
     },
     "163": {
       "name": "Shantinagar",
@@ -1314,7 +1314,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 193,
       "partsDone": 193,
-      "electors": 121619
+      "electors": 127599
     },
     "164": {
       "name": "Gandhinagar",
@@ -1322,7 +1322,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 220,
       "partsDone": 220,
-      "electors": 116859
+      "electors": 122367
     },
     "165": {
       "name": "Rajajinagar",
@@ -1330,7 +1330,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 194,
       "partsDone": 194,
-      "electors": 104475
+      "electors": 109038
     },
     "166": {
       "name": "Govindarajanagar",
@@ -1338,7 +1338,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 269,
       "partsDone": 268,
-      "electors": 149214
+      "electors": 155956
     },
     "167": {
       "name": "Vijayanagar",
@@ -1346,7 +1346,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 284,
       "partsDone": 284,
-      "electors": 148549
+      "electors": 155387
     },
     "168": {
       "name": "Chamrajapet",
@@ -1354,7 +1354,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 216,
       "partsDone": 215,
-      "electors": 136298
+      "electors": 142708
     },
     "169": {
       "name": "Chickpet",
@@ -1362,7 +1362,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 222,
       "partsDone": 222,
-      "electors": 127028
+      "electors": 132696
     },
     "170": {
       "name": "Basavanagudi",
@@ -1370,7 +1370,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 220,
       "partsDone": 220,
-      "electors": 117719
+      "electors": 123027
     },
     "171": {
       "name": "Padmanabanagar",
@@ -1378,7 +1378,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 279,
       "partsDone": 279,
-      "electors": 158522
+      "electors": 165626
     },
     "172": {
       "name": "B.T.M Layout",
@@ -1386,7 +1386,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 243,
       "partsDone": 242,
-      "electors": 129072
+      "electors": 134840
     },
     "173": {
       "name": "Jayanagar",
@@ -1394,7 +1394,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 210,
       "partsDone": 210,
-      "electors": 120531
+      "electors": 126003
     },
     "174": {
       "name": "Mahadevapura",
@@ -1402,7 +1402,7 @@
       "district": "BANGALORE URBAN",
       "parts": 533,
       "partsDone": 533,
-      "electors": 370526
+      "electors": 387995
     },
     "175": {
       "name": "Bommanahalli",
@@ -1410,7 +1410,7 @@
       "district": "B.B.M.P(SOUTH)",
       "parts": 390,
       "partsDone": 390,
-      "electors": 209826
+      "electors": 218205
     },
     "176": {
       "name": "Bangalore South",
@@ -1418,7 +1418,7 @@
       "district": "BANGALORE URBAN",
       "parts": 605,
       "partsDone": 602,
-      "electors": 399434
+      "electors": 418349
     },
     "177": {
       "name": "Anekal",
@@ -1426,7 +1426,7 @@
       "district": "BANGALORE URBAN",
       "parts": 384,
       "partsDone": 383,
-      "electors": 240452
+      "electors": 251214
     },
     "178": {
       "name": "Hosakote",
@@ -1434,7 +1434,7 @@
       "district": "BANGALORE RURAL",
       "parts": 298,
       "partsDone": 298,
-      "electors": 208281
+      "electors": 217689
     },
     "179": {
       "name": "Devanahalli",
@@ -1442,7 +1442,7 @@
       "district": "BANGALORE RURAL",
       "parts": 296,
       "partsDone": 296,
-      "electors": 184966
+      "electors": 193313
     },
     "180": {
       "name": "Doddaballapur",
@@ -1450,7 +1450,7 @@
       "district": "BANGALORE RURAL",
       "parts": 279,
       "partsDone": 278,
-      "electors": 182357
+      "electors": 190721
     },
     "181": {
       "name": "Nelamangala",
@@ -1458,7 +1458,7 @@
       "district": "BANGALORE RURAL",
       "parts": 281,
       "partsDone": 280,
-      "electors": 182138
+      "electors": 190509
     },
     "182": {
       "name": "Magadi",
@@ -1466,7 +1466,7 @@
       "district": "RAMANAGARAM",
       "parts": 311,
       "partsDone": 311,
-      "electors": 204398
+      "electors": 213897
     },
     "183": {
       "name": "Ramanagaram",
@@ -1474,7 +1474,7 @@
       "district": "RAMANAGARAM",
       "parts": 284,
       "partsDone": 284,
-      "electors": 188231
+      "electors": 196984
     },
     "184": {
       "name": "Kanakapura",
@@ -1482,7 +1482,7 @@
       "district": "RAMANAGARAM",
       "parts": 301,
       "partsDone": 300,
-      "electors": 195384
+      "electors": 204232
     },
     "185": {
       "name": "Channapatna",
@@ -1490,7 +1490,7 @@
       "district": "RAMANAGARAM",
       "parts": 287,
       "partsDone": 287,
-      "electors": 201435
+      "electors": 210940
     },
     "186": {
       "name": "Malavalli",
@@ -1498,7 +1498,7 @@
       "district": "MANDYA",
       "parts": 291,
       "partsDone": 291,
-      "electors": 212785
+      "electors": 222546
     },
     "187": {
       "name": "Maddur",
@@ -1506,39 +1506,39 @@
       "district": "MANDYA",
       "parts": 262,
       "partsDone": 262,
-      "electors": 185422
+      "electors": 194093
     },
     "188": {
       "name": "Melukote",
       "nameKn": "ಮೇಲುಕೋಟೆ",
       "district": "MANDYA",
       "parts": 270,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 270,
+      "electors": 193326
     },
     "189": {
       "name": "Mandya",
       "nameKn": "ಮಂಡ್ಯ",
       "district": "MANDYA",
       "parts": 265,
-      "partsDone": 129,
-      "electors": 89330
+      "partsDone": 265,
+      "electors": 192806
     },
     "190": {
       "name": "Shrirangapattana",
       "nameKn": "ಶ್ರೀರಂಗಪಟ್ಟಣ",
       "district": "MANDYA",
       "parts": 253,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 253,
+      "electors": 198320
     },
     "191": {
       "name": "Nagamangala",
       "nameKn": "ನಾಗಮಂಗಲ",
       "district": "MANDYA",
       "parts": 272,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 272,
+      "electors": 200310
     },
     "192": {
       "name": "Krishnarajpet",
@@ -1546,7 +1546,7 @@
       "district": "MANDYA",
       "parts": 276,
       "partsDone": 276,
-      "electors": 194688
+      "electors": 203688
     },
     "193": {
       "name": "Shravanabelagola",
@@ -1554,7 +1554,7 @@
       "district": "HASSAN",
       "parts": 272,
       "partsDone": 272,
-      "electors": 183168
+      "electors": 191576
     },
     "194": {
       "name": "Arsikere",
@@ -1562,7 +1562,7 @@
       "district": "HASSAN",
       "parts": 281,
       "partsDone": 279,
-      "electors": 193779
+      "electors": 202992
     },
     "195": {
       "name": "Belur",
@@ -1570,7 +1570,7 @@
       "district": "HASSAN",
       "parts": 276,
       "partsDone": 275,
-      "electors": 176648
+      "electors": 184371
     },
     "196": {
       "name": "Hassan",
@@ -1578,7 +1578,7 @@
       "district": "HASSAN",
       "parts": 282,
       "partsDone": 282,
-      "electors": 180401
+      "electors": 188498
     },
     "197": {
       "name": "Holenarasipur",
@@ -1586,7 +1586,7 @@
       "district": "HASSAN",
       "parts": 330,
       "partsDone": 330,
-      "electors": 194346
+      "electors": 202826
     },
     "198": {
       "name": "Arakalgud",
@@ -1594,7 +1594,7 @@
       "district": "HASSAN",
       "parts": 292,
       "partsDone": 292,
-      "electors": 202986
+      "electors": 212490
     },
     "199": {
       "name": "Sakaleshpur",
@@ -1602,7 +1602,7 @@
       "district": "HASSAN",
       "parts": 295,
       "partsDone": 295,
-      "electors": 178581
+      "electors": 186716
     },
     "200": {
       "name": "Belthangady",
@@ -1674,7 +1674,7 @@
       "district": "KODAGU",
       "parts": 285,
       "partsDone": 283,
-      "electors": 197635
+      "electors": 207135
     },
     "209": {
       "name": "Virajpet",
@@ -1682,7 +1682,7 @@
       "district": "KODAGU",
       "parts": 282,
       "partsDone": 282,
-      "electors": 187749
+      "electors": 196413
     },
     "210": {
       "name": "Piriyapatna",
@@ -1690,7 +1690,7 @@
       "district": "MYSORE",
       "parts": 240,
       "partsDone": 185,
-      "electors": 131463
+      "electors": 137558
     },
     "211": {
       "name": "Krishnarajanagara",
@@ -1698,7 +1698,7 @@
       "district": "MYSORE",
       "parts": 259,
       "partsDone": 258,
-      "electors": 184468
+      "electors": 193037
     },
     "212": {
       "name": "Hunsur",
@@ -1706,7 +1706,7 @@
       "district": "MYSORE",
       "parts": 285,
       "partsDone": 285,
-      "electors": 208569
+      "electors": 218408
     },
     "213": {
       "name": "Heggadadevankote",
@@ -1714,7 +1714,7 @@
       "district": "MYSORE",
       "parts": 288,
       "partsDone": 287,
-      "electors": 191549
+      "electors": 200521
     },
     "214": {
       "name": "Nanjangud",
@@ -1722,7 +1722,7 @@
       "district": "MYSORE",
       "parts": 249,
       "partsDone": 247,
-      "electors": 181235
+      "electors": 189615
     },
     "215": {
       "name": "Chamundeshwari",
@@ -1730,7 +1730,7 @@
       "district": "MYSORE",
       "parts": 351,
       "partsDone": 351,
-      "electors": 262420
+      "electors": 274936
     },
     "216": {
       "name": "Krishnaraja",
@@ -1738,7 +1738,7 @@
       "district": "MYSORE",
       "parts": 265,
       "partsDone": 265,
-      "electors": 167494
+      "electors": 176082
     },
     "217": {
       "name": "Chamaraja",
@@ -1746,7 +1746,7 @@
       "district": "MYSORE",
       "parts": 248,
       "partsDone": 248,
-      "electors": 168727
+      "electors": 177428
     },
     "218": {
       "name": "Narasimharaja",
@@ -1754,7 +1754,7 @@
       "district": "MYSORE",
       "parts": 283,
       "partsDone": 283,
-      "electors": 217610
+      "electors": 227660
     },
     "219": {
       "name": "Varuna",
@@ -1762,7 +1762,7 @@
       "district": "MYSORE",
       "parts": 267,
       "partsDone": 65,
-      "electors": 49470
+      "electors": 51720
     },
     "220": {
       "name": "T. Narasipur",
@@ -1778,7 +1778,7 @@
       "district": "CHAMARAJNAGAR",
       "parts": 269,
       "partsDone": 269,
-      "electors": 192991
+      "electors": 202253
     },
     "222": {
       "name": "Kollegal",
@@ -1786,7 +1786,7 @@
       "district": "CHAMARAJNAGAR",
       "parts": 245,
       "partsDone": 245,
-      "electors": 187250
+      "electors": 195835
     },
     "223": {
       "name": "Chamarajanagar",
@@ -1794,7 +1794,7 @@
       "district": "CHAMARAJNAGAR",
       "parts": 259,
       "partsDone": 259,
-      "electors": 185614
+      "electors": 194385
     },
     "224": {
       "name": "Gundlupet",
@@ -1802,7 +1802,7 @@
       "district": "CHAMARAJNAGAR",
       "parts": 257,
       "partsDone": 257,
-      "electors": 189442
+      "electors": 198010
     }
   }
 }
