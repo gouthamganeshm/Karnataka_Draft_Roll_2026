@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T21:43:12.291Z",
+  "builtAt": "2026-08-29T22:39:12.832Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 40808441,
+  "electors": 41096314,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 56144,
-  "coverage": 92.16,
+  "partsDone": 56537,
+  "coverage": 92.8,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -329,8 +329,8 @@
       "nameKn": "ಚಿತ್ತಾಪೂರ",
       "district": "GULBARGA",
       "parts": 263,
-      "partsDone": 153,
-      "electors": 115869
+      "partsDone": 263,
+      "electors": 195463
     },
     "41": {
       "name": "Sedam",
@@ -353,16 +353,16 @@
       "nameKn": "ಗುಲಬರ್ಗಾ ಗ್ರಾಮಾಂತರ",
       "district": "GULBARGA",
       "parts": 304,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 18,
+      "electors": 12640
     },
     "44": {
       "name": "Gulbarga Dakshin",
       "nameKn": "ಗುಲಬರ್ಗಾ ದಕ್ಷಿಣ",
       "district": "GULBARGA",
       "parts": 265,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 265,
+      "electors": 195639
     },
     "45": {
       "name": "Gulbarga Uttar",
