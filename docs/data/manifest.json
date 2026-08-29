@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T06:37:44.031Z",
+  "builtAt": "2026-08-29T07:15:34.503Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 36477521,
+  "electors": 36685823,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 50599,
-  "coverage": 83.05,
+  "partsDone": 50891,
+  "coverage": 83.53,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -433,8 +433,8 @@
       "nameKn": "ರಾಯಚೂರು ಗ್ರಾಮಾಂತರ",
       "district": "RAICHUR",
       "parts": 278,
-      "partsDone": 164,
-      "electors": 113836
+      "partsDone": 278,
+      "electors": 197177
     },
     "54": {
       "name": "Raichur",
@@ -473,8 +473,8 @@
       "nameKn": "ಸಿಂಧನೂರು",
       "district": "RAICHUR",
       "parts": 272,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 178,
+      "electors": 124961
     },
     "59": {
       "name": "Maski",
