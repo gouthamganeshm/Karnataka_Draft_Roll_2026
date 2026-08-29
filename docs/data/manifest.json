@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T09:58:03.920Z",
+  "builtAt": "2026-08-29T10:34:38.265Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 37556771,
+  "electors": 37755778,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 51972,
-  "coverage": 85.31,
+  "partsDone": 52216,
+  "coverage": 85.71,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1625,16 +1625,16 @@
       "nameKn": "ಮಂಗಳೂರು ನಗರ ಉತ್ತರ",
       "district": "DAKSHINA KANNADA",
       "parts": 267,
-      "partsDone": 167,
-      "electors": 136086
+      "partsDone": 267,
+      "electors": 222764
     },
     "203": {
       "name": "Mangalore City South",
       "nameKn": "ಮಂಗಳೂರು ನಗರ ದಕ್ಷಿಣ",
       "district": "DAKSHINA KANNADA",
       "parts": 260,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 144,
+      "electors": 112329
     },
     "204": {
       "name": "Mangalore",
