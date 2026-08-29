@@ -164,30 +164,6 @@ if (noPush) {
 
 // ---------------------------------------------------------------------- push
 
-/* Rebase onto the remote before pushing. This loop is the only thing that
- * normally writes to `main`, so for a long time there was nothing to diverge
- * from and a bare push was fine. That stopped being true once documents meant
- * to be edited later — OBSERVATIONS-ASD.md — started living in the repo: an
- * edit made on GitHub, or a push from anywhere else, leaves the remote ahead
- * and every subsequent push in this loop fails non-fast-forward until someone
- * notices by hand.
- *
- * `--autostash` because the extraction running alongside can leave tracked
- * files dirty mid-cycle, and `--rebase` so a data commit never turns into a
- * merge bubble. If the rebase cannot be completed it is aborted rather than
- * left half-applied — the push is then skipped and the commit stays local, so
- * the next cycle retries. That is the existing failure behaviour, not a new
- * one; nothing is lost either way. */
-const pull = git('pull', '--rebase', '--autostash', 'origin', 'main');
-if (pull.status !== 0) {
-  log(pull.stdout || pull.stderr);
-  log('Pull/rebase failed — aborting it and leaving the commit local.');
-  git('rebase', '--abort');
-  log('Will retry on the next cycle.');
-  process.exit(pull.status ?? 1);
-}
-if (pull.stdout?.trim()) log(pull.stdout.trim());
-
 const push = await pushWithTimeout(20 * 60 * 1000);
 log(push.stdout || push.stderr);
 if (push.status !== 0) {

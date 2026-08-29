@@ -3,8 +3,11 @@
 Session of **2026-08-29**. Written to be picked up cold, without re-deriving
 anything. Companion to `HANDOFF.md`; merge into it when convenient.
 
-Nothing in the extraction or publish pipeline was changed to produce this,
-with one deliberate exception recorded in §9.
+**Nothing in the extraction or publish pipeline was changed.** No script was
+edited, nothing was restarted, and extraction, verification and the publish
+loop ran undisturbed throughout. §9 records one change that is *recommended*
+but deliberately **not applied** — it is written out in full there so it can be
+applied deliberately, later, by a human who wants it.
 
 Everything marked **verified** was actually run this session and its output
 inspected. Everything marked **inferred** was reasoned but not tested — the
@@ -343,22 +346,79 @@ where the mockup's category dots come from. Not a bug; an asset.
 
 ---
 
-## 9. The one change made to the pipeline
+## 9. Recommended: rebase before pushing — **not applied**
 
-`scripts/5-publish.mjs` previously ran `git push` with no fetch first. Because
-this file was committed while the publish loop was live, and because the
-observations here are meant to be edited later — possibly on GitHub directly —
-a **`git pull --rebase --autostash` was added immediately before the push**, so
-a diverged remote self-heals instead of failing the cycle.
+This is a recommendation only. `scripts/5-publish.mjs` is **unchanged** and
+remains byte-identical to what it was before this session.
 
-`6-auto-publish.mjs` re-spawns `5-publish.mjs` as a fresh child every cycle, so
-this took effect on the next cycle with **no restart and no interruption** to
-the running extraction. The rebase is guarded: if it fails it aborts cleanly and
-the push is skipped, leaving the commit local for the next cycle to retry —
-exactly the existing failure behaviour.
+### The problem
 
-Nothing else in the pipeline was touched. Extraction, verification and the
-publish loop ran undisturbed throughout this session.
+`5-publish.mjs` runs `git push origin HEAD` with no fetch first. That was safe
+for as long as this loop was the *only* writer on `main` — there was nothing to
+diverge from. That assumption breaks the moment anything else writes to the
+branch, and this file is exactly such a thing: it exists to be picked up and
+edited later, quite possibly on GitHub directly.
+
+When it does break, it breaks quietly and repeatedly. The remote ends up ahead,
+every subsequent push in the loop is rejected non-fast-forward, and because
+`6-auto-publish.mjs` treats a failed publish as "retry next cycle", **the loop
+keeps running and keeps failing** — publishing silently stops while the log
+fills with retries, until a human notices.
+
+### The fix
+
+Insert immediately before the `// ---- push` block's `pushWithTimeout` call:
+
+```js
+const pull = git('pull', '--rebase', '--autostash', 'origin', 'main');
+if (pull.status !== 0) {
+  log(pull.stdout || pull.stderr);
+  log('Pull/rebase failed — aborting it and leaving the commit local.');
+  git('rebase', '--abort');
+  log('Will retry on the next cycle.');
+  process.exit(pull.status ?? 1);
+}
+if (pull.stdout?.trim()) log(pull.stdout.trim());
+```
+
+`--autostash` because the extraction running alongside can leave tracked files
+dirty mid-cycle, which would otherwise block the rebase outright. `--rebase` so
+a data commit never turns into a merge bubble. On failure the rebase is aborted
+rather than left half-applied, the push is skipped, and the commit stays local
+for the next cycle — which is the script's *existing* failure behaviour, so this
+adds no new way to lose work.
+
+### Verified in a throwaway clone, not against this repo
+
+Two clones against a bare remote, with the doc edited in one and a data commit
+made in the other:
+
+```
+OLD  git push origin HEAD
+     ! [rejected]  HEAD -> main (fetch first)
+
+NEW  git pull --rebase --autostash origin main   ->  Successfully rebased
+     git push origin HEAD                        ->  5af9f5c..ff291ca  HEAD -> main
+```
+
+History stayed linear (`Publish roll data` on top of `edit from github`, no
+merge bubble) and the edit made elsewhere survived intact.
+
+### Applying it later is safe
+
+`6-auto-publish.mjs` re-spawns `5-publish.mjs` as a fresh child process every
+cycle, so editing the file takes effect on the **next** cycle with no restart
+and no interruption to extraction. Run `node --check scripts/5-publish.mjs`
+after editing — a syntax error there takes the whole publish loop down.
+
+### Until it is applied
+
+If the remote ever diverges, the loop will stall silently. The manual recovery
+is one command, run when no publish is mid-cycle:
+
+```
+git pull --rebase --autostash origin main && git push origin HEAD
+```
 
 ---
 
