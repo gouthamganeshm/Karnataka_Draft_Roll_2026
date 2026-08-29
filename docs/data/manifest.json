@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T09:18:28.542Z",
+  "builtAt": "2026-08-29T09:58:03.920Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 37338984,
+  "electors": 37556771,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 51702,
-  "coverage": 84.86,
+  "partsDone": 51972,
+  "coverage": 85.31,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -489,16 +489,16 @@
       "nameKn": "ಕುಷ್ಟಗಿ",
       "district": "KOPPAL",
       "parts": 282,
-      "partsDone": 281,
-      "electors": 207829
+      "partsDone": 282,
+      "electors": 208667
     },
     "61": {
       "name": "Kanakagiri",
       "nameKn": "ಕನಕಗಿರಿ",
       "district": "KOPPAL",
       "parts": 277,
-      "partsDone": 274,
-      "electors": 206198
+      "partsDone": 277,
+      "electors": 208418
     },
     "62": {
       "name": "Gangavathi",
@@ -513,16 +513,16 @@
       "nameKn": "ಯಲಬುರ್ಗಾ",
       "district": "KOPPAL",
       "parts": 259,
-      "partsDone": 258,
-      "electors": 205162
+      "partsDone": 259,
+      "electors": 205891
     },
     "64": {
       "name": "Koppal",
       "nameKn": "ಕೊಪ್ಪಳ",
       "district": "KOPPAL",
       "parts": 294,
-      "partsDone": 293,
-      "electors": 225788
+      "partsDone": 294,
+      "electors": 226408
     },
     "65": {
       "name": "Shirahatti",
@@ -561,8 +561,8 @@
       "nameKn": "ನವಲಗುಂದ",
       "district": "DHARWAD",
       "parts": 242,
-      "partsDone": 241,
-      "electors": 191955
+      "partsDone": 242,
+      "electors": 192774
     },
     "70": {
       "name": "Kundgol",
@@ -577,8 +577,8 @@
       "nameKn": "ಧಾರವಾಡ",
       "district": "DHARWAD",
       "parts": 247,
-      "partsDone": 246,
-      "electors": 192598
+      "partsDone": 247,
+      "electors": 193186
     },
     "72": {
       "name": "Hubli-Dharwad-East",
@@ -617,16 +617,16 @@
       "nameKn": "ಹಳಿಯಾಳ",
       "district": "UTTARA KANNADA",
       "parts": 234,
-      "partsDone": 233,
-      "electors": 166391
+      "partsDone": 234,
+      "electors": 167415
     },
     "77": {
       "name": "Karwar",
       "nameKn": "ಕಾರವಾರ",
       "district": "UTTARA KANNADA",
       "parts": 265,
-      "partsDone": 260,
-      "electors": 193932
+      "partsDone": 265,
+      "electors": 198370
     },
     "78": {
       "name": "Kumta",
@@ -649,8 +649,8 @@
       "nameKn": "ಸಿರ್ಸಿ",
       "district": "UTTARA KANNADA",
       "parts": 278,
-      "partsDone": 277,
-      "electors": 189745
+      "partsDone": 278,
+      "electors": 190730
     },
     "81": {
       "name": "Yellapur",
@@ -713,8 +713,8 @@
       "nameKn": "ಹಡಗಲಿ",
       "district": "VIJAYANAGARA",
       "parts": 226,
-      "partsDone": 225,
-      "electors": 173373
+      "partsDone": 226,
+      "electors": 173994
     },
     "89": {
       "name": "Hagaribommanahalli",
@@ -777,8 +777,8 @@
       "nameKn": "ಕೂಡ್ಲಿಗಿ",
       "district": "VIJAYANAGARA",
       "parts": 264,
-      "partsDone": 263,
-      "electors": 193669
+      "partsDone": 264,
+      "electors": 194239
     },
     "97": {
       "name": "Molakalmuru",
@@ -801,8 +801,8 @@
       "nameKn": "ಚಿತ್ರದುರ್ಗ",
       "district": "CHITRADURGA",
       "parts": 302,
-      "partsDone": 301,
-      "electors": 229691
+      "partsDone": 302,
+      "electors": 230051
     },
     "100": {
       "name": "Hiriyur",
@@ -865,8 +865,8 @@
       "nameKn": "ದಾವಣಗೆರೆ ದಕ್ಷಿಣ",
       "district": "DAVANGERE",
       "parts": 284,
-      "partsDone": 281,
-      "electors": 172520
+      "partsDone": 284,
+      "electors": 174069
     },
     "108": {
       "name": "Mayakonda",
@@ -889,8 +889,8 @@
       "nameKn": "ಹೊನ್ನಾಳಿ",
       "district": "DAVANGERE",
       "parts": 248,
-      "partsDone": 247,
-      "electors": 182607
+      "partsDone": 248,
+      "electors": 183327
     },
     "111": {
       "name": "Shimoga Rural",
@@ -937,8 +937,8 @@
       "nameKn": "ಸೊರಬ",
       "district": "SHIMOGA",
       "parts": 256,
-      "partsDone": 255,
-      "electors": 181257
+      "partsDone": 256,
+      "electors": 181950
     },
     "117": {
       "name": "Sagar",
@@ -953,40 +953,40 @@
       "nameKn": "ಬೈಂದೂರು",
       "district": "UDUPI",
       "parts": 294,
-      "partsDone": 293,
-      "electors": 226015
+      "partsDone": 294,
+      "electors": 227103
     },
     "119": {
       "name": "Kundapur",
       "nameKn": "ಕುಂದಾಪುರ",
       "district": "UDUPI",
       "parts": 238,
-      "partsDone": 237,
-      "electors": 199535
+      "partsDone": 238,
+      "electors": 200354
     },
     "120": {
       "name": "Udupi",
       "nameKn": "ಉಡುಪಿ",
       "district": "UDUPI",
       "parts": 247,
-      "partsDone": 244,
-      "electors": 200772
+      "partsDone": 247,
+      "electors": 203364
     },
     "121": {
       "name": "Kaup",
       "nameKn": "ಕಾಪು",
       "district": "UDUPI",
       "parts": 231,
-      "partsDone": 230,
-      "electors": 183297
+      "partsDone": 231,
+      "electors": 184157
     },
     "122": {
       "name": "Karkala",
       "nameKn": "ಕಾರ್ಕಳ",
       "district": "UDUPI",
       "parts": 234,
-      "partsDone": 233,
-      "electors": 182613
+      "partsDone": 234,
+      "electors": 183172
     },
     "123": {
       "name": "Sringeri",
@@ -1129,8 +1129,8 @@
       "nameKn": "ಬಾಗೇಪಲ್ಲಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 281,
-      "electors": 182546
+      "partsDone": 282,
+      "electors": 183428
     },
     "141": {
       "name": "Chikkaballapur",
@@ -1153,8 +1153,8 @@
       "nameKn": "ಚಿಂತಾಮಣಿ",
       "district": "CHIKKABALLAPUR",
       "parts": 282,
-      "partsDone": 281,
-      "electors": 194276
+      "partsDone": 282,
+      "electors": 194799
     },
     "144": {
       "name": "Srinivasapur",
@@ -1193,8 +1193,8 @@
       "nameKn": "ಕೋಲಾರ",
       "district": "KOLAR",
       "parts": 284,
-      "partsDone": 283,
-      "electors": 202655
+      "partsDone": 284,
+      "electors": 203439
     },
     "149": {
       "name": "Malur",
@@ -1217,16 +1217,16 @@
       "nameKn": "ಕೆ.ಆರ್‌.ಪುರ",
       "district": "B.B.M.P(NORTH)",
       "parts": 509,
-      "partsDone": 507,
-      "electors": 298108
+      "partsDone": 509,
+      "electors": 299354
     },
     "152": {
       "name": "Byatarayanapura",
       "nameKn": "ಬ್ಯಾಟರಾಯನಪುರ",
       "district": "BANGALORE URBAN",
       "parts": 442,
-      "partsDone": 436,
-      "electors": 316293
+      "partsDone": 442,
+      "electors": 320020
     },
     "153": {
       "name": "Yeshwanthapura",
@@ -1337,8 +1337,8 @@
       "nameKn": "ಗೋವಿಂದರಾಜ ನಗರ",
       "district": "B.B.M.P(SOUTH)",
       "parts": 269,
-      "partsDone": 268,
-      "electors": 155956
+      "partsDone": 269,
+      "electors": 156634
     },
     "167": {
       "name": "Vijayanagar",
@@ -1353,8 +1353,8 @@
       "nameKn": "ಚಾಮರಾಜಪೇಟೆ",
       "district": "B.B.M.P(CENTRAL)",
       "parts": 216,
-      "partsDone": 215,
-      "electors": 142708
+      "partsDone": 216,
+      "electors": 143755
     },
     "169": {
       "name": "Chickpet",
@@ -1385,8 +1385,8 @@
       "nameKn": "ಬಿ.ಟಿ.ಎಂ ಲೇಔಟ್",
       "district": "B.B.M.P(SOUTH)",
       "parts": 243,
-      "partsDone": 242,
-      "electors": 134840
+      "partsDone": 243,
+      "electors": 135687
     },
     "173": {
       "name": "Jayanagar",
@@ -1417,16 +1417,16 @@
       "nameKn": "ಬೆಂಗಳೂರು ದಕ್ಷಿಣ",
       "district": "BANGALORE URBAN",
       "parts": 605,
-      "partsDone": 602,
-      "electors": 418349
+      "partsDone": 605,
+      "electors": 420285
     },
     "177": {
       "name": "Anekal",
       "nameKn": "ಆನೇಕಲ್‌",
       "district": "BANGALORE URBAN",
       "parts": 384,
-      "partsDone": 383,
-      "electors": 251214
+      "partsDone": 384,
+      "electors": 251681
     },
     "178": {
       "name": "Hosakote",
@@ -1449,16 +1449,16 @@
       "nameKn": "ದೊಡ್ಡಬಳ್ಳಾಪುರ",
       "district": "BANGALORE RURAL",
       "parts": 279,
-      "partsDone": 278,
-      "electors": 190721
+      "partsDone": 279,
+      "electors": 191616
     },
     "181": {
       "name": "Nelamangala",
       "nameKn": "ನೆಲಮಂಗಲ",
       "district": "BANGALORE RURAL",
       "parts": 281,
-      "partsDone": 280,
-      "electors": 190509
+      "partsDone": 281,
+      "electors": 191517
     },
     "182": {
       "name": "Magadi",
@@ -1481,8 +1481,8 @@
       "nameKn": "ಕನಕಪುರ",
       "district": "RAMANAGARAM",
       "parts": 301,
-      "partsDone": 300,
-      "electors": 204232
+      "partsDone": 301,
+      "electors": 204637
     },
     "185": {
       "name": "Channapatna",
@@ -1561,16 +1561,16 @@
       "nameKn": "ಅರಸೀಕೆರೆ",
       "district": "HASSAN",
       "parts": 281,
-      "partsDone": 279,
-      "electors": 202992
+      "partsDone": 281,
+      "electors": 204245
     },
     "195": {
       "name": "Belur",
       "nameKn": "ಬೇಲೂರು",
       "district": "HASSAN",
       "parts": 276,
-      "partsDone": 275,
-      "electors": 184371
+      "partsDone": 276,
+      "electors": 185311
     },
     "196": {
       "name": "Hassan",
@@ -1609,8 +1609,8 @@
       "nameKn": "ಬೆಳ್ತಂಗಡಿ",
       "district": "DAKSHINA KANNADA",
       "parts": 268,
-      "partsDone": 266,
-      "electors": 215822
+      "partsDone": 268,
+      "electors": 217122
     },
     "201": {
       "name": "Moodabidri",
@@ -1625,8 +1625,8 @@
       "nameKn": "ಮಂಗಳೂರು ನಗರ ಉತ್ತರ",
       "district": "DAKSHINA KANNADA",
       "parts": 267,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 167,
+      "electors": 136086
     },
     "203": {
       "name": "Mangalore City South",
@@ -1641,16 +1641,16 @@
       "nameKn": "ಮಂಗಳೂರು",
       "district": "DAKSHINA KANNADA",
       "parts": 235,
-      "partsDone": 192,
-      "electors": 156285
+      "partsDone": 235,
+      "electors": 194401
     },
     "205": {
       "name": "Bantwal",
       "nameKn": "ಬಂಟ್ವಾಳ",
       "district": "DAKSHINA KANNADA",
       "parts": 261,
-      "partsDone": 259,
-      "electors": 208406
+      "partsDone": 261,
+      "electors": 209851
     },
     "206": {
       "name": "Puttur",
@@ -1673,8 +1673,8 @@
       "nameKn": "ಮಡಿಕೇರಿ",
       "district": "KODAGU",
       "parts": 285,
-      "partsDone": 283,
-      "electors": 207135
+      "partsDone": 285,
+      "electors": 208645
     },
     "209": {
       "name": "Virajpet",
