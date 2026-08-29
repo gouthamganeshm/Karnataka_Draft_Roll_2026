@@ -11,10 +11,20 @@
  * A record is
  *
  *   [hash8, acNo, partNo, serial]
+ *   [hash8, acNo, partNo, serial, 1]   // trailing 1 = serial not OCR-confirmed
  *
  * and carries no EPIC. The browser already knows the number the user typed, so
  * it can render it; publishing it would turn this into a scrapeable
  * EPIC-to-elector table, which is exactly what it must not become.
+ *
+ * The trailing flag exists because the OCR stage withholds two different
+ * things under one `ok` bit: an EPIC that fails its grammar (real misread,
+ * cannot be published at all) and a serial that the part's sequence-fit
+ * could not independently confirm (the EPIC itself is fine). Measured across
+ * the first 8 districts to reach 100% coverage, 95% of `ok: false` rows were
+ * the second kind — a correct EPIC held back only because of the serial. This
+ * publishes those rows rather than dropping the elector from search entirely,
+ * flagging the serial as approximate instead of pretending it is confirmed.
  *
  * There is no name field because the OCR stage deliberately does not read one —
  * see the README. That keeps records to four small values, which is what makes
@@ -45,9 +55,9 @@
  * run ever, `docs/data` was deleted or edited outside this script, or the
  * bucket depth needs to change because the state has grown enough to need
  * finer sharding). Incremental and full builds share the exact same
- * acceptance rules (a row needs `ok` and a well-formed EPIC) and the same
- * manifest-writing code, so they cannot silently diverge in what counts as a
- * valid record.
+ * acceptance rule (a row needs a well-formed EPIC; `ok` only decides the
+ * trailing approximate-serial flag) and the same manifest-writing code, so
+ * they cannot silently diverge in what counts as a valid record.
  */
 
 import { createReadStream } from 'node:fs';
@@ -197,13 +207,27 @@ if (!canIncremental) {
   log(forceFull || onlyAcs ? 'Full rebuild (requested)…' : 'Full rebuild (no usable checkpoint)…');
 
   const buckets = new Map();
+  // Per-bucket suffix sets, not one global Set(epic) — V8 caps a single Set
+  // at 2^24 entries, and the full state now holds tens of millions of rows.
+  // Splitting the membership check across ~65,536 small per-bucket sets (the
+  // same scope the incremental path already uses, just built from a single
+  // pass here instead of from disk) keeps every individual Set far under
+  // that ceiling while the duplicate check stays O(1). Hit exactly this
+  // ceiling on 2026-08-29 at ~16.7M rows into a full rebuild.
+  const bucketSuffixes = new Map();
   const acStats = {};
-  const seen = new Set();
+  let electors = 0;
   let duplicates = 0;
   let lowConfidence = 0;
+  let approxSerial = 0;
   let built = 0;
 
-  await rm(DATA, { recursive: true, force: true });
+  // maxRetries: Windows AV/indexer can briefly hold a lock on a file inside
+  // DATA while this is deleting it, throwing ENOTEMPTY on an unrelated bucket
+  // dir each time (hit repeatedly on 2026-08-29). fs.rm's own retry defaults
+  // to 0 attempts, so it doesn't self-heal without this. A 1s budget (5x200ms)
+  // was not enough against a 65k-file tree — widened to ~15s.
+  await rm(DATA, { recursive: true, force: true, maxRetries: 30, retryDelay: 500 });
   await mkdir(resolve(DATA, 'parts'), { recursive: true });
 
   for (const file of rowFiles) {
@@ -219,25 +243,32 @@ if (!canIncremental) {
       const epic = String(row.epic ?? '').trim().toUpperCase();
       const partNo = +row.part || 0;
 
-      // A row the OCR could not vouch for is counted toward the part's
-      // coverage shortfall, never published as a record. Publishing a
-      // misread EPIC would tell one person they are on the roll and another
-      // that they are not.
-      if (!row.ok || !/^[A-Z]{3}[0-9]{7}$/.test(epic)) { lowConfidence++; continue; }
-
-      // The same EPIC can appear in two parts when a transfer is mid-flight.
-      if (seen.has(epic)) { duplicates++; continue; }
-      seen.add(epic);
+      // An EPIC that fails its own grammar is a genuine misread and cannot be
+      // published at all — publishing it would tell one person they are on
+      // the roll and another that they are not. A well-formed EPIC whose
+      // serial the sequence-fit could not confirm is published anyway, with
+      // the approximate-serial flag set below, rather than dropped entirely.
+      if (!/^[A-Z]{3}[0-9]{7}$/.test(epic)) { lowConfidence++; continue; }
+      const approx = !row.ok;
+      if (approx) approxSerial++;
 
       const hash = sha256hex(epic);
       const prefix = hash.slice(0, shardDepth);
+      const suffix = hash.slice(shardDepth, shardDepth + SUFFIX);
+
+      // The same EPIC can appear in two parts when a transfer is mid-flight —
+      // checked per-bucket (see `bucketSuffixes` above), which is exactly the
+      // scope a duplicate must collide within anyway.
+      let suffixSet = bucketSuffixes.get(prefix);
+      if (!suffixSet) { suffixSet = new Set(); bucketSuffixes.set(prefix, suffixSet); }
+      if (suffixSet.has(suffix)) { duplicates++; continue; }
+      suffixSet.add(suffix);
+      electors++;
+
       if (!buckets.has(prefix)) buckets.set(prefix, []);
-      buckets.get(prefix).push([
-        hash.slice(shardDepth, shardDepth + SUFFIX),
-        acNo,
-        partNo,
-        +row.serial || 0
-      ]);
+      const rec = [suffix, acNo, partNo, +row.serial || 0];
+      if (approx) rec.push(1);
+      buckets.get(prefix).push(rec);
 
       if (row.partName && !parts[partNo]) parts[partNo] = String(row.partName).trim();
 
@@ -275,12 +306,13 @@ if (!canIncremental) {
   }
   progress('');
 
-  const { partsTotal, partsDone, coverage } = await writeManifest(acStats, seen.size);
+  const { partsTotal, partsDone, coverage } = await writeManifest(acStats, electors);
 
   log(`\nWrote ${buckets.size} buckets (${fmtBytes(bytes)}) to ${DATA}`);
-  log(`  ${seen.size} electors, ${Object.keys(acStats).length} constituencies, ${partsDone}/${partsTotal} booths (${coverage.toFixed(1)}%)`);
+  log(`  ${electors} electors, ${Object.keys(acStats).length} constituencies, ${partsDone}/${partsTotal} booths (${coverage.toFixed(1)}%)`);
   if (duplicates) log(`  ${duplicates} duplicate EPICs skipped`);
   if (lowConfidence) log(`  ${lowConfidence} rows withheld as low-confidence (${(lowConfidence / total * 100).toFixed(1)}%)`);
+  if (approxSerial) log(`  ${approxSerial} published with an approximate serial (${(approxSerial / total * 100).toFixed(1)}%)`);
 
   // A partial `--ac`/`--full` run against a subset does not describe the
   // whole state, so it cannot seed a checkpoint later runs would trust.
@@ -288,9 +320,10 @@ if (!canIncremental) {
     await writeJson(STATE_PATH, {
       shardDepth,
       suffixLength: SUFFIX,
-      electors: seen.size,
+      electors,
       duplicates,
       lowConfidence,
+      approxSerial,
       acLineCounts: lineCounts,
       acStats
     });
@@ -311,6 +344,7 @@ if (!canIncremental) {
 
   const candidatesByPrefix = new Map();
   let scannedLowConfidence = 0;
+  let scannedApproxSerial = 0;
 
   for (const ac of changedAcs) {
     const startLine = state.acLineCounts[ac] ?? 0;
@@ -327,7 +361,9 @@ if (!canIncremental) {
       const row = JSON.parse(line);
       const epic = String(row.epic ?? '').trim().toUpperCase();
       const partNo = +row.part || 0;
-      if (!row.ok || !/^[A-Z]{3}[0-9]{7}$/.test(epic)) { scannedLowConfidence++; continue; }
+      if (!/^[A-Z]{3}[0-9]{7}$/.test(epic)) { scannedLowConfidence++; continue; }
+      const approx = !row.ok;
+      if (approx) scannedApproxSerial++;
 
       const hash = sha256hex(epic);
       const prefix = hash.slice(0, shardDepth);
@@ -337,6 +373,7 @@ if (!canIncremental) {
         acNo: ac,
         partNo,
         serial: +row.serial || 0,
+        approx,
         partName: row.partName ? String(row.partName).trim() : ''
       });
     }
@@ -364,11 +401,13 @@ if (!canIncremental) {
       // The same EPIC can appear in two parts when a transfer is mid-flight —
       // and because SHA-256(EPIC) is deterministic, "already in this bucket"
       // is exactly the cross-constituency duplicate check the full-rebuild
-      // path does with a single statewide `seen` set, just scoped to the one
-      // bucket this EPIC could ever land in.
+      // path does too (`bucketSuffixes` there), just read from disk here
+      // instead of built in one pass.
       if (suffixesHere.has(c.suffix)) { scannedDuplicates++; continue; }
       suffixesHere.add(c.suffix);
-      merged.push([c.suffix, c.acNo, c.partNo, c.serial]);
+      const rec = [c.suffix, c.acNo, c.partNo, c.serial];
+      if (c.approx) rec.push(1);
+      merged.push(rec);
       scannedElectors++;
 
       const stat = state.acStats[c.acNo] ?? (state.acStats[c.acNo] = { electors: 0, partsSeen: [] });
@@ -399,6 +438,7 @@ if (!canIncremental) {
   state.electors = newElectorsTotal;
   state.duplicates = (state.duplicates ?? 0) + scannedDuplicates;
   state.lowConfidence = (state.lowConfidence ?? 0) + scannedLowConfidence;
+  state.approxSerial = (state.approxSerial ?? 0) + scannedApproxSerial;
 
   const { partsTotal, partsDone, coverage } = await writeManifest(state.acStats, newElectorsTotal);
 
@@ -406,6 +446,7 @@ if (!canIncremental) {
   log(`  ${newElectorsTotal} electors total, ${Object.keys(state.acStats).length} constituencies, ${partsDone}/${partsTotal} booths (${coverage.toFixed(1)}%)`);
   if (scannedDuplicates) log(`  ${scannedDuplicates} duplicate EPICs skipped this build`);
   if (scannedLowConfidence) log(`  ${scannedLowConfidence} rows withheld as low-confidence this build`);
+  if (scannedApproxSerial) log(`  ${scannedApproxSerial} published with an approximate serial this build`);
 
   await writeJson(STATE_PATH, state);
 }

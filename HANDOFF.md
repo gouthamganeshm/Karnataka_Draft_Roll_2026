@@ -322,7 +322,7 @@ supplementary or oddly-laid-out page. These do not get marked done, so every
 future round will keep retrying and keep failing on exactly these 6 — AC 152
 will plateau at 436/442 until someone fixes the geometry case. 6 of 19,801
 parts (0.03%); not chased further this session, flagged here so it is not
-mistaken for a new regression.
+mistaken for a new regression. **Fixed 2026-08-29 — see section 4g.**
 
 ## 4f. Full-state queue — 2026-08-25, ascending by booth count, all 34 districts
 
@@ -537,6 +537,142 @@ product decision than the original ask.
 Next cheap step if revisited: OCR ~50-100 cached English-roll name crops and
 hand-check against the source PDF — turns the accuracy question from an
 estimate into a real number. Not run yet; still just study.
+
+## 4g. Two fixes — 2026-08-29, cross-district validation against the CEO press
+note surfaced both
+
+Cross-checking the first 8 districts to reach 100% coverage against the CEO's
+28.08.2026 press note (statewide 4,46,35,948 electors) found every district
+landing at a consistent 94.8-95.4% of the official count — no outliers, but a
+real, explainable shortfall worth chasing since the gap is uniform rather than
+random.
+
+**Fix 1 — the AC152 crop-geometry crash (referenced in section 9) was not
+AC152-specific.** Same `ValueError: Coordinate 'right' is less than 'left'`
+was hitting AC152, AC168, AC176, AC177 and AC110 on specific parts,
+deterministically on every retry (confirmed via `cache/extract.log`: the same
+part numbers fail every single round). Root cause: `card_header` in
+`scripts/ocr/roll_ocr.py` computes a card's serial/EPIC crop boxes from
+detected rule positions and calls `im.crop()` without checking the box is
+non-degenerate first — on a card where rule-detection lands on a near-zero-
+width box (noise on the source page), PIL raises rather than clamping, and
+that exception was uncaught, killing the *entire part* (do_part in
+`2-extract.py` catches it as `{'error': ...}` and never writes the part to
+`cache/done/<ac>.txt`), so it retried and failed identically forever. Fixed by
+validating both crop boxes in `card_header` before cropping and returning
+`None, None` (already-handled "unreadable card" path) instead of raising.
+Verified directly against two previously-permanently-failing parts (AC152
+part 359, AC177 part 235) — both now read cleanly (486 and 468 rows). This
+unblocks every AC that had a part stuck on this bug from ever reaching 100%;
+AC177 (Anekal) was sitting at 383/384 for exactly this reason.
+
+**Fix 2 — most of the "low-confidence" shortfall was a publishing-gate
+problem, not an OCR-accuracy problem.** Broke down the ~4.6% of rows withheld
+as `ok: false` across the 8 complete districts (8.1M rows): **95.3% have a
+grammar-valid EPIC** and are withheld *only* because the part's serial
+sequence-fit (`repair_serials` in `roll_ocr.py`) could not independently
+confirm that row's position — the EPIC itself was read correctly. Only 4.7%
+of withheld rows are genuine EPIC misreads. `scripts/3-build-data.mjs` was
+dropping both cases identically (`if (!row.ok || !EPIC_RE.test(epic))`),
+discarding a correctly-read elector from search over an unconfirmed serial
+number alone. Changed the acceptance rule to publish any row with a
+grammar-valid EPIC; rows where `row.ok` was false get a trailing `1` appended
+to their record tuple (`[hash8, ac, part, serial, 1]`) marking the serial as
+approximate rather than OCR-confirmed. `docs/app.js` shows a caveat line
+(`approxSerialNote`, both languages) when that flag is present, pointing to
+the source PDF as authoritative. No new OCR needed — the EPIC was already
+sitting in `cache/rows/*.jsonl`; this only required reprocessing already-read
+rows through a full rebuild (`node scripts/3-build-data.mjs --full`) to
+retroactively recover them, since the incremental build path only processes
+rows past its `build-state.json` checkpoint. Projected effect: shortfall
+against official district totals should drop from ~4.6% to roughly ~0.2%
+once the full rebuild ships.
+
+**Coordination note for future full rebuilds**: `3-build-data.mjs --full`
+starts by `rm`-ing `docs/data` before rewriting it, and the auto-publish loop
+(`scripts/6-auto-publish.mjs`) runs its own (incremental) build/commit/push
+cycle on the same directory every ~30-45 min. Running a manual full rebuild
+while that cycle is mid-flight is a real race (confirmed a `git push` from an
+in-flight cycle can run 10-15+ minutes on this connection/tree size) — wait
+for `cache/publish.log`'s latest line and no active `git.exe` process before
+starting one by hand.
+
+## 4h. Three more bugs — 2026-08-29, later the same day as 4g
+
+The full rebuild needed to retroactively apply 4g's two fixes to already-read
+data stalled the site for **~5 hours** (last good publish 06:45, next one
+11:10) on two new bugs neither previous session had hit, because the dataset
+crossed a size threshold neither had reached before. A third, more important
+finding: **4g's crop-geometry fix was never actually live**, despite reading
+as verified there. All three found by the user pushing for "robust testing"
+of new vs. old data rather than trusting the fix commits at face value.
+
+**Bug 1 — `ENOTEMPTY` deleting `docs/data`.** `3-build-data.mjs`'s full-rebuild
+path opens with `await rm(DATA, { recursive: true, force: true })`. Starting
+~07:28, every attempt crashed with `ENOTEMPTY: directory not empty, rmdir
+'...\docs\data\roll\<random 2-hex dir>'` — a different bucket subdirectory
+each time (`43`, `40`, `89`, `d5`, ...), the signature of a transient
+Windows AV/indexer lock racing the delete rather than anything wrong with the
+tree itself. `fs.rm`'s own Windows retry logic defaults to `maxRetries: 0`, so
+it never self-healed. First fix attempt (`maxRetries: 5, retryDelay: 200` —
+~1s budget) **was not enough** and still failed once. Widened to
+`maxRetries: 30, retryDelay: 500` (~15s budget), which held.
+
+**Bug 2 — heap OOM once bug 1 stopped masking it.** With deletion no longer
+crashing first, rebuilds ran long enough to hit a second wall: `FATAL ERROR:
+... JavaScript heap out of memory` at ~29.4M of 36M rows, during the
+in-memory bucket-accumulation pass. The full-rebuild path holds every row in
+memory (`Map<prefix, Set<suffix>>` + `Map<prefix, record[]>`) before writing
+anything to disk, and at this row count that now exceeds Node's default
+~4GB heap ceiling — a size threshold the dataset had not crossed before
+today. Fixed by passing `--max-old-space-size=6144` when `5-publish.mjs`
+spawns `3-build-data.mjs`. Checked headroom first, not assumed: this machine
+has 15.6GB total RAM, and the OCR pool's ~10 Tesseract workers were only
+using ~3.5GB combined at the time, so 6GB for the build process left comfortable
+margin for both plus the OS.
+
+Both bugs together, compounding on the pre-existing checkpoint-mismatch issue
+(4g) that was already forcing every publish into a full rebuild, are why the
+site went stale for ~5 hours before the fixes landed. A side effect worth
+naming: diagnosing bug 1 was slower than it should have been because the
+auto-publish supervisor's stdout redirect had been pointed at a log file that
+was later `rm`'d while still open for writing (see the `dont-rm-live-logs`
+lesson from earlier the same day) — the redirect target existed on disk but
+had stopped receiving new content, so the supervisor looked silent right when
+its error output was needed most. Restarting the supervisor with a fresh,
+correctly-captured log was what actually surfaced bug 1's stack trace.
+
+**Bug 3 — the more important one: 4g's crop-geometry fix was committed but
+never deployed.** `2-extract.py` is one-shot by design (documented in section
+4d) — it loads `roll_ocr.py` once at process start and works through its job
+list for the life of that process. The running extraction workers had started
+**2026-08-24 and 2026-08-26**, well before the fix landed in
+`roll_ocr.py` at **06:32 on 2026-08-29**, and kept running on the pre-fix
+code for another ~9 hours with nothing to signal the fix wasn't live — no
+error, no warning, just the same parts continuing to fail exactly as before.
+Confirmed directly: `cache/extract.log`'s *current* pass (started long after
+the fix commit) was still throwing the identical `ValueError: Coordinate
+'right' is less than 'left'` on AC152 parts 359/360/361/362/437/438 and
+others. The true scope was also wider than 4g's write-up suggested — not
+just the 5 ACs originally identified (AC110/152/168/176/177), but **61 stuck
+parts across 40 ACs**, all silently accumulating against the same
+never-deployed fix. Fixed by killing and restarting
+`scripts/2-extract-forever.mjs` — safe by the supervisor's own design
+(section 4d): the `cache/done/<ac>.txt` ledger means a restart costs at most
+the one part that was mid-flight. Verified after restart: 0 unreadable
+across the next 325 parts processed, and every specific previously-stuck
+part (AC152/359, AC177/235, etc.) completed with plausible row counts on the
+very next attempt.
+
+**The general lesson, worth not re-discovering**: verifying a fix against a
+standalone repro (as 4g did, against two previously-crashing PDFs) confirms
+the *code* is correct. It does not confirm the fix is *live*, if the code in
+question is loaded once by a long-running supervised process rather than
+re-read per invocation. `2-extract.py`'s workers, and any similar persistent
+pool, need an explicit restart called out and done before a fix can be
+considered deployed — the standing constraint "never mark anything verified
+that was not actually tested" (section 1) applies to *deployment*, not just
+*correctness*.
 
 ## 4b. Publishing — decided 2026-08-24, supersedes the Actions plan
 
@@ -813,4 +949,5 @@ periodic `Revision2`-existence probe (`HEAD` on the same path with
 a real ECI revision would surface automatically instead of requiring someone
 to think to re-check by hand. Not yet implemented — pick this up if revisiting
 verification tooling, or if EPIC lookups ever start looking suspicious for
-reasons unexplained by the known OCR-geometry bug (section on AC152/AC172).
+reasons unexplained by the known OCR-geometry bug (section 4g — fixed
+2026-08-29, this note is now historical).

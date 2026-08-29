@@ -58,6 +58,7 @@ const STRINGS = {
     checkOfficial: 'Confirm on the official portal',
     checkAgain: 'Search another number',
     print: 'Print this result', fAc: 'Constituency', fPart: 'Booth', fSerial: 'Serial number',
+    approxSerialNote: 'Serial number is approximate — the booth PDF is the authoritative source.',
     viewSourcePdf: 'View this booth’s official roll PDF ↗',
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
@@ -103,6 +104,7 @@ const STRINGS = {
     checkOfficial: 'ಅಧಿಕೃತ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿ',
     checkAgain: 'ಮತ್ತೊಂದು ಸಂಖ್ಯೆ ಹುಡುಕಿ',
     print: 'ಈ ಫಲಿತಾಂಶ ಮುದ್ರಿಸಿ', fAc: 'ಕ್ಷೇತ್ರ', fPart: 'ಮತಗಟ್ಟೆ', fSerial: 'ಕ್ರಮ ಸಂಖ್ಯೆ',
+    approxSerialNote: 'ಕ್ರಮ ಸಂಖ್ಯೆ ಅಂದಾಜು — ಮತಗಟ್ಟೆ ಪಿಡಿಎಫ್ ಅಧಿಕೃತ ಮೂಲವಾಗಿದೆ.',
     viewSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಪಟ್ಟಿ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
@@ -205,11 +207,11 @@ const acLabel = (acNo) => {
 };
 
 function recordFields(rec, partName) {
-  const [, acNo, partNo, serial] = rec;
+  const [, acNo, partNo, serial, approx] = rec;
   return [
     [t('fAc'), acLabel(acNo)],
     [t('fPart'), partName ? `${partNo} — ${partName}` : String(partNo)],
-    [t('fSerial'), serial]
+    [t('fSerial'), approx ? `${serial} *` : serial]
   ].filter(([, v]) => v !== '' && v != null);
 }
 
@@ -228,6 +230,7 @@ function renderCard({ tone, title, lede, rec, partName, extra }) {
       dl.append(el('dt', null, k), el('dd', null, String(v)));
     }
     card.append(dl);
+    if (rec[4]) card.append(el('p', 'meta', t('approxSerialNote')));
 
     const [, acNo, partNo] = rec;
     const src = el('a', 'source-link', t('viewSourcePdf'));

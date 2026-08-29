@@ -87,7 +87,11 @@ function pushWithTimeout(timeoutMs) {
  * clears its output directory first, so a booth that vanishes from the rows
  * cannot linger in a bucket. */
 log(`Building buckets into ${OUT}…\n`);
-const build = run(process.execPath, [resolve(ROOT, 'scripts', '3-build-data.mjs'), ...buildArgs], {
+// --max-old-space-size: a full rebuild now holds ~36M rows in memory before
+// writing any bucket out, which outgrew Node's default ~4GB heap ceiling and
+// crashed with "JavaScript heap out of memory" (hit 2026-08-29, ~29M rows in).
+// This machine has 15.6GB; extraction's OCR workers use ~3.5GB, leaving room.
+const build = run(process.execPath, ['--max-old-space-size=6144', resolve(ROOT, 'scripts', '3-build-data.mjs'), ...buildArgs], {
   stdio: 'inherit',
   env: { ...process.env, ROLL_DATA: OUT }
 });

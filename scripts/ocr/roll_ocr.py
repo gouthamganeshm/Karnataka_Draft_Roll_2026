@@ -213,8 +213,19 @@ def card_header(im: Image.Image, dark: np.ndarray, band_top: int,
 
     bl, br = sides[0], sides[-1]
     y0, y1 = band_top + m + top + px(2), band_top + m + bot - px(1)
-    serial = im.crop((left + m + bl + px(2), y0, left + m + br - px(1), y1))
-    epic = im.crop((left + m + br + px(8), y0 - px(4), right - px(4), y1 + px(4)))
+    serial_box = (left + m + bl + px(2), y0, left + m + br - px(1), y1)
+    epic_box = (left + m + br + px(8), y0 - px(4), right - px(4), y1 + px(4))
+    # A card whose detected box is degenerate (near-zero or negative width —
+    # seen on a handful of parts where the rule-detection picks up noise)
+    # must not crash the whole part over one card. PIL's crop() raises rather
+    # than clamping, so this is checked explicitly; the card is dropped like
+    # any other unreadable one (see the "Drop empty cells" step upstream).
+    if serial_box[2] <= serial_box[0] or serial_box[3] <= serial_box[1]:
+        return None, None
+    if epic_box[2] <= epic_box[0] or epic_box[3] <= epic_box[1]:
+        return None, None
+    serial = im.crop(serial_box)
+    epic = im.crop(epic_box)
     return serial, epic
 
 
