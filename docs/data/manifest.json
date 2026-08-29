@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-28T23:27:59.804Z",
+  "builtAt": "2026-08-29T00:11:14.752Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 32701875,
+  "electors": 32921140,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 47558,
-  "coverage": 78.06,
+  "partsDone": 47863,
+  "coverage": 78.56,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1497,16 +1497,16 @@
       "nameKn": "ಮಳವಳ್ಳಿ",
       "district": "MANDYA",
       "parts": 291,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 121,
+      "electors": 86668
     },
     "187": {
       "name": "Maddur",
       "nameKn": "ಮದ್ದೂರು",
       "district": "MANDYA",
       "parts": 262,
-      "partsDone": 78,
-      "electors": 52825
+      "partsDone": 262,
+      "electors": 185422
     },
     "188": {
       "name": "Melukote",
