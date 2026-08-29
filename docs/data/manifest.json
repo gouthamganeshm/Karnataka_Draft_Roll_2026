@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T12:35:02.399Z",
+  "builtAt": "2026-08-29T13:37:14.970Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 38178134,
+  "electors": 38491540,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 52741,
-  "coverage": 86.57,
+  "partsDone": 53153,
+  "coverage": 87.25,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -241,8 +241,8 @@
       "nameKn": "ಬಬಲೇಶ್ವರ್‌",
       "district": "BIJAPUR",
       "parts": 259,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 93,
+      "electors": 72448
     },
     "30": {
       "name": "Bijapur City",
@@ -1657,16 +1657,16 @@
       "nameKn": "ಪುತ್ತೂರು",
       "district": "DAKSHINA KANNADA",
       "parts": 245,
-      "partsDone": 164,
-      "electors": 135987
+      "partsDone": 245,
+      "electors": 200524
     },
     "207": {
       "name": "Sullia",
       "nameKn": "ಸುಳ್ಯ",
       "district": "DAKSHINA KANNADA",
       "parts": 238,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 238,
+      "electors": 176421
     },
     "208": {
       "name": "Madikeri",
