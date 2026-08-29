@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T20:47:06.914Z",
+  "builtAt": "2026-08-29T21:43:12.291Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 40502078,
+  "electors": 40808441,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 55731,
-  "coverage": 91.48,
+  "partsDone": 56144,
+  "coverage": 92.16,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -329,8 +329,8 @@
       "nameKn": "ಚಿತ್ತಾಪೂರ",
       "district": "GULBARGA",
       "parts": 263,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 153,
+      "electors": 115869
     },
     "41": {
       "name": "Sedam",
@@ -345,8 +345,8 @@
       "nameKn": "ಚಿಂಚೋಳಿ",
       "district": "GULBARGA",
       "parts": 253,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 253,
+      "electors": 184134
     },
     "43": {
       "name": "Gulbarga Rural",
@@ -377,8 +377,8 @@
       "nameKn": "ಅಳಂದ",
       "district": "GULBARGA",
       "parts": 258,
-      "partsDone": 251,
-      "electors": 199110
+      "partsDone": 258,
+      "electors": 205470
     },
     "47": {
       "name": "Basavakalyan",
