@@ -234,6 +234,36 @@ one search to the other.
 three-letter prefixes for AC 176; the text-layer ASD data shows **135**. Most of
 that spread is OCR noise, which is a useful independent read on roll quality.
 
+### 5a. But "disjoint" is not a guarantee for every part statewide
+
+Broadened the check to 30 more ACs chosen at random from every AC with a
+complete local roll extraction (not just 176), sampling 4 ASD parts per AC:
+**17,745 more ASD rows, 0 more overlaps.** Combined with §5: **33,127 ASD rows
+checked against ~6.4 M roll EPICs across 31 ACs, still zero.** The check
+included rows the roll marks `ok: false`, specifically to catch an OCR
+misread on the roll side coincidentally colliding with a real ASD EPIC — still
+zero. **verified**
+
+This is strong, but it is a sample of 31 of 224 ACs and a few thousand of
+60,923 parts — it is not proof that no EPIC anywhere in the state ever appears
+in both lists. Two mechanisms could produce a genuine overlap that this sample
+would not catch, and both are real-world data properties, not extraction bugs:
+
+- **The `DUPLICATE` reason itself.** 6.5% of ASD rows read ಹೆಸರು ಈಗಾಗಲೇ
+  ನೋಂದಾಯಿಸಲ್ಪಟ್ಟಿದೆ — "already registered [elsewhere]". That is the BLO
+  asserting the *same person or the same EPIC* is active on another booth's
+  roll. If it means the same EPIC, an overlap is exactly what should be
+  expected for this one category, and no amount of sampling elsewhere would
+  surface it if it is rare.
+- **Timing skew.** The draft roll and an ASD report are two different
+  documents that need not be generated at the same instant. If a claim was
+  filed and processed after an ASD report was frozen but before the roll
+  snapshot used here, the same EPIC could legitimately sit in both — the ASD
+  entry simply superseded, not wrong.
+
+**Do not treat "0 found so far" as "cannot happen."** Design the site for the
+case in §6 below, even though it was never observed this session.
+
 ---
 
 ## 6. Site integration
@@ -247,17 +277,34 @@ loses people. Wire the existing `notFoundTitle` branch at `docs/app.js:296` to
 run the ASD lookup itself and deep-link into the section with the EPIC
 pre-filled. The standalone section stays for anyone landing there directly.
 
-### Four verdicts, in order
+### Five verdicts, in order — not four
 
-1. **On the draft roll** — existing card, unchanged.
+The original four-verdict ladder assumed the roll and the ASD list are
+mutually exclusive, so it only ever checked one, then the other. §5a says that
+assumption can fail for a real reason (`DUPLICATE`, or timing skew), so **both
+lookups must run independently, every time, and the two results combined** —
+never short-circuit on the first hit.
+
+1. **On the draft roll, not in ASD** — existing card, unchanged. This is by
+   far the common case: 33,127/33,127 sampled ASD rows so far.
 2. **Not on roll, found in ASD** — show the reason, the **old part number and
    serial**, and the remedy the report itself states: an aggrieved person may
    file a claim with a copy of their Aadhaar, before `claimsCloseAt`.
-3. **In neither, both coverages high** — "not found in either list; this may be
+3. **Found in BOTH** — the rare case this section exists for. Show both
+   records, side by side, with neither one hidden or treated as authoritative.
+   Do not compute a single verdict by picking a winner: the two sources
+   disagree with each other, and this site's OCR/extraction pipeline is not
+   the tool to arbitrate that. State plainly that the two lists disagree for
+   this EPIC and link to the official ECI portal for the current status. This
+   is the one verdict where "we found conflicting information" is the honest
+   and complete answer, not "we don't know."
+4. **In neither, both coverages high** — "not found in either list; this may be
    a gap in our extraction", with a link out to the official ECI search. This is
    the correct terminal state and it is honest.
-4. **Either coverage below threshold** — withhold, as the roll section already
-   does below 99%.
+5. **Either coverage below threshold** — withhold, as the roll section already
+   does below 99%. Coverage is checked per-list: a roll hit found while ASD
+   coverage for that AC is still low should say so, rather than silently
+   asserting "not in ASD either" on an incomplete import.
 
 ### Data build
 
@@ -432,6 +479,7 @@ fastparse.py           rule-derived word-binning parser (the recommended approac
 test_wrapped_epic.py   3-way wrapped-EPIC check: grammar, order witness, cross-engine
 visual_check.py        renders EPIC cells to PNG for eyeball ground truth
 overlap_test.py        ASD vs draft-roll membership, AC 176
+overlap_broad.py       same check widened to 30 more ACs (§5a)
 bench_asd3.py          throughput benchmark, process pool
 sample_statewide.py    unbiased statewide row-count and size projection
 ```
