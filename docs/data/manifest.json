@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T18:55:03.023Z",
+  "builtAt": "2026-08-29T19:50:52.291Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 39912493,
+  "electors": 40207074,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 54986,
-  "coverage": 90.25,
+  "partsDone": 55357,
+  "coverage": 90.86,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -273,16 +273,16 @@
       "nameKn": "ಸಿಂಧಗಿ",
       "district": "BIJAPUR",
       "parts": 276,
-      "partsDone": 43,
-      "electors": 31660
+      "partsDone": 276,
+      "electors": 218454
     },
     "34": {
       "name": "Afzalpur",
       "nameKn": "ಅಫಜಲಪೂರ",
       "district": "GULBARGA",
       "parts": 261,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 138,
+      "electors": 107787
     },
     "35": {
       "name": "Jevargi",
