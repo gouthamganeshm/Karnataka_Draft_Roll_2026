@@ -674,6 +674,38 @@ considered deployed — the standing constraint "never mark anything verified
 that was not actually tested" (section 1) applies to *deployment*, not just
 *correctness*.
 
+### Live state as of 2026-08-29 ~19:40 IST — read this if picking up cold
+
+All three 4h fixes are committed (`f4648e2`) and confirmed live, not just
+committed — see 4h's own lesson about that distinction. Coverage **87.3%**,
+38,491,540 electors, 53,153/60,923 parts, latest push `df3b8a9`.
+
+**Both long-running processes were just restarted detached** (`nohup ... &
+disown`, not the native background-task mechanism), specifically because they
+had drifted to being direct descendants of that session's own CLI process —
+verified via full parent-chain walk (`Get-CimInstance Win32_Process`, follow
+`ParentProcessId` to root) — and would likely have died with it otherwise.
+If you're reading this after a session boundary and either process is not
+running, that parent-chain check is the first thing to redo before assuming
+something is actually broken versus just needing a restart:
+
+    node scripts/2-extract-forever.mjs   # resumes from cache/done/<ac>.txt
+    node scripts/6-auto-publish.mjs --interval 30
+
+Both are safe to kill and restart any time **except** while a `git.exe`
+process is a live child of the auto-publish tree (mid commit/push) — check
+`Get-CimInstance Win32_Process -Filter "Name='git.exe'"` first, same
+coordination note as 4g.
+
+**Verification backlog in progress, not finished**: 184 ACs are at 100% but
+only 131 + partial were in `cache/verified-acs.json` when this was written.
+A batch verify (`node scripts/7-verify.mjs --ac <53 ACs>`) was started for
+the remaining ones; 13/53 done and clean when this note was written, no
+failures. If it didn't finish, just re-derive the list (any AC where
+`manifest.acs[n].partsDone === manifest.acs[n].parts` and `n` is not a key in
+`cache/verified-acs.json`) and re-run — cheap, idempotent, nothing depends on
+finishing in one pass.
+
 ## 4b. Publishing — decided 2026-08-24, supersedes the Actions plan
 
 The user's call after the runner kept returning 406: **"process the data locally
