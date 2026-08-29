@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T13:37:14.970Z",
+  "builtAt": "2026-08-29T15:02:32.749Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 38491540,
+  "electors": 38782805,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 53153,
-  "coverage": 87.25,
+  "partsDone": 53522,
+  "coverage": 87.85,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -233,16 +233,16 @@
       "nameKn": "ಬಸವನ ಬಾಗೇವಾಡಿ",
       "district": "BIJAPUR",
       "parts": 244,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 203,
+      "electors": 162744
     },
     "29": {
       "name": "Babaleshwar",
       "nameKn": "ಬಬಲೇಶ್ವರ್‌",
       "district": "BIJAPUR",
       "parts": 259,
-      "partsDone": 93,
-      "electors": 72448
+      "partsDone": 259,
+      "electors": 200969
     },
     "30": {
       "name": "Bijapur City",
