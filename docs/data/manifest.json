@@ -3,22 +3,22 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-30T09:54:39.560Z",
+  "builtAt": "2026-08-30T10:16:51.788Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 44377604,
+  "electors": 44385222,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 60914,
-  "coverage": 99.99,
+  "partsDone": 60923,
+  "coverage": 100,
   "acs": {
     "1": {
       "name": "Nippani",
       "nameKn": "ನಿಪ್ಪಾಣಿ",
       "district": "BELGAUM",
       "parts": 259,
-      "partsDone": 258,
-      "electors": 208959
+      "partsDone": 259,
+      "electors": 209930
     },
     "2": {
       "name": "Chikkodi-Sadalga",
@@ -73,8 +73,8 @@
       "nameKn": "ಅರಭಾವಿ",
       "district": "BELGAUM",
       "parts": 290,
-      "partsDone": 289,
-      "electors": 225990
+      "partsDone": 290,
+      "electors": 226676
     },
     "9": {
       "name": "Gokak",
@@ -105,16 +105,16 @@
       "nameKn": "ಬೆಳಗಾವಿ  ದಕ್ಷಿಣ",
       "district": "BELGAUM",
       "parts": 260,
-      "partsDone": 258,
-      "electors": 191856
+      "partsDone": 260,
+      "electors": 193430
     },
     "13": {
       "name": "Belgaum Rural",
       "nameKn": "ಬೆಳಗಾವಿ ಗ್ರಾಮಾಂತರ",
       "district": "BELGAUM",
       "parts": 299,
-      "partsDone": 298,
-      "electors": 233871
+      "partsDone": 299,
+      "electors": 234890
     },
     "14": {
       "name": "Khanapur",
@@ -1761,8 +1761,8 @@
       "nameKn": "ವರುಣ",
       "district": "MYSORE",
       "parts": 267,
-      "partsDone": 263,
-      "electors": 206403
+      "partsDone": 267,
+      "electors": 209771
     },
     "220": {
       "name": "T. Narasipur",
