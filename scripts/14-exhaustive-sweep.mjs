@@ -34,6 +34,7 @@
  * the one that actually needs the multi-day budget.
  */
 
+import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { appendFile, mkdir, readFile } from 'node:fs/promises';
@@ -109,6 +110,30 @@ async function lookupLive(epic, manifest) {
   return findInBucket(bucket, hash.slice(depth, depth + manifest.suffixLength));
 }
 
+/** Promise-based spawn, matching spawnSync's {status, stdout, stderr} shape.
+ * Load-bearing, not a style choice: spawnSync blocks Node's entire
+ * single-threaded event loop until the subprocess exits, which silently
+ * serializes every "concurrent" pool() worker onto whichever one currently
+ * holds it — with --concurrency 10 this measured ~52-55 booths/min instead
+ * of anything near the ~700/min the ASD text-layer parse is capable of.
+ * Caught by the throughput itself looking wrong, not by reasoning about it
+ * in advance. */
+function spawnAsync(cmd, args, input) {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(cmd, args);
+    const stdout = [];
+    const stderr = [];
+    child.stdout.on('data', (d) => stdout.push(d));
+    child.stderr.on('data', (d) => stderr.push(d));
+    child.on('error', reject);
+    child.on('close', (status) => {
+      resolvePromise({ status, stdout: Buffer.concat(stdout), stderr: Buffer.concat(stderr) });
+    });
+    child.stdin.on('error', () => { /* EPIPE if the process exits before stdin drains — status still reported via close */ });
+    child.stdin.end(input);
+  });
+}
+
 /** One PDF fetch per booth, all samplesPerBooth rows checked against it. */
 async function verifyBoothAgainstPdf(ac, part, rows) {
   const url = dataset === 'roll' ? rollPartUrl(ac, part) : asdPartUrl(ac, part);
@@ -125,7 +150,6 @@ async function verifyBoothAgainstPdf(ac, part, rows) {
     }
   }
 
-  const { spawnSync } = await import('node:child_process');
   const epicsJson = JSON.stringify(rows.map((r) => r.epic));
   const script = dataset === 'roll'
     ? `
@@ -161,7 +185,7 @@ for e in wanted:
     })
 print(json.dumps(out))
 `;
-  const r = spawnSync('python', ['-c', script], { input: buf, maxBuffer: 1024 * 1024 * 64 });
+  const r = await spawnAsync('python', ['-c', script], buf);
   if (r.status !== 0) {
     const reason = `python exit ${r.status}: ${r.stderr?.toString().slice(-300)}`;
     return rows.map((row) => ({ row, ok: false, reason }));
