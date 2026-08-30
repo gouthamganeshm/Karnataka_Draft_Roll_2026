@@ -84,7 +84,7 @@ const STRINGS = {
     viewSourcePdf: 'View this booth’s official roll PDF ↗',
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
-    tileCoverage: 'State coverage',
+    tileCoverage: 'vs. CEO official count',
     coverageFull: 'All {parts} booths across {acs} constituencies have been read.',
     coveragePartial: 'Read {done} of {parts} booths ({pct}%). Constituencies still importing cannot be searched, and a “not on the roll” answer is withheld until coverage passes ' + NEGATIVE_VERDICT_COVERAGE + '%.',
     provenance: 'Draft roll published {published}. Data last rebuilt {built}.',
@@ -133,7 +133,7 @@ const STRINGS = {
     viewSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಪಟ್ಟಿ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
-    tileCoverage: 'ರಾಜ್ಯ ವ್ಯಾಪ್ತಿ',
+    tileCoverage: 'ಸಿಇಒ ಅಧಿಕೃತ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ',
     coverageFull: '{acs} ಕ್ಷೇತ್ರಗಳ ಎಲ್ಲಾ {parts} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ.',
     coveragePartial: '{parts} ರಲ್ಲಿ {done} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ ({pct}%).',
     provenance: 'ಕರಡು ಪಟ್ಟಿ {published} ರಂದು ಪ್ರಕಟವಾಗಿದೆ. ದತ್ತಾಂಶ {built} ರಂದು ಮರುನಿರ್ಮಿಸಲಾಗಿದೆ.',
@@ -334,7 +334,13 @@ function renderDashboard() {
     [t('tileElectors'), fmtNum(manifest.electors)],
     [t('tileAcs'), fmtNum(manifest.constituencies)],
     [t('tileParts'), fmtNum(manifest.parts)],
-    [t('tileCoverage'), `${manifest.coverage.toFixed(1)}%`]
+    // Booths-read coverage is what gates the "not on the roll" verdict below
+    // (manifest.coverage, untouched) — but once that hits 100%, showing it
+    // here reads as "the whole roll is captured", which is not true: some
+    // electors within already-read booths are withheld as unreadable. This
+    // tile compares against the CEO's own official count instead, which is
+    // the number that actually answers "how much of the electorate do we have".
+    [t('tileCoverage'), `${(manifest.electors / CEO_OFFICIAL_TOTAL * 100).toFixed(1)}%`]
   ];
   for (const [label, value] of stats) {
     const tile = el('div', 'tile');
