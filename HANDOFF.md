@@ -983,3 +983,174 @@ to think to re-check by hand. Not yet implemented — pick this up if revisiting
 verification tooling, or if EPIC lookups ever start looking suspicious for
 reasons unexplained by the known OCR-geometry bug (section 4g — fixed
 2026-08-29, this note is now historical).
+
+---
+
+## 10. Session 2026-08-30 — 100% coverage, CEO cross-check, ASD feature underway
+
+**Draft roll reached 100% coverage** — all 224 ACs, 60,923 parts, ~44.4M
+electors. `2-extract-forever.mjs` exited cleanly on its own ("Nothing left in
+the current manifest") once the last stragglers (5 Belagavi parts that had
+been sitting near the tail of the job queue for hours, not stuck — see below)
+went through. The site's `builtAt` and GitHub Pages both confirmed caught up
+by ~10:16 IST.
+
+### The 5 "stuck" Belagavi parts were never actually stuck
+
+AC1/214, AC8/256, AC12/9, AC12/20, AC13/275 sat unfinished for hours while
+extraction visibly progressed through Tumkur and Mysore, which look like
+higher AC numbers. **Root cause: `cache/manifest.json`'s `constituencies`
+array is not sorted by AC number** — these five were re-appended late (an
+earlier `1-discover.mjs --district` re-run), landing at positions 206-219 of
+224, genuinely behind Tumkur (position 191). Confirmed by running each job
+standalone outside the worker pool (all 5 completed fine, one took 137s due
+to a slow CDN retry — the 120s default tool timeout made that look like a
+hang when it very much was not). **Lesson**: job queue order in this pipeline
+follows manifest array order, not AC number — do not assume "lower AC number
+= earlier in queue" when diagnosing a similar stall again.
+
+### Full statewide sweep — `scripts/8-full-sweep.mjs`
+
+A new test, distinct from `7-verify.mjs`'s per-AC spot checks: one random
+booth + one random sample from **every** constituency in a single run, plus
+four corner-case sections — approximate-serial rows actually carry the
+published flag, malformed-EPIC rows are genuinely absent (not just OCR-
+flagged), duplicate EPICs resolve to exactly one live record, and the lowest/
+highest-numbered AC get pushed harder (both ends of their booth range). Gated
+on 100% coverage by default (`--force` to smoke-test early); everything
+randomized fresh per run, no fixed seed.
+
+Hit the same Node/Windows bug `7-verify.mjs` already documents and works
+around: calling `process.exit()` while fetch's keep-alive sockets are open
+crashes with `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)`. Fixed
+identically — set `process.exitCode` and let the event loop drain, never call
+`process.exit()` directly, anywhere in this script.
+
+Also hit, and this is worth remembering for the next "why isn't the site
+showing X": **a landed `git push` is not the same as GitHub Pages serving
+it.** Twice this session the local build, the commit, and `origin/main` were
+all confirmed correct while the live site still served the previous build for
+several minutes. `gh api repos/<owner>/<repo>/pages/builds/latest` and
+`gh run list` (look for the `pages-build-deployment` / `Deploy site` workflow
+runs) show the real state — `in_progress` means genuinely still building, not
+a bug. Don't diagnose a "stale site" as a data problem until Pages itself
+confirms deployed.
+
+### CEO official numbers — cross-checked and now shown in the UI
+
+Fetched the CEO's official 28.08.2026 press note (`ceo.karnataka.gov.in` →
+Press Releases → `Press Note - 28.08.2026.pdf`) via `WebSearch`/`WebFetch`,
+extracted Annexure-1's district-wise elector table with PyMuPDF (scanned PDF,
+`page.get_text()` on the raw fetched bytes — not the roll's OCR pipeline).
+Statewide total **4,46,35,948**, matching section 4g's figure exactly.
+
+Computed per-district offset against our own numbers: **99.42% overall**,
+every district in a tight **97.6%-99.8%** band, no outliers — a real
+improvement over the 94.8-95.4% band section 4g measured before its two
+fixes shipped. Shipped as a UI feature (commit `4281077`): the district table
+gained "CEO official" and "vs. official" columns, plus a footer line and an
+explanatory note (the gap is genuinely-unreadable EPICs withheld rather than
+guessed, not a coverage bug). CEO figures are a **hard-coded snapshot** in
+`docs/app.js` (`CEO_OFFICIAL_ELECTORS`), not fetched live — they won't move
+as more of the roll is verified, only this site's own count will.
+
+**Open task, explicitly deferred**: investigate *why* the remaining ~0.6% gap
+exists (genuinely unreadable source pages vs. some fixable extraction gap).
+**Explicit user constraint if a fixable cause is found**: patch it and
+re-pull only the specific affected booths — no full rebuild, nothing existing
+gets deleted or disturbed.
+
+### ASD ("uncollectable elector") feature — build underway
+
+Implementing the feature `OBSERVATIONS-ASD.md` designed. **User decision made
+this session, overriding that document's open item**: include elector name
+and relative name in the ASD schema (breaks from the roll's own "no names"
+stance — the privacy copy will need updating before the UI ships). **Explicit
+storage requirement**: fully separate from the draft roll at every layer —
+`cache/asd-rows/` / `cache/asd-done/` (not `cache/rows/` / `cache/done/`),
+`docs/data/asd/` with its **own** `manifest.json` (deliberately *not* folding
+`asdCoverage` fields into the existing `docs/data/manifest.json` as that
+document suggested — full separation was judged safer and removes any risk of
+racing the roll's own publish loop on one shared file).
+
+Built and validated:
+
+- **`scripts/ocr/asd_parser.py`** — rule-derived table extraction from
+  `page.get_drawings()` (cluster into vertical/horizontal rules, bin words
+  into cells, sort by `(round(cy,1), x0)`), exactly per the observations
+  document's hard-won lessons: process pool only (PyMuPDF is not
+  thread-safe), never `page.find_tables()`, EPIC column joined by string
+  concatenation only (never parsed as int first — loses leading zeros),
+  widened EPIC grammar `[A-Z]{3}[0-9]{7,8}` for AC174's real 11-character
+  series, validate-never-coerce since this text layer is exact.
+- **`scripts/9-extract-asd.py`** — process-pool fetch/extract shell around
+  the parser, mirrors `2-extract.py`'s resume-by-ledger design. A 404 is
+  handled as a genuine zero-row successful read (that booth had no
+  uncollectable electors), distinct from a real fetch failure that gets
+  retried — never touches any draft-roll cache path.
+- **`scripts/10-build-asd-data.mjs`** — full-rebuild-only (the ~12M-row ASD
+  dataset doesn't need `3-build-data.mjs`'s incremental-checkpoint
+  machinery), writes `docs/data/asd/roll/<ab>/<cd>.json` (same bucket layout
+  as the roll, for `app.js`'s binary search to reuse unchanged) and
+  `docs/data/asd/manifest.json`. Row tuple:
+  `[suffix, ac, part, serial, reasonCode, oldPart, oldSerial, name, relativeName]`.
+
+**Two real bugs found and fixed during validation** (both by cross-checking
+actual PDF output against the document's own expected numbers, not by
+trusting the design doc at face value):
+
+1. **Header regex silently failed.** A hand-transcribed Kannada label string
+   used a different (but visually identical) conjunct-glyph sequence than
+   what's actually in the AC-name/part-name header line. Fixed by matching
+   *structurally* — first two lines of the page, pattern `: N - text` — never
+   by matching hardcoded label text again.
+2. **~5.5% of `DUPLICATE` rows silently misclassified as `OTHER`.** Same root
+   cause, different spot: the vowel sign 'ೇ' has both a single precomposed
+   Unicode codepoint and a base+combining-mark decomposition that render
+   identically but don't compare equal as raw strings. A hand-typed reference
+   string used one form; PyMuPDF's extracted text used the other. Fixed with
+   `unicodedata.normalize('NFC', …)` on both the reference table and every
+   lookup. **General lesson, not just this one string**: any hand-typed
+   Kannada literal compared against PDF-extracted text in this codebase needs
+   NFC normalization — do not assume visual identity means string equality.
+
+Validated post-fix against 2,816 real rows across 13 parts spanning AC1/50/174
+(including all 8 real 11-character EPICs in the sample): **100% EPIC grammar
+validity**, reason-code mix now lands cleanly in the document's expected
+4-category split with zero unexplained `OTHER`.
+
+**Statewide extraction launched** ~15:56 IST 2026-08-30, `nohup`+`disown`
+detached (confirmed via parent-chain walk — rooted at `nohup.exe`, no further
+traceable ancestor), `PYTHONUNBUFFERED=1` set explicitly (Python's default
+buffering otherwise leaves the log looking silent for minutes at a time when
+not attached to a TTY — hit this once, fixed by restarting with the env var
+set rather than waiting it out). Logs to `cache/asd-extract.log`. Sustained
+~290 parts/min, 0 unreadable, ETA roughly 3-3.5h from launch — in line with
+the observations document's own ~3h projection.
+
+### Task pipeline as of this write-up (for continuity if picked up cold)
+
+In progress:
+1. Full statewide sweep test of the draft roll (`8-full-sweep.mjs`) — running
+2. ASD extraction (`9-extract-asd.py`) — running, see log for live progress
+
+Queued, in order:
+3. Build ASD data (`10-build-asd-data.mjs` is written, not yet run)
+4. Publish ASD data to the live site (no publish script written yet — needs
+   one, likely mirroring `6-auto-publish.mjs`'s shape but for the ASD tree)
+5. Build the ASD UI feature: new search section, the five-verdict cascade
+   from `OBSERVATIONS-ASD.md` §6, wire the roll's existing `notFoundTitle`
+   branch (`docs/app.js` around line 296) to auto-cascade into an ASD lookup,
+   fix the three pre-existing UI bugs that document's §7 found (no tone-color
+   CSS actually matches `docs/app.js`'s `tone-${tone}` classes; `maxlength="10"`
+   / `EPIC_RE` block the real 11-character series from being typed at all,
+   roll search included; `.acronym` CSS is an already-built, unused legend the
+   ASD reason-code dots can reuse), and update the privacy-stance copy for the
+   names-included decision above.
+6. End-to-end test the ASD feature once released
+7. Duplicate/overlap audit, full statewide (not the document's 31-AC sample):
+   duplicate EPICs within ASD, duplicate EPICs within the draft roll, and
+   EPICs appearing in **both** lists
+8. Investigate the ~0.6% CEO-gap root cause; if fixable, patch and re-pull
+   only the specific affected booths — no full rebuild, nothing existing
+   touched (explicit user constraint, see above)
