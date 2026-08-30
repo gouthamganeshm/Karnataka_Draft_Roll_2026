@@ -22,6 +22,25 @@ const partPdfUrl = (acNo, partNo) =>
  * holding the whole site hostage to them would help nobody. */
 const NEGATIVE_VERDICT_COVERAGE = 99;
 
+/* District-wise elector totals from the Chief Electoral Officer's own press
+ * note (Annexure-1, "Press Note - 28.08.2026.pdf"), fetched and transcribed by
+ * hand — the CEO does not publish this as structured data. This is a fixed
+ * snapshot, not a live figure: it will not move as more of the roll is read,
+ * only this site's own count will. See the offset note rendered next to the
+ * district table for why the two never match exactly. */
+const CEO_OFFICIAL_ELECTORS = {
+  'BELGAUM': 3593561, 'BANGALORE URBAN': 2303623, 'MYSORE': 2242452, 'TUMKUR': 2061786,
+  'GULBARGA': 1849585, 'BIJAPUR': 1684968, 'DAKSHINA KANNADA': 1646387, 'MANDYA': 1408364,
+  'RAICHUR': 1393163, 'BAGALKOT': 1392523, 'HASSAN': 1375517, 'DHARWAD': 1353946,
+  'SHIMOGA': 1330905, 'CHITRADURGA': 1297789, 'DAVANGERE': 1298219, 'B.B.M.P(NORTH)': 1280085,
+  'BIDAR': 1220916, 'HAVERI': 1220281, 'UTTARA KANNADA': 1123022, 'KOLAR': 1124231,
+  'B.B.M.P(SOUTH)': 1086729, 'KOPPAL': 1041388, 'B.B.M.P(CENTRAL)': 1029196, 'BELLARY': 1006307,
+  'UDUPI': 1000545, 'VIJAYANAGARA': 994157, 'CHIKKABALLAPUR': 944623, 'YADGIR': 864005,
+  'CHIKKMAGALUR': 863516, 'RAMANAGARAM': 828037, 'BANGALORE RURAL': 796138, 'CHAMARAJNAGAR': 791949,
+  'GADAG': 782232, 'KODAGU': 405803
+};
+const CEO_OFFICIAL_TOTAL = 44635948;
+
 // ---------------------------------------------------------------- i18n
 
 const STRINGS = {
@@ -39,11 +58,14 @@ const STRINGS = {
     dashHeading: 'What is in this dataset',
     districtTitle: 'Import coverage by district',
     districtSub: 'A constituency is only searchable once every one of its booths has been read. Click a column heading to sort.',
+    colOfficial: 'CEO official', colOffset: 'vs. official',
+    offsetReasonNote: 'The "CEO official" column is the district-wise elector count from the Chief Electoral Officer\'s press note of 28 August 2026 — a fixed snapshot, shown for comparison only. This site\'s own count runs slightly behind it in every district, for one deliberate reason: where the source page image is too smudged, folded or low-contrast for the OCR reader to form a valid EPIC with confidence, that entry is withheld from search rather than published as a guess. The CEO\'s figure comes from their own source records, not OCR, so it is not subject to the same gap.',
     footerSource: 'Source: the draft electoral roll published by the Chief Electoral Officer, Karnataka for the Special Intensive Revision 2026. This site is an independent, unofficial reformatting of those documents. Always confirm with your BLO or voters.eci.gov.in before acting.',
     footerLink: 'Official draft roll download on voters.eci.gov.in',
     footerCeo: 'Chief Electoral Officer, Karnataka',
     footerOfficialStats: 'Official count as of 28 August 2026: 4,46,35,948 electors statewide (Chief Electoral Officer, Karnataka).',
     footerOfficialStatsLink: 'Read the official press note (PDF) ↗',
+    footerOffsetCompare: 'This site currently indexes {ours} electors — {pct}% of that official figure. See "Import coverage by district" above for why.',
 
     errFormat: 'That does not look like an EPIC number. It is 3 letters followed by 7 digits, like ABC1234567.',
     errNetwork: 'Could not load the data files. Check your connection and try again.',
@@ -85,11 +107,14 @@ const STRINGS = {
     dashHeading: 'ಈ ದತ್ತಾಂಶದಲ್ಲಿ ಏನಿದೆ',
     districtTitle: 'ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ',
     districtSub: 'ಎಲ್ಲಾ ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಿದ ನಂತರವೇ ಕ್ಷೇತ್ರವನ್ನು ಹುಡುಕಬಹುದು.',
+    colOfficial: 'ಸಿಇಒ ಅಧಿಕೃತ', colOffset: 'ಅಧಿಕೃತಕ್ಕೆ ಹೋಲಿಸಿ',
+    offsetReasonNote: '"ಸಿಇಒ ಅಧಿಕೃತ" ಅಂಕಣವು ೨೮ ಆಗಸ್ಟ್ ೨೦೨೬ರ ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ಜಿಲ್ಲಾವಾರು ಎಣಿಕೆ — ಹೋಲಿಕೆಗಾಗಿ ಮಾತ್ರ ತೋರಿಸಲಾಗಿದೆ, ಇದು ಬದಲಾಗುವುದಿಲ್ಲ. ಈ ತಾಣದ ಸ್ವಂತ ಎಣಿಕೆ ಪ್ರತಿ ಜಿಲ್ಲೆಯಲ್ಲಿ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರುತ್ತದೆ, ಏಕೆಂದರೆ ಮೂಲ ಪುಟದ ಚಿತ್ರ ಅಸ್ಪಷ್ಟ ಅಥವಾ ಮಸುಕಾಗಿದ್ದಲ್ಲಿ, ಒಸಿಆರ್ ಊಹಿಸಿ ಪ್ರಕಟಿಸುವ ಬದಲು ಆ ನಮೂದನ್ನು ತಡೆಹಿಡಿಯುತ್ತದೆ. ಸಿಇಒ ಅಂಕಿ ಅವರ ಸ್ವಂತ ಮೂಲ ದಾಖಲೆಗಳಿಂದ ಬಂದಿದೆ, ಒಸಿಆರ್‌ನಿಂದಲ್ಲ.',
     footerSource: 'ಮೂಲ: ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ ಪ್ರಕಟಿಸಿದ ಎಸ್‌ಐಆರ್ ೨೦೨೬ ಕರಡು ಮತದಾರರ ಪಟ್ಟಿ. ಇದು ಅನಧಿಕೃತ ಮರುರಚನೆ. ಕ್ರಮ ಕೈಗೊಳ್ಳುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ voters.eci.gov.in ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
     footerLink: 'voters.eci.gov.in ನಲ್ಲಿ ಅಧಿಕೃತ ಕರಡು ಪಟ್ಟಿ',
     footerCeo: 'ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ',
     footerOfficialStats: '೨೮ ಆಗಸ್ಟ್ ೨೦೨೬ರಂತೆ ಅಧಿಕೃತ ಎಣಿಕೆ: ರಾಜ್ಯಾದ್ಯಂತ ೪,೪೬,೩೫,೯೪೮ ಮತದಾರರು (ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ).',
     footerOfficialStatsLink: 'ಅಧಿಕೃತ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಿ (ಪಿಡಿಎಫ್) ↗',
+    footerOffsetCompare: 'ಈ ತಾಣ ಪ್ರಸ್ತುತ {ours} ಮತದಾರರನ್ನು ಸೂಚಿಸುತ್ತದೆ — ಅಧಿಕೃತ ಅಂಕಿಯ {pct}%. ಕಾರಣಕ್ಕಾಗಿ ಮೇಲಿನ "ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ" ನೋಡಿ.',
 
     errFormat: 'ಇದು ಇಪಿಐಸಿ ಸಂಖ್ಯೆಯಂತೆ ಕಾಣುತ್ತಿಲ್ಲ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು, ಉದಾ. ABC1234567.',
     errNetwork: 'ದತ್ತಾಂಶ ಕಡತಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
@@ -328,6 +353,16 @@ function renderDashboard() {
     published: fmtDate(manifest.publishedAt), built: fmtDate(manifest.builtAt)
   });
 
+  const footerOffset = $('#footer-offset-compare');
+  if (footerOffset) {
+    footerOffset.textContent = t('footerOffsetCompare', {
+      ours: fmtNum(manifest.electors),
+      pct: (manifest.electors / CEO_OFFICIAL_TOTAL * 100).toFixed(1)
+    });
+  }
+  const offsetNote = $('#offset-reason-note');
+  if (offsetNote) offsetNote.textContent = t('offsetReasonNote');
+
   renderDistrictTable();
 }
 
@@ -345,14 +380,19 @@ function districtRows() {
     row.electors += a.electors;
     void no;
   }
-  return [...by.values()].map((r) => ({ ...r, pct: r.parts ? (r.done / r.parts) * 100 : 0 }));
+  return [...by.values()].map((r) => {
+    const official = CEO_OFFICIAL_ELECTORS[r.district] ?? null;
+    const offsetPct = official ? (r.electors / official) * 100 : null;
+    return { ...r, pct: r.parts ? (r.done / r.parts) * 100 : 0, official, offsetPct };
+  });
 }
 
 function renderDistrictTable() {
   const table = $('#district-table');
   const cols = [
     ['district', t('colDistrict')], ['acs', t('colAcs')], ['parts', t('colParts')],
-    ['done', t('colDone')], ['electors', t('colElectors')], ['pct', t('colPct')]
+    ['done', t('colDone')], ['electors', t('colElectors')], ['pct', t('colPct')],
+    ['official', t('colOfficial')], ['offsetPct', t('colOffset')]
   ];
   const thead = el('tr');
   for (const [key, label] of cols) {
@@ -370,8 +410,8 @@ function renderDistrictTable() {
   table.tHead.replaceChildren(thead);
 
   const rows = districtRows().sort((a, b) => {
-    const av = a[sortKey];
-    const bv = b[sortKey];
+    const av = a[sortKey] ?? -Infinity;
+    const bv = b[sortKey] ?? -Infinity;
     return (typeof av === 'string' ? av.localeCompare(bv) : av - bv) * sortDir;
   });
 
@@ -385,7 +425,9 @@ function renderDistrictTable() {
       el('td', 'num', fmtNum(r.parts)),
       el('td', 'num', fmtNum(r.done)),
       el('td', 'num', fmtNum(r.electors)),
-      el('td', 'num', `${r.pct.toFixed(1)}%`)
+      el('td', 'num', `${r.pct.toFixed(1)}%`),
+      el('td', 'num', r.official != null ? fmtNum(r.official) : '—'),
+      el('td', 'num', r.offsetPct != null ? `${r.offsetPct.toFixed(1)}%` : '—')
     );
     body.append(tr);
   }
