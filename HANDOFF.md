@@ -1068,10 +1068,16 @@ and relative name in the ASD schema (breaks from the roll's own "no names"
 stance — the privacy copy will need updating before the UI ships). **Explicit
 storage requirement**: fully separate from the draft roll at every layer —
 `cache/asd-rows/` / `cache/asd-done/` (not `cache/rows/` / `cache/done/`),
-`docs/data/asd/` with its **own** `manifest.json` (deliberately *not* folding
+`docs/data-asd/` with its **own** `manifest.json` (deliberately *not* folding
 `asdCoverage` fields into the existing `docs/data/manifest.json` as that
 document suggested — full separation was judged safer and removes any risk of
-racing the roll's own publish loop on one shared file).
+racing the roll's own publish loop on one shared file). **Note the path is
+`docs/data-asd`, a sibling of `docs/data`, not `docs/data/asd`, a child of
+it** — it started as a child and was moved after realizing `3-build-data.mjs`
+runs `rm(docs/data, {recursive:true})` on every full rebuild (a real,
+periodic event — see the checkpoint-mismatch incident above), which would
+have silently deleted the whole ASD tree the next time that fired. Caught
+before it could happen, not after.
 
 Built and validated:
 
@@ -1090,9 +1096,9 @@ Built and validated:
   retried — never touches any draft-roll cache path.
 - **`scripts/10-build-asd-data.mjs`** — full-rebuild-only (the ~12M-row ASD
   dataset doesn't need `3-build-data.mjs`'s incremental-checkpoint
-  machinery), writes `docs/data/asd/roll/<ab>/<cd>.json` (same bucket layout
+  machinery), writes `docs/data-asd/roll/<ab>/<cd>.json` (same bucket layout
   as the roll, for `app.js`'s binary search to reuse unchanged) and
-  `docs/data/asd/manifest.json`. Row tuple:
+  `docs/data-asd/manifest.json`. Row tuple:
   `[suffix, ac, part, serial, reasonCode, oldPart, oldSerial, name, relativeName]`.
 
 **Two real bugs found and fixed during validation** (both by cross-checking

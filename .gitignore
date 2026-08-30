@@ -11,3 +11,9 @@ __pycache__/
 # JSON is pushed from there. It is the only build output in git, and it is
 # ~55 MB of four-value records; the PDFs it came from are ~31 GB and stay out.
 !docs/data/
+
+# Same reasoning applies to the ASD dataset's own published tree. It is a
+# *sibling* of docs/data, not a child of it (see scripts/10-build-asd-data.mjs
+# for why), and its name happens to match the `data-*/` glob above, so it
+# needs its own explicit negation or it would be silently untracked.
+!docs/data-asd/
