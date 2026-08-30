@@ -366,11 +366,22 @@ apt-get install tesseract-ocr          # or: winget install UB-Mannheim.Tesserac
       cross-checks, corner cases (approximate serials, withheld rows,
       duplicate EPICs, boundary constituencies) — `8-full-sweep.mjs` /
       `12-full-sweep-asd.mjs`
-- [ ] Full statewide duplicate/overlap audit across all 224 ACs (a sampled
-      version already runs inside the ASD sweep; the exhaustive pass is
-      still queued — see `HANDOFF.md`)
+- [x] **Full statewide overlap audit — exhaustive, not sampled — complete.**
+      **3,191 EPICs genuinely appear on both lists** (0.007% of the roll),
+      contradicting the earlier sampled "zero overlap" conclusion. Full
+      write-up: [`reports/overlap-audit-2026-08-30.pdf`](reports/overlap-audit-2026-08-30.pdf).
+      Confirms the five-verdict search's "found on both, they disagree"
+      result is handling a real, measured condition, not a hypothetical.
+- [x] **Test log book** — every verification test (all five verify/sweep
+      scripts) now logs to `test-logs/test-log.jsonl` (timestamp, EPIC,
+      expected, actual, verdict), committed automatically on a cadence by
+      `16-commit-test-log.mjs`. See `test-logs/README.md`.
+- [ ] Exhaustive per-booth sweep (`14-exhaustive-sweep.mjs`, every booth
+      rather than one per AC): ASD dataset running (~1.5h); the roll
+      dataset (~4 days, CDN-bound) is built and ready but deliberately
+      deferred until explicitly requested.
 - [ ] Root cause of the residual ~0.6% gap against the CEO's official count
-      — investigation queued, with an explicit constraint that any fix
+      — investigation queued next, with an explicit constraint that any fix
       re-pulls only the specific affected booths, never a full rebuild
 
 See `HANDOFF.md` for the full session-by-session history, and
