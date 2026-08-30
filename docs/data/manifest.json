@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-30T09:07:38.839Z",
+  "builtAt": "2026-08-30T09:54:39.560Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 44104806,
+  "electors": 44377604,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 60563,
-  "coverage": 99.41,
+  "partsDone": 60914,
+  "coverage": 99.99,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1761,16 +1761,16 @@
       "nameKn": "ವರುಣ",
       "district": "MYSORE",
       "parts": 267,
-      "partsDone": 65,
-      "electors": 51720
+      "partsDone": 263,
+      "electors": 206403
     },
     "220": {
       "name": "T. Narasipur",
       "nameKn": "ಟಿ.ನರಸೀಪುರ",
       "district": "MYSORE",
       "parts": 232,
-      "partsDone": 79,
-      "electors": 63023
+      "partsDone": 232,
+      "electors": 181138
     },
     "221": {
       "name": "Hanur",
