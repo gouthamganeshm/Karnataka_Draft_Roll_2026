@@ -1,0 +1,119 @@
+# Trial: can a GitHub-hosted runner reach the roll CDN if its egress is
+# routed through a Tailscale exit node on the user's own home network?
+#
+# `.github/workflows/probe-cdn.yml` already established (2026-08-24/25) that
+# every GitHub-hosted-runner IP range gets a flat 406 from this CDN — tested
+# on ubuntu-latest and macos-latest, both fetch and curl. HANDOFF.md §5
+# concluded the only way to still reach it from Actions is routing through a
+# non-datacenter IP, and flagged that as needing the user's explicit
+# sign-off first, since it is deliberately working around a bot-defense
+# rule the site operator put up on purpose (the files themselves are public
+# — no auth, no captcha — but this is a step further than anything else
+# this project does).
+#
+# User sign-off given 2026-08-30: trial it at 1-part scale, routed through
+# the user's own home connection specifically (not a third-party VPN or
+# residential-proxy service) — the same IP the local extraction pipeline
+# already uses successfully every day. This does not add new egress
+# capacity (HANDOFF.md already noted a self-hosted runner on the same
+# network gives "no throughput gain, no new egress" — a Tailscale tunnel
+# back to that same network is the same fact in a different shape); it only
+# tests whether Actions orchestration is possible at all, and if so,
+# whether it's worth the added complexity purely for convenience (no
+# machine needs to stay open) rather than speed.
+#
+# One-time tailnet setup required before this can run (see HANDOFF.md, not
+# repeated here — none of it is secret and none of it belongs in a workflow
+# comment that runs unattended):
+#   1. Tailscale installed and signed in on the home machine already used
+#      for local extraction; that machine advertising itself as an exit
+#      node (`tailscale up --advertise-exit-node`) and approved as one in
+#      the admin console (Machines -> the device's menu -> "Edit route
+#      settings" -> Exit node).
+#   2. A `tag:github-actions` ACL tag defined
+#      (https://login.tailscale.com/admin/acls/file) and an OAuth client
+#      (https://login.tailscale.com/admin/settings/oauth) with "Devices:
+#      Core" and "Auth Keys" read+write, tagged with it.
+#   3. Three repo secrets, set by the user directly (via `gh secret set` or
+#      the GitHub web UI — never pasted into chat or committed):
+#      TAILSCALE_OAUTH_CLIENT_ID, TAILSCALE_OAUTH_SECRET,
+#      TAILSCALE_EXIT_NODE (the home machine's tailnet IP, 100.x.y.z).
+#
+# If any of those three secrets is unset, the Tailscale step below fails
+# fast rather than silently probing over the runner's own (already known
+# to be blocked) egress — a false "it works" here would be worse than an
+# honest failure.
+
+name: Probe roll CDN via home exit node (VPN trial)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ac:
+        description: 'AC number to probe (default 177 Anekal)'
+        required: false
+        default: '177'
+      part:
+        description: 'Part number to probe (default 1 — every AC has one)'
+        required: false
+        default: '1'
+
+permissions:
+  contents: read
+
+jobs:
+  probe-via-home-exit-node:
+    name: Probe from a hosted runner, routed through the home connection
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require the tailnet secrets to be set
+        run: |
+          missing=0
+          for v in TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET TAILSCALE_EXIT_NODE; do
+            if [ -z "${!v}" ]; then echo "::error::Secret $v is not set — see this workflow file's header comment for setup steps."; missing=1; fi
+          done
+          [ "$missing" = 0 ]
+        env:
+          TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          TAILSCALE_OAUTH_SECRET: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          TAILSCALE_EXIT_NODE: ${{ secrets.TAILSCALE_EXIT_NODE }}
+
+      - name: Egress IP BEFORE the tunnel (should be a GitHub/Azure IP, same as the existing blocked baseline)
+        run: curl -s --max-time 20 https://api.ipify.org || echo '(unavailable)'; echo
+
+      - name: Connect to tailnet, route all egress through the home exit node
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          tags: tag:github-actions
+          args: --exit-node=${{ secrets.TAILSCALE_EXIT_NODE }} --exit-node-allow-lan-access=false
+
+      - name: Egress IP AFTER the tunnel (should now be the home connection's public IP)
+        run: curl -s --max-time 20 https://api.ipify.org || echo '(unavailable)'; echo
+
+      # Same three request shapes probe-cdn.yml already tried directly from
+      # a hosted runner (all three 406'd there) — run unchanged here so the
+      # only variable that differs is the egress path.
+      - name: Probe the roll CDN through the tunnel
+        run: |
+          url="https://voters.eci.gov.in/eroll/2026/s10/sir-draftroll/${{ inputs.ac }}/2026-EROLLGEN-S10-${{ inputs.ac }}-SIR-DraftRoll-Revision1-KAN-${{ inputs.part }}-WI.pdf"
+          ua='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+          status=1
+          for label in "HEAD bare" "HEAD browser-ua" "GET range browser-ua"; do
+            echo "--- $label ---"
+            case "$label" in
+              "HEAD bare")             curl -s -S -I --max-time 60 "$url" ;;
+              "HEAD browser-ua")       curl -s -S -I --max-time 60 -A "$ua" -H 'Referer: https://voters.eci.gov.in/' "$url" ;;
+              "GET range browser-ua")  code=$(curl -s -S --max-time 60 -D - -o /tmp/probe.bin -w '\n%{http_code}\n' -r 0-4095 -A "$ua" -H 'Referer: https://voters.eci.gov.in/' "$url" | tee /tmp/probe-headers.txt | tail -1)
+                                        if [ "$code" = "200" ] || [ "$code" = "206" ]; then status=0; fi ;;
+            esac || echo "curl exit $?"
+          done
+          echo
+          if [ "$status" = 0 ]; then
+            echo "VERDICT: reached the CDN through the home exit node (got $(wc -c < /tmp/probe.bin) bytes of PDF)."
+          else
+            echo "VERDICT: still blocked even through the home exit node — see the response codes above."
+          fi
+          exit $status
