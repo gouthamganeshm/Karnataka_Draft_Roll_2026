@@ -1219,6 +1219,117 @@ not a hypothetical.
 Full result set (3,191 rows) persisted to `test-logs/test-log.jsonl` with
 `layer: "overlap-audit"` — see the log book section immediately below.
 
+### A real bug in the audit's own EPIC-attribution — found by the user, fixed, verified
+
+**Found by manual verification, not by this project's own checks.** The user
+spot-checked one reported example (`YYV0007401`, a DEAD-reason collision)
+against the live site and reported it didn't look right. Investigated and
+that *specific* EPIC turned out to be genuinely correct on every layer
+checked (`cache/rows`, `cache/asd-rows`, both published buckets, and a live
+replica of the site's own lookup) — but tracing it surfaced a **real bug
+elsewhere** in `13-overlap-audit.mjs`'s EPIC-recovery step:
+
+```js
+const bySuffix = new Map(collisions.map((c) => [c.suffix, c]));   // BUG: suffix only
+```
+
+The recovery phase re-hashes all ~55M rows (`cache/rows` + `cache/asd-rows`)
+to find which EPIC produced each of the 3,191 collision addresses, but was
+matching on the 32-bit **suffix alone**, never checking the 16-bit prefix.
+Across 55M rows against 3,191 target suffixes, that gives an expected **~41
+false attributions** by pure chance (55,000,000 &times; 3,191 / 2&sup3;&sup2;
+&asymp; 41) — the underlying bucket-level collision (found via the
+merge-compare step, which *does* use the full bucket address) was never
+wrong, only some of the human-readable EPIC strings attached to them.
+
+**Fixed**: collisions now carry their bucket's `prefix` alongside `suffix`,
+and the recovery scan matches on both together
+(`` `${prefix}:${suffix}` ``). Re-ran the full exhaustive audit with the fix.
+
+**Result confirmed by diffing old vs. new `test-logs/test-log.jsonl`
+entries**: exactly **10 of the 3,191 collisions had their attributed EPIC
+change**. The bucket-level collision *count* (3,191) did not change — only
+10 of the EPIC labels did. **Manually re-verified 2 of the 10 corrected
+entries directly against `cache/rows`/`cache/asd-rows`** (not just re-running
+the script again): both post-fix EPICs matched the cache files exactly;
+both pre-fix EPICs did not. Example: collision at roll AC156/part107/serial306
+— old (wrong) attribution `RSB4744439`, new (confirmed correct) attribution
+`ICP4301362`, verified directly against `cache/rows/156.jsonl`.
+
+`reports/overlap-audit-2026-08-30.pdf` regenerated from the corrected data
+(81 pages now, was 80) with an explicit revision note at the top explaining
+what changed and why, rather than silently replacing the file. Pushed.
+
+**Lesson for future report-generation work in this codebase**: re-hashing a
+large row set to recover a label for a small set of target hashes needs the
+*full* address (every hex segment used for bucketing), not just the part
+that happens to be convenient to compare. This is the second time this
+project has found a bug from a suffix/segment being treated as sufficiently
+unique when it wasn't at large-N scale (the first was the JS heap ceiling
+issue at ~36M rows, a different mechanism but the same underlying lesson:
+assumptions that hold at small scale silently stop holding at this dataset's
+actual size).
+
+### A second, independent, more serious finding: OCR misreads that pass every check
+
+**Also found by manual user verification**, same session, different part of
+the pipeline: `INA8000960` (published, `ok:true` — fully confirmed by the
+pipeline's own accuracy layers) is actually `INA1800960` on the source PDF
+(AC112, part 202, serial 476). Confirmed by rendering the actual page at
+high DPI and reading the card directly.
+
+**Root cause is not the crop.** Isolating this exact card's EPIC crop and
+OCR'ing it *alone* (outside the production pipeline's batching) reads it as
+`INA1I800960` — an 11-character string with the same "spurious glyph at the
+letter/digit boundary" pattern `coerce_epic()`'s own docstring already
+documents (`'TDB0917013'` read as `'TDBO0917013'`). Applying the pipeline's
+own existing `coerce_epic()` to *that* isolated reading correctly produces
+`INA1800960` — the true value.
+
+**But the real pipeline doesn't OCR one card at a time.** For speed
+(~10x, per the README's own measurement — 0.9s for a 30-card contact sheet
+vs 9.6s for 30 separate Tesseract calls), all 30 cards on a page are stacked
+into one tall image and read in a single Tesseract pass. In that batched
+context, this same card reads as `INA8000960` directly — a *different,
+worse* misread that happens to already be exactly 10 characters, so the
+11-char spurious-glyph fixer never triggers. It is silently, confidently
+wrong rather than silently uncertain.
+
+**This is a materially different problem from everything found so far**:
+- The crop-geometry bug (section 4g/4h) produced a hard crash or an
+  obviously-invalid string — caught by validation.
+- The malformed-EPIC withholding (the CEO-gap work, in progress when this
+  was found) produces `ok:false` — flagged, not published as confirmed.
+- **This produces a `ok:true`, grammatically valid, wrong EPIC** — invisible
+  to geometry checks, grammar checks, the serial-sequence fit, and every
+  "verify" script that has run so far, because those all re-run the *same*
+  batched pipeline and get the *same* wrong answer both times. Re-OCR-ing
+  the same image with the same method is not independent verification of
+  accuracy — only of reproducibility.
+
+**Deterministic, not a rare glitch**: re-ran extraction on this exact PDF
+twice and got `INA8000960` both times.
+
+**Status: root cause understood, scope not yet measured.** Confirmed on this
+one example. Not yet known how many of the ~44M published `ok:true` rows are
+affected by the same contact-sheet-batching degradation — this is
+**explicitly queued as the top-priority next task** (see the task pipeline
+below), ahead of the CEO-gap investigation that surfaced the retry-recovery
+finding just below.
+
+**Related, found the same session while investigating the CEO gap**:
+`ROLL_OCR_RETRY` (an opt-in second-pass re-read for EPICs that *fail
+grammar*) is off by default, based on a code comment claiming Karnataka's
+200 DPI renders read "100%" on the first pass — contradicted directly by
+production data (0.42% genuinely withheld, 187,142 rows). Tested on 4 real
+parts: 3 of 4 previously-malformed EPICs were fully recovered into valid
+EPICs with the retry enabled (`NUV200268`&rarr;`NUV2002681`,
+`NUV202842`&rarr;`NUV2028421`, an empty read&rarr;`NUV4241303`). This retry
+only fires for EPICs that already **fail** grammar, so it would **not** have
+caught the `INA8000960` case above (which passes grammar) — the two findings
+are related (both trace back to contact-sheet OCR degradation) but need
+separate fixes.
+
 ### Test log book — new standing convention, 2026-08-30
 
 Explicit user requirement: every verification test this project runs is now
@@ -1319,37 +1430,56 @@ Done:
    the dedicated section above for the exact resume command. Not abandoned,
    not forgotten — paused on purpose to free the machine for item 10.
 9. Detailed PDF report on the overlap audit —
-   `reports/overlap-audit-2026-08-30.pdf`, 80 pages, full methodology,
+   `reports/overlap-audit-2026-08-30.pdf`, now 81 pages, full methodology,
    breakdown, sensitive-case discussion, and an appendix listing all 3,191
    collision EPICs. Generated programmatically (PyMuPDF's `Story` API) from
-   `test-logs/test-log.jsonl`, no hand-typed figures. Pushed in two stages
-   (`9746be75355` short version, `0037c00baf5` with the full appendix) — if
-   a downloaded copy ever looks short, it is very likely a stale cached
-   download from between those two pushes, not a corrupt file; verified the
-   raw `raw.githubusercontent.com` blob directly and it serves 80 pages
-   correctly.
+   `test-logs/test-log.jsonl`, no hand-typed figures. **Revised once already**
+   after the EPIC-attribution bug below was found and fixed — the current
+   version carries an explicit revision note at the top; do not treat an
+   older cached copy (short, or missing the note) as current. Verified the
+   raw `raw.githubusercontent.com` blob directly after each push.
+10. **EPIC-attribution bug in the overlap audit — found by user manual
+    verification, fixed, re-verified.** 10 of the 3,191 collisions had a
+    wrong EPIC attached due to a suffix-only (not prefix+suffix) matching
+    bug in the recovery step. See the dedicated section above for the full
+    root cause, the fix, and the manual re-verification against `cache/rows`
+    directly (not just re-trusting the script). This is now **done**, not
+    queued — listed here for the ordering, since it happened between items
+    9 and what follows.
 
 Queued, in order:
-10. **CEO-gap root cause investigation — IN PROGRESS as of this write-up.**
-    User explicitly asked to pick this up next, after pausing the ASD
-    exhaustive sweep (item 8) to make room for it. If a fixable cause is
-    found: patch it and re-pull **only the specific affected booths** — no
-    full rebuild, nothing existing touched (explicit user constraint,
-    unchanged from when this was first queued).
-11. **Roll dataset's exhaustive per-booth sweep — still deferred**, now
-    additionally blocked behind item 10 by explicit sequencing (ASD paused
-    to make room for the CEO-gap work, roll was already waiting behind
-    ASD). `node scripts/14-exhaustive-sweep.mjs --dataset roll
-    --concurrency 8` (or similar) is ready to run; realistic cost is ~4
-    days continuous, CDN-bound. **Do not start it without being asked.**
-12. Resume the ASD exhaustive sweep (item 8) once item 10 is settled —
+11. **TOP PRIORITY, as of this write-up: OCR misreads that pass every
+    existing check** — see the dedicated section above
+    ("A second, independent, more serious finding"). Root cause understood
+    (contact-sheet batching degrades Tesseract's read below what the same
+    crop gets in isolation, at least for some cards) but **scope not yet
+    measured** — unknown how many of ~44M published `ok:true` rows are
+    affected. **Explicit user instruction: let the overlap-audit re-run
+    finish (done, see item 10), then take this on priority — ahead of the
+    CEO-gap investigation (item 12) that was already in progress when this
+    was found.**
+12. CEO-gap root cause investigation — **paused mid-investigation** to let
+    the OCR-misread finding (item 11) take priority, per explicit
+    instruction. Already found one real, related lead before pausing: the
+    opt-in `ROLL_OCR_RETRY` second-pass recovers ~75% of grammar-*failing*
+    EPICs in a small sample (see the dedicated section above) — but does
+    **not** address item 11's failure mode (grammar-*passing* but wrong),
+    so the two need to be resolved together, not treated as the same fix.
+    If a fixable cause is found for either: patch it and re-pull **only the
+    specific affected booths** — no full rebuild, nothing existing touched
+    (explicit user constraint, unchanged since first queued).
+13. **Roll dataset's exhaustive per-booth sweep — still deferred.**
+    `node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8`
+    (or similar) is ready to run; realistic cost is ~4 days continuous,
+    CDN-bound. **Do not start it without being asked.**
+14. Resume the ASD exhaustive sweep once items 11-12 are settled —
     `node scripts/14-exhaustive-sweep.mjs --dataset asd --concurrency 10`,
     picks up from 1,661/60,923 automatically.
-11. Publish/republish loop for ASD data going forward — no auto-publish
+15. Publish/republish loop for ASD data going forward — no auto-publish
     script written yet. Low priority: ASD extraction is a one-shot, already-
     finished pass; revisit only if ECI revises ASD reports in place (untested
     — see `OBSERVATIONS-ASD.md` §8).
-12. Now that a real overlap exists (item 6), consider whether the 3,191
+16. Now that a real overlap exists (item 6), consider whether the 3,191
     known collision EPICs deserve their own spot-check pass through the
     live site's actual verdict-3 UI path once picked up cold — not done
     this session, just noting the data now exists to make that check

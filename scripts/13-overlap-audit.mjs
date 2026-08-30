@@ -77,7 +77,7 @@ for (const file of shared) {
     if (a < b) i++;
     else if (a > b) j++;
     else {
-      collisions.push({ suffix: a, asd: asdRecords[i], roll: rollRecords[j] });
+      collisions.push({ prefix: file.replace(/\//g, '').replace(/\.json$/, ''), suffix: a, asd: asdRecords[i], roll: rollRecords[j] });
       i++; j++;
     }
   }
@@ -94,9 +94,21 @@ if (!collisions.length) {
 
 // Recover which EPIC each collision actually was, by re-hashing the cached
 // rows — the only place the full EPIC still exists once it is bucketed.
+//
+// Keyed on prefix+suffix together, not suffix alone — a real bug found by
+// the user manually verifying a report example (2026-08-30): checking ~55M
+// rows' hashes against 3,191 target *suffixes* (32 bits) alone gives an
+// expected ~41 false attributions by pure birthday-paradox chance
+// (55,000,000 x 3,191 / 2^32 ~= 41), independent of whether the underlying
+// bucket-level collision is real. The collision itself (found via the
+// merge-compare above, within one bucket file) was never wrong; only the
+// human-readable EPIC string recovered for it could be borrowed from an
+// unrelated row that happened to share just the suffix. Prefix is already
+// known per collision (bucket file path) and per candidate row (first N hex
+// chars of its own hash) — matching on both closes the gap.
 log('Recovering the actual EPIC for each collision from cache/rows + cache/asd-rows…');
-const bySuffix = new Map(collisions.map((c) => [c.suffix, c]));
-let remaining = bySuffix.size;
+const byPrefixSuffix = new Map(collisions.map((c) => [`${c.prefix}:${c.suffix}`, c]));
+let remaining = byPrefixSuffix.size;
 
 async function scanForSuffixes(dir, isAsd) {
   const files = readdirSync(dir).filter((f) => f.endsWith('.jsonl'));
@@ -109,8 +121,9 @@ async function scanForSuffixes(dir, isAsd) {
       const row = JSON.parse(line);
       const epic = String(row.epic ?? '').trim().toUpperCase();
       const hash = sha256hex(epic);
+      const prefix = hash.slice(0, rollManifest.shardDepth);
       const suffix = hash.slice(rollManifest.shardDepth, rollManifest.shardDepth + rollManifest.suffixLength);
-      const hit = bySuffix.get(suffix);
+      const hit = byPrefixSuffix.get(`${prefix}:${suffix}`);
       if (hit && !hit[isAsd ? 'asdEpic' : 'rollEpic']) {
         hit[isAsd ? 'asdEpic' : 'rollEpic'] = epic;
         if (hit.asdEpic && hit.rollEpic) remaining--;
