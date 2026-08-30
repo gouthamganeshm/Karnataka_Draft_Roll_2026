@@ -21,7 +21,7 @@ import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
-import { CACHE, log } from './lib/common.mjs';
+import { CACHE, log, logTest } from './lib/common.mjs';
 
 const args = process.argv.slice(2);
 const argValue = (flag) => {
@@ -191,16 +191,22 @@ for (const ac of acList) {
     for (const row of rows) {
       const hits = await lookupLive(row.epic, manifest);
       const match = hits.find((h) => h[1] === row.ac && h[2] === row.part && h[3] === row.serial);
+      const fieldsOk = match && match[4] === row.reasonCode && match[5] === row.oldPart
+        && match[6] === row.oldSerial && match[7] === row.name && match[8] === row.relativeName;
       if (!match) {
         mismatches++;
         log(`  FAIL  ${row.epic}  expected [${row.ac},${row.part},${row.serial}]  ` +
             `got ${JSON.stringify(hits)}`);
-      } else if (match[4] !== row.reasonCode || match[5] !== row.oldPart || match[6] !== row.oldSerial
-        || match[7] !== row.name || match[8] !== row.relativeName) {
+      } else if (!fieldsOk) {
         mismatches++;
         log(`  FAIL  ${row.epic}  published record disagrees with source row: `
           + `${JSON.stringify(match)} vs row ${JSON.stringify(row)}`);
       }
+      await logTest({
+        dataset: 'asd', layer: 'site', ac: row.ac, part: row.part, epic: row.epic,
+        expected: { ac: row.ac, part: row.part, serial: row.serial, reasonCode: row.reasonCode, oldPart: row.oldPart, oldSerial: row.oldSerial },
+        actual: hits, verdict: (match && fieldsOk) ? 'pass' : 'fail'
+      });
     }
     log(`  live-site consistency: ${rows.length - mismatches}/${rows.length} matched`);
 
@@ -214,6 +220,11 @@ for (const ac of acList) {
       } else {
         log(`  PDF-CHECK ok    ${row.epic}  part ${row.part}  serial ${row.serial}  ${row.reasonCode}`);
       }
+      await logTest({
+        dataset: 'asd', layer: 'pdf', ac: row.ac, part: row.part, epic: row.epic,
+        expected: { serial: row.serial, reasonCode: row.reasonCode, oldPart: row.oldPart, oldSerial: row.oldSerial },
+        verdict: r.ok ? 'pass' : 'fail', reason: r.reason ?? null
+      });
     }
 
     if (mismatches || pdfFails) {

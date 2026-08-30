@@ -1173,41 +1173,138 @@ EPIC-keyed by design). A fallback "known unmatched entries" list was
 offered and **declined by the user** — noting it here in case it's wanted
 later, not building it now.
 
+### The full statewide overlap audit found real collisions — 3,191 of them
+
+`13-overlap-audit.mjs` (new this session) checked **every** shared bucket
+between the two published trees — not a sample. Both trees share shard
+depth 4 / suffix length 8 (verified, not assumed), so the same SHA-256(EPIC)
+lands in the identically-pathed bucket file in both, which made an exhaustive
+check cheap: read each bucket pair once, merge-compare the two sorted suffix
+arrays.
+
+**Result: 3,191 EPICs genuinely appear on both lists**, out of 44,385,222
+roll electors and 10,766,778 ASD rows. This contradicts the small-sample
+assumption both this session and `OBSERVATIONS-ASD.md` §5 made (0/1,400 and
+0/33,127 respectively) — not because either sample was run wrong, but
+because the true rate (~0.007% of roll electors) is genuinely too low for a
+few-thousand-row sample to reliably surface. Do not trust a sampled overlap
+check to mean "zero exists" again; only an exhaustive one can say that.
+
+Breakdown (recovered actual EPICs by re-hashing `cache/rows` +
+`cache/asd-rows` against the 3,191 colliding suffixes):
+
+| | count | share |
+|---|---|---|
+| reason: SHIFTED | 2,414 | 75.7% |
+| reason: ABSENT | 596 | 18.7% |
+| reason: DUPLICATE | 149 | 4.7% |
+| reason: DEAD | 32 | 1.0% |
+| same AC on both sides | 123 | 3.9% |
+| different AC on each side | 3,068 | 96.1% |
+
+The 96.1% different-AC figure matches `OBSERVATIONS-ASD.md` §5a's "timing
+skew" mechanism exactly: someone shifted, was recorded as such on their old
+AC's ASD report, and is now on a *different* AC's current roll — both true
+at once, not a data error. The 149 DUPLICATE-reason rows are the other
+predicted mechanism confirmed directly: the BLO's assertion "already
+registered elsewhere" checked out as literally true.
+
+**The 32 DEAD-reason collisions are the sensitive case verdict 3's wording
+was written for** — an EPIC a BLO recorded as belonging to a deceased person,
+that still appears on the current live roll. This is exactly why that
+verdict states a disagreement between two sources rather than picking one as
+authoritative (see the UI section above) — confirmed necessary by real data,
+not a hypothetical.
+
+Full result set (3,191 rows) persisted to `test-logs/test-log.jsonl` with
+`layer: "overlap-audit"` — see the log book section immediately below.
+
+### Test log book — new standing convention, 2026-08-30
+
+Explicit user requirement: every verification test this project runs is now
+recorded to `test-logs/test-log.jsonl` (committed to git, not `cache/`, which
+is gitignored) — timestamp, EPIC, expected, actual, verdict, one JSON line
+per test, appended only, never rewritten. See `test-logs/README.md` for the
+full format.
+
+- `scripts/7-verify.mjs`, `8-full-sweep.mjs`, `11-verify-asd.mjs`,
+  `12-full-sweep-asd.mjs`, `13-overlap-audit.mjs` all updated to log here —
+  a shared `logTest()` helper now lives in `scripts/lib/common.mjs` for
+  exactly this, so future test scripts should use it too rather than
+  reinventing a log format per script.
+- `scripts/16-commit-test-log.mjs` — a small supervisor loop (same shape as
+  `6-auto-publish.mjs`) that commits + pushes `test-logs/` on an interval
+  (default 10 min) so a long-running sweep's results are never more than one
+  interval from being safely on `origin/main`. Running detached
+  (`nohup`+`disown`) as of this write-up.
+
+### Exhaustive per-booth sweep — built, ASD running now, roll deferred
+
+`scripts/14-exhaustive-sweep.mjs` — every booth (not one per AC), both
+datasets, both layers (live-site + source-PDF), logging every test to the
+book above. `--samples` defaults to **1** per booth (scaled down from an
+initial request of 5 once the roll dataset's realistic cost was measured —
+**note this does not change the roll dataset's ~4-day estimate**, since a
+booth's PDF is fetched once regardless of sample count and that fetch is the
+actual bottleneck, not the sample count).
+
+**User decision**: run the ASD dataset now (~1.5h), hold the roll dataset
+(~4 days, CDN-bound) until explicitly told to start. ASD run is live as of
+this write-up — `node scripts/14-exhaustive-sweep.mjs --dataset asd
+--concurrency 10`, detached, resumable via `cache/exhaustive-done-asd.txt` if
+interrupted. **Do not start the roll dataset without asking first.**
+
 ### Task pipeline as of this write-up (for continuity if picked up cold)
 
 Done:
-1. Full statewide sweep test of the draft roll (`8-full-sweep.mjs`) —
-   started, very slow under concurrent ASD extraction load; check whether it
-   finished before assuming stale
-2. ASD extraction — complete, 10,766,778 rows, 0 unreadable
-3. ASD build — complete, pushed as `8268e005d0a`
+1. Full statewide sweep test of the draft roll (`8-full-sweep.mjs`) — ran to
+   completion (~2.5h). **Section A: 224/224 swept, 0 site mismatches** — the
+   published data itself is clean. The 64 "failures" reported were all
+   `PDF fetch failed twice: terminated` — CDN-side connection resets, not
+   data errors, almost certainly from running concurrently with the ASD
+   extraction's own 11-worker load on the same CDN for most of that window.
+   Section B corner cases all clean (20/20, 20/20, 20/20, 8/8). Worth a clean
+   re-run of just the PDF-recheck portion once nothing else is hammering the
+   CDN, but not urgent — this is a network-flakiness question, not a data one.
+2. ASD extraction — complete, 10,766,778 rows, 0 unreadable, 85 min
+3. ASD build — complete, relocated to `docs/data-asd` (sibling, not child, of
+   `docs/data` — see above), pushed as `8268e005d0a`
+4. ASD UI — complete: one search box, five verdicts, both lookups run every
+   time. Tested locally against real data (3 of 4 scenarios via the actual
+   SHA-256+bucket lookup path against a local server; the 4th, found-on-both,
+   via direct logic verification since no genuine overlap exists in sampled
+   data) before pushing, then re-verified against the *live* site after
+   deploy with the same real EPICs. Pushed as `1a991e24553`.
+5. README and dashboard updated to describe the ASD feature and current
+   (100%/100%) status — pushed as `090ada236fb`.
+6. Full statewide overlap/duplicate audit (`13-overlap-audit.mjs`) —
+   complete. **3,191 real collisions found** — see the dedicated section
+   above. This is the one item on this list that actually changed a prior
+   conclusion (the "the two lists are disjoint" sampled finding) rather than
+   just confirming it, so read that section before assuming zero overlap
+   anywhere else in this codebase's history of claims.
+7. Test log book (`test-logs/`) — built and wired into all five
+   verify/sweep scripts, committed, periodic committer running. See the
+   dedicated section above.
+8. Exhaustive per-booth sweep script (`14-exhaustive-sweep.mjs`) — built,
+   smoke-tested, ASD dataset running now (~1.5h). See the dedicated section
+   above.
 
 Queued, in order:
-4. Publish/republish loop for ASD data going forward — no auto-publish
-   script written yet (this session shipped one build as a single manual
-   commit; there is nothing yet that re-runs `10-build-asd-data.mjs` and
-   pushes on a cadence the way `6-auto-publish.mjs` does for the roll).
-   Probably not needed again soon since ASD extraction is a one-shot,
-   already-finished pass — revisit if ECI revises ASD reports in place
-   (untested — see `OBSERVATIONS-ASD.md` §8).
-5. Build the ASD UI feature: new search section, the five-verdict cascade
-   from `OBSERVATIONS-ASD.md` §6, wire the roll's existing `notFoundTitle`
-   branch (`docs/app.js` around line 296) to auto-cascade into an ASD lookup,
-   fix the three pre-existing UI bugs that document's §7 found (no tone-color
-   CSS actually matches `docs/app.js`'s `tone-${tone}` classes; `maxlength="10"`
-   / `EPIC_RE` block the real 11-character series from being typed at all,
-   roll search included; `.acronym` CSS is an already-built, unused legend the
-   ASD reason-code dots can reuse), and update the privacy-stance copy for the
-   names-included decision above.
-6. End-to-end test the ASD feature once released — `11-verify-asd.mjs`
-   (per-AC) and `12-full-sweep-asd.mjs` (statewide + corner cases) are
-   already written and syntax-checked, mirroring `7-verify.mjs` /
-   `8-full-sweep.mjs` exactly, ready to run once the UI ships
-7. Duplicate/overlap audit, full statewide (not the document's 31-AC sample):
-   duplicate EPICs within ASD, duplicate EPICs within the draft roll, and
-   EPICs appearing in **both** lists. `12-full-sweep-asd.mjs`'s section B4
-   already does a *light sampled* version of the cross-list check as an
-   early warning — this item is the full exhaustive pass, still separate.
-8. Investigate the ~0.6% CEO-gap root cause; if fixable, patch and re-pull
-   only the specific affected booths — no full rebuild, nothing existing
-   touched (explicit user constraint, see above)
+9. **Roll dataset's exhaustive per-booth sweep — explicitly deferred.**
+   `node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8`
+   (or similar) is ready to run; realistic cost is ~4 days continuous,
+   CDN-bound. **Do not start it without the user explicitly asking** — this
+   was deferred on request, not forgotten.
+10. Investigate the ~0.6% CEO-gap root cause; if fixable, patch and re-pull
+    only the specific affected booths — no full rebuild, nothing existing
+    touched (explicit user constraint).
+11. Publish/republish loop for ASD data going forward — no auto-publish
+    script written yet. Low priority: ASD extraction is a one-shot, already-
+    finished pass; revisit only if ECI revises ASD reports in place (untested
+    — see `OBSERVATIONS-ASD.md` §8).
+12. Now that a real overlap exists (item 6), consider whether the 3,191
+    known collision EPICs deserve their own spot-check pass through the
+    live site's actual verdict-3 UI path once picked up cold — not done
+    this session, just noting the data now exists to make that check
+    meaningful rather than theoretical.

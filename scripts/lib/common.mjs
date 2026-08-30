@@ -3,7 +3,7 @@
    now on whatever Node the volunteer running it happens to have. */
 
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -131,6 +131,20 @@ export function fmtBytes(n) {
 
 export function log(...args) {
   process.stdout.write(args.join(' ') + '\n');
+}
+
+/** Shared test log book — test-logs/test-log.jsonl, committed (not
+ * cache/, which is gitignored). Every verify/sweep script appends here so
+ * there is one durable, git-tracked record of what was checked, when, and
+ * with what result, instead of each script's results living only in a
+ * terminal that scrolled away. See test-logs/README.md for the format and
+ * why this exists — standing convention as of 2026-08-30, not specific to
+ * any one script. `entry` should at minimum carry `dataset`, `layer`,
+ * `ac`, `part`, `epic`, `expected`, `actual` (or `null`), and `verdict`. */
+export async function logTest(entry) {
+  const path = resolve(ROOT, 'test-logs', 'test-log.jsonl');
+  await mkdir(resolve(ROOT, 'test-logs'), { recursive: true });
+  await appendFile(path, JSON.stringify({ timestamp: new Date().toISOString(), ...entry }) + '\n');
 }
 
 /** Overwrites the current terminal line — for progress that shouldn't scroll. */

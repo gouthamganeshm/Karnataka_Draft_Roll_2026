@@ -30,7 +30,7 @@ import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
-import { CACHE, log, pool } from './lib/common.mjs';
+import { CACHE, log, logTest, pool } from './lib/common.mjs';
 
 const args = process.argv.slice(2);
 const argValue = (flag) => {
@@ -233,6 +233,15 @@ for (const r of sweepResults) {
     sweepPdfFails++;
     fail(`AC ${r.ac} part ${r.row.part} serial ${r.row.serial} (${r.row.epic}) — PDF re-check: ${r.pdf.reason}`);
   }
+  await logTest({
+    dataset: 'asd', layer: 'site', ac: r.ac, part: r.row.part, epic: r.row.epic,
+    expected: { ac: r.row.ac, part: r.row.part, serial: r.row.serial },
+    actual: r.hits, verdict: r.siteOk ? 'pass' : 'fail'
+  });
+  await logTest({
+    dataset: 'asd', layer: 'pdf', ac: r.ac, part: r.row.part, epic: r.row.epic,
+    expected: { serial: r.row.serial }, verdict: r.pdf.ok ? 'pass' : 'fail', reason: r.pdf.reason ?? null
+  });
 }
 log(`Section A: ${swept} constituencies swept, ${sweepFails} site mismatches, ${sweepPdfFails} PDF mismatches\n`);
 
@@ -335,6 +344,11 @@ for (const ac of boundaryAcs) {
       } else {
         log(`  ok    AC ${ac} part ${part} serial ${row.serial} (edge of booth range)`);
       }
+      await logTest({
+        dataset: 'asd', layer: 'site-boundary', ac: row.ac, part: row.part, epic: row.epic,
+        expected: { ac: row.ac, part: row.part, serial: row.serial },
+        actual: hits, verdict: match ? 'pass' : 'fail'
+      });
     }
   }
 }

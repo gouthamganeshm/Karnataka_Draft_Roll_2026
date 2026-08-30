@@ -35,7 +35,7 @@ import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
-import { CACHE, log } from './lib/common.mjs';
+import { CACHE, log, logTest } from './lib/common.mjs';
 
 const args = process.argv.slice(2);
 const argValue = (flag) => {
@@ -205,6 +205,11 @@ for (const ac of acList) {
         log(`  FAIL  ${row.epic}  expected [${row.ac},${row.part},${row.serial}]  ` +
             `got ${JSON.stringify(hits)}`);
       }
+      await logTest({
+        dataset: 'roll', layer: 'site', ac: row.ac, part: row.part, epic: row.epic,
+        expected: { ac: row.ac, part: row.part, serial: row.serial },
+        actual: hits, verdict: match ? 'pass' : 'fail'
+      });
     }
     log(`  live-site consistency: ${rows.length - mismatches}/${rows.length} matched`);
 
@@ -218,6 +223,10 @@ for (const ac of acList) {
       } else {
         log(`  PDF-CHECK ok    ${row.epic}  part ${row.part}  serial ${row.serial}`);
       }
+      await logTest({
+        dataset: 'roll', layer: 'pdf', ac: row.ac, part: row.part, epic: row.epic,
+        expected: { serial: row.serial }, verdict: r.ok ? 'pass' : 'fail', reason: r.reason ?? null
+      });
     }
 
     if (mismatches || pdfFails) {
