@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-30T01:48:26.608Z",
+  "builtAt": "2026-08-30T03:00:24.865Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 42018057,
+  "electors": 42392513,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 57779,
-  "coverage": 94.84,
+  "partsDone": 58273,
+  "coverage": 95.65,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1033,8 +1033,8 @@
       "nameKn": "ಚಿಕ್ಕನಾಯಕನಹಳ್ಳಿ",
       "district": "TUMKUR",
       "parts": 270,
-      "partsDone": 99,
-      "electors": 75362
+      "partsDone": 270,
+      "electors": 204594
     },
     "129": {
       "name": "Tiptur",
@@ -1081,16 +1081,16 @@
       "nameKn": "ಕೊರಟಗೆರೆ",
       "district": "TUMKUR",
       "parts": 256,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 101,
+      "electors": 73990
     },
     "135": {
       "name": "Gubbi",
       "nameKn": "ಗುಬ್ಬಿ",
       "district": "TUMKUR",
       "parts": 222,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 222,
+      "electors": 171234
     },
     "136": {
       "name": "Sira",
