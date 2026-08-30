@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-29T23:37:18.700Z",
+  "builtAt": "2026-08-30T00:33:37.440Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 41389595,
+  "electors": 41687795,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 56946,
-  "coverage": 93.47,
+  "partsDone": 57336,
+  "coverage": 94.11,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -289,8 +289,8 @@
       "nameKn": "ಜೇವರ್ಗಿ",
       "district": "GULBARGA",
       "parts": 285,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 205,
+      "electors": 155599
     },
     "36": {
       "name": "Shorapur",
@@ -369,8 +369,8 @@
       "nameKn": "ಗುಲಬರ್ಗಾ ಉತ್ತರ",
       "district": "GULBARGA",
       "parts": 308,
-      "partsDone": 123,
-      "electors": 84852
+      "partsDone": 308,
+      "electors": 227453
     },
     "46": {
       "name": "Aland",
