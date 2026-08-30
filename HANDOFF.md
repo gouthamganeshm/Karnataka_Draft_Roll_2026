@@ -1238,7 +1238,7 @@ full format.
   interval from being safely on `origin/main`. Running detached
   (`nohup`+`disown`) as of this write-up.
 
-### Exhaustive per-booth sweep — built, ASD running now, roll deferred
+### Exhaustive per-booth sweep — built, ASD paused mid-run, roll still deferred
 
 `scripts/14-exhaustive-sweep.mjs` — every booth (not one per AC), both
 datasets, both layers (live-site + source-PDF), logging every test to the
@@ -1248,11 +1248,38 @@ initial request of 5 once the roll dataset's realistic cost was measured —
 booth's PDF is fetched once regardless of sample count and that fetch is the
 actual bottleneck, not the sample count).
 
-**User decision**: run the ASD dataset now (~1.5h), hold the roll dataset
-(~4 days, CDN-bound) until explicitly told to start. ASD run is live as of
-this write-up — `node scripts/14-exhaustive-sweep.mjs --dataset asd
---concurrency 10`, detached, resumable via `cache/exhaustive-done-asd.txt` if
-interrupted. **Do not start the roll dataset without asking first.**
+**Found and fixed a real concurrency bug in this script while it ran**:
+`spawnSync` for the Python re-check call was blocking Node's entire
+single-threaded event loop, silently serializing every `pool()` worker
+behind whichever one held it. Measured ~52-55 booths/min before the fix,
+~216-232/min immediately after on a 50-booth smoke test at the same
+`--concurrency 10`. Fixed with a `spawnAsync()` Promise wrapper around
+`child_process.spawn` (same `{status, stdout, stderr}` shape as `spawnSync`,
+so nothing else needed to change) — committed as `a33a1cb93c3`. Once the
+full run resumed at scale, throughput settled lower again (~75-78/min,
+likely the ECI CDN's own aggregate throttling reasserting itself under
+sustained load — the same ceiling section 4e already documents for the roll
+dataset, not a regression of this fix).
+
+**Status as of this write-up: PAUSED, not finished, explicitly by user
+request** (to free the machine for the CEO-gap investigation below).
+**1,661 of 60,923 ASD booths done**, 0 site-layer fails, 0 pdf-layer fails
+so far. Fully resumable — the done-ledger (`cache/exhaustive-done-asd.txt`)
+already has all 1,661 recorded, and every test up to this point is already
+in `test-logs/test-log.jsonl`. **To resume exactly where this left off**:
+
+```
+node scripts/14-exhaustive-sweep.mjs --dataset asd --concurrency 10
+```
+
+run detached (`nohup ... & disown`) as before — it will report "N already
+done from a prior run" and pick up the remaining ~59,262 booths in a fresh
+random order. The periodic committer
+(`node scripts/16-commit-test-log.mjs --interval 600`) was left running
+throughout the pause, so nothing further needs restarting on that front.
+
+The roll dataset (~4 days, CDN-bound) remains **not started**, per the
+same standing instruction as before — do not start it without being asked.
 
 ### Task pipeline as of this write-up (for continuity if picked up cold)
 
@@ -1287,18 +1314,37 @@ Done:
    verify/sweep scripts, committed, periodic committer running. See the
    dedicated section above.
 8. Exhaustive per-booth sweep script (`14-exhaustive-sweep.mjs`) — built,
-   smoke-tested, ASD dataset running now (~1.5h). See the dedicated section
-   above.
+   smoke-tested, a real concurrency bug found and fixed mid-run. **ASD
+   dataset PAUSED at 1,661/60,923 booths, by explicit user request** — see
+   the dedicated section above for the exact resume command. Not abandoned,
+   not forgotten — paused on purpose to free the machine for item 10.
+9. Detailed PDF report on the overlap audit —
+   `reports/overlap-audit-2026-08-30.pdf`, 80 pages, full methodology,
+   breakdown, sensitive-case discussion, and an appendix listing all 3,191
+   collision EPICs. Generated programmatically (PyMuPDF's `Story` API) from
+   `test-logs/test-log.jsonl`, no hand-typed figures. Pushed in two stages
+   (`9746be75355` short version, `0037c00baf5` with the full appendix) — if
+   a downloaded copy ever looks short, it is very likely a stale cached
+   download from between those two pushes, not a corrupt file; verified the
+   raw `raw.githubusercontent.com` blob directly and it serves 80 pages
+   correctly.
 
 Queued, in order:
-9. **Roll dataset's exhaustive per-booth sweep — explicitly deferred.**
-   `node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8`
-   (or similar) is ready to run; realistic cost is ~4 days continuous,
-   CDN-bound. **Do not start it without the user explicitly asking** — this
-   was deferred on request, not forgotten.
-10. Investigate the ~0.6% CEO-gap root cause; if fixable, patch and re-pull
-    only the specific affected booths — no full rebuild, nothing existing
-    touched (explicit user constraint).
+10. **CEO-gap root cause investigation — IN PROGRESS as of this write-up.**
+    User explicitly asked to pick this up next, after pausing the ASD
+    exhaustive sweep (item 8) to make room for it. If a fixable cause is
+    found: patch it and re-pull **only the specific affected booths** — no
+    full rebuild, nothing existing touched (explicit user constraint,
+    unchanged from when this was first queued).
+11. **Roll dataset's exhaustive per-booth sweep — still deferred**, now
+    additionally blocked behind item 10 by explicit sequencing (ASD paused
+    to make room for the CEO-gap work, roll was already waiting behind
+    ASD). `node scripts/14-exhaustive-sweep.mjs --dataset roll
+    --concurrency 8` (or similar) is ready to run; realistic cost is ~4
+    days continuous, CDN-bound. **Do not start it without being asked.**
+12. Resume the ASD exhaustive sweep (item 8) once item 10 is settled —
+    `node scripts/14-exhaustive-sweep.mjs --dataset asd --concurrency 10`,
+    picks up from 1,661/60,923 automatically.
 11. Publish/republish loop for ASD data going forward — no auto-publish
     script written yet. Low priority: ASD extraction is a one-shot, already-
     finished pass; revisit only if ECI revises ASD reports in place (untested
