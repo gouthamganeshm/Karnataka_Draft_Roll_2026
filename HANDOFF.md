@@ -1134,16 +1134,62 @@ set rather than waiting it out). Logs to `cache/asd-extract.log`. Sustained
 ~290 parts/min, 0 unreadable, ETA roughly 3-3.5h from launch — in line with
 the observations document's own ~3h projection.
 
+### ASD extraction and build finished — 100% coverage, 10,766,778 rows
+
+Extraction finished in 84.7 minutes (well under the ~3h projection —
+throughput climbed to ~713 parts/min by the end, faster than the doc's
+bench figure), 60,305 parts read, 187 legitimate zero-elector booths (a 404
+is data, not a failure — see the parser's own doc comment), **0 unreadable**.
+Build followed cleanly: 65,536 buckets, 10,766,778 rows published, 100.0%
+coverage across all 224 constituencies, 463 duplicate EPICs skipped, 30 rows
+withheld. Committed (`8268e005d0a`) and pushed.
+
+**All 30 withheld rows manually traced back to the source PDF** — none are a
+parsing bug, all are genuine source-document properties:
+
+- **~19 rows: legacy out-of-state EPIC formats** (`OR/19/117/328070`,
+  `HR/02/20/069872`, `WB/10/063/552354`, `UP/56/275/0252577`, …) — voters who
+  shifted from another state, still carrying that state's pre-standardization
+  ID format. Rendered one at 400 DPI and confirmed it's exactly what's
+  printed — a real ID, just not the national 3-letter+7-digit grammar.
+- **8 rows: a font-encoding defect in the source PDF itself**, all sharing
+  the identical corrupted prefix `ŸÑÜ`, concentrated in AC157/158/159 (one
+  district, likely one report-generation batch). Rendered the actual glyphs
+  and compared against a clean neighboring EPIC using the identical font on
+  the same page: **the corruption is in the rendered pixels, not just the
+  extracted text** — even a human reading the printed page sees the same
+  garbled characters. Nothing to recover; this is ECI's own PDF, broken at
+  the source.
+- **3 rows: genuine source-data errors** — two pure-numeric legacy
+  enrollment IDs with no letters at all (`321399`, `288088`, both very old
+  `DEAD` entries — pre-EPIC-era voters who never got a modern card), and one
+  literal place name (`CHANDAPURA`) typed into the EPIC column, a real BLO
+  data-entry mistake. All confirmed by rendering, not assumed.
+
+These electors are not erased — name, reason, and old part/serial are still
+in `cache/asd-rows/`, just not published to the hash-bucket index since
+there is no valid EPIC to bucket them under (the site's search is
+EPIC-keyed by design). A fallback "known unmatched entries" list was
+offered and **declined by the user** — noting it here in case it's wanted
+later, not building it now.
+
 ### Task pipeline as of this write-up (for continuity if picked up cold)
 
-In progress:
-1. Full statewide sweep test of the draft roll (`8-full-sweep.mjs`) — running
-2. ASD extraction (`9-extract-asd.py`) — running, see log for live progress
+Done:
+1. Full statewide sweep test of the draft roll (`8-full-sweep.mjs`) —
+   started, very slow under concurrent ASD extraction load; check whether it
+   finished before assuming stale
+2. ASD extraction — complete, 10,766,778 rows, 0 unreadable
+3. ASD build — complete, pushed as `8268e005d0a`
 
 Queued, in order:
-3. Build ASD data (`10-build-asd-data.mjs` is written, not yet run)
-4. Publish ASD data to the live site (no publish script written yet — needs
-   one, likely mirroring `6-auto-publish.mjs`'s shape but for the ASD tree)
+4. Publish/republish loop for ASD data going forward — no auto-publish
+   script written yet (this session shipped one build as a single manual
+   commit; there is nothing yet that re-runs `10-build-asd-data.mjs` and
+   pushes on a cadence the way `6-auto-publish.mjs` does for the roll).
+   Probably not needed again soon since ASD extraction is a one-shot,
+   already-finished pass — revisit if ECI revises ASD reports in place
+   (untested — see `OBSERVATIONS-ASD.md` §8).
 5. Build the ASD UI feature: new search section, the five-verdict cascade
    from `OBSERVATIONS-ASD.md` §6, wire the roll's existing `notFoundTitle`
    branch (`docs/app.js` around line 296) to auto-cascade into an ASD lookup,
@@ -1153,10 +1199,15 @@ Queued, in order:
    roll search included; `.acronym` CSS is an already-built, unused legend the
    ASD reason-code dots can reuse), and update the privacy-stance copy for the
    names-included decision above.
-6. End-to-end test the ASD feature once released
+6. End-to-end test the ASD feature once released — `11-verify-asd.mjs`
+   (per-AC) and `12-full-sweep-asd.mjs` (statewide + corner cases) are
+   already written and syntax-checked, mirroring `7-verify.mjs` /
+   `8-full-sweep.mjs` exactly, ready to run once the UI ships
 7. Duplicate/overlap audit, full statewide (not the document's 31-AC sample):
    duplicate EPICs within ASD, duplicate EPICs within the draft roll, and
-   EPICs appearing in **both** lists
+   EPICs appearing in **both** lists. `12-full-sweep-asd.mjs`'s section B4
+   already does a *light sampled* version of the cross-list check as an
+   early warning — this item is the full exhaustive pass, still separate.
 8. Investigate the ~0.6% CEO-gap root cause; if fixable, patch and re-pull
    only the specific affected booths — no full rebuild, nothing existing
    touched (explicit user constraint, see above)
