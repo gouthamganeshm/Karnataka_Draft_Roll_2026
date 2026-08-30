@@ -1,23 +1,22 @@
 # Karnataka Draft Electoral Roll 2026 — EPIC search
 
-The Karnataka Chief Electoral Officer publishes the Special Intensive Revision
+The Karnataka Chief Electoral Officer published the Special Intensive Revision
 2026 **draft roll on 24-08-2026**. Claims and objections close **23-09-2026**;
-the final roll is published **27-10-2026**.
+the final roll is due **27-10-2026**.
 
 The draft is published the way electoral rolls are always published: as one PDF
-per polling part, several hundred of them per constituency, roughly 58,000
-across the state. There is no way to ask "am I on it?" — you have to know your
-part number, download the right PDF and read it.
+per polling part, several hundred of them per constituency, **60,923 of them
+across the state**. There is no way to ask "am I on it?" — you have to know
+your part number, download the right PDF and read it.
 
 This project turns those PDFs into a static site where a voter types an EPIC
 number and gets their entry back. It reformats official data; it is not
-official.
+official. As of 30-08-2026 the draft roll is fully imported: **224/224
+constituencies, 100% of booths, ~44.4M electors**.
 
-Sibling project: [karnataka-asddo-dashboard][asddo], which answers the opposite
-question — whether an EPIC is on the **deletion** list. The two are deliberately
-separate repos with separate data lifecycles.
-
-[asddo]: https://github.com/gouthamganeshm/karnataka-asddo-dashboard
+It also indexes a second, separate ECI dataset — see
+[**The ASD list — a second, separate search**](#the-asd-list--a-second-separate-search)
+below — and checks both on every search.
 
 ---
 
@@ -103,9 +102,9 @@ states — `PyMuPDF.get_text()` returns **0 characters across every page**:
 So there is nothing to extract. The rows have to be **OCR'd**, and
 `scripts/ocr/roll_ocr.py` does that.
 
-Note this is **not** true of the ASDDO deletion lists, which do carry a text
-layer — that is why the sibling project gets away with a pure text extractor.
-Do not assume the two families behave alike.
+Note this is **not** true of the ASD list (see below), which does carry a
+text layer — a pure table extractor works there, and would be the wrong tool
+here. Do not assume the two families behave alike.
 
 ### Why it is nonetheless tractable
 
@@ -219,8 +218,9 @@ rather than trust, and they are ~5× cheaper than reading the whole card.
 
 ## How a lookup works without a server
 
-Identical in spirit to the ASDDO dashboard: the data is pre-bucketed by hash so
-a static host can answer a query it cannot compute.
+The data is pre-bucketed by hash so a static host can answer a query it
+cannot compute — the same mechanism serves both the roll and the ASD lookup
+below, against two separate bucket trees.
 
 ```
 user types ABC1234567
@@ -241,36 +241,86 @@ published data being trivially scraped into an EPIC-to-name table.
 
 ### The verdicts
 
+Every search runs **two independent lookups** — the draft roll and the ASD
+list below — and never short-circuits on the first hit, because the two are
+not guaranteed to be mutually exclusive (see the next section):
+
 | Verdict | Condition |
 |---|---|
-| **On the draft roll** | hash found — shows name, relative, age, gender, AC, part, serial, booth |
-| **Not on the draft roll** | not found, and state coverage is ≥ 99% |
-| **Can't say yet** | not found, but the constituency has not finished importing |
+| **On the draft roll** | roll hash found, ASD hash not found |
+| **Found on the ASD list** | roll hash not found, ASD hash found — shows the BLO's stated reason and the claim remedy |
+| **Found on both — they disagree** | both found — shown side by side, neither treated as authoritative |
+| **Not found on either** | neither found, and both imports are ≥ 99% complete |
+| **Can't say yet** | neither found, but either import has not finished |
 
-The third verdict is the important one. A partial import must never let a
+The last verdict is the important one. A partial import must never let a
 missing record read as "you have been left off the roll" — that is a claim that
 would send someone to an ERO office for nothing, or worse, reassure someone who
-really is missing. Coverage is tracked per constituency in `manifest.json` and
-the client refuses to render a negative verdict for an AC that is not complete.
+really is missing. Coverage is tracked per constituency in each dataset's own
+`manifest.json`, independently, and the client refuses to render a negative
+verdict while either import is incomplete.
+
+---
+
+## The ASD list — a second, separate search
+
+Alongside the draft roll, ECI separately publishes an **ASD ("uncollectable
+elector") report** — one PDF per polling part, listing every elector whose
+enumeration form the Booth Level Officer could not collect, with the reason
+recorded against each one. These are, by definition, people who are largely
+*absent* from the draft roll — so a roll search alone leaves them with no
+answer at all. This site checks both lists on every search rather than making
+someone guess which one applies to them.
+
+```
+https://voters.eci.gov.in/eroll/asd/2026/s10/<ac>/uncollectable_elector_report_ac<ac>_part<part>_KAN.pdf
+```
+
+Unlike the draft roll, **these PDFs carry a real text layer** — no OCR needed,
+just careful table extraction (`scripts/ocr/asd_parser.py`, rule-derived cell
+binning against the page's own vector rules, never PyMuPDF's `find_tables()` —
+see that module's own header comment for the full list of hard-won lessons).
+Extraction ran the whole state in 85 minutes: **10,766,778 rows, 100% coverage,
+0 unreadable parts.**
+
+The two lists are stored, and served, as **fully separate trees** —
+`docs/data-asd/` is a *sibling* of `docs/data/`, not a child of it, with its
+own `manifest.json` and its own coverage figures that are never folded into
+the roll's. That separation is deliberate at every layer (raw rows, published
+buckets, coverage accounting) and is a real, load-bearing constraint, not
+tidiness: `3-build-data.mjs`'s full-rebuild path deletes the whole `docs/data`
+tree, and a `docs/data/asd` *child* directory would have been silently wiped
+out by that the next time it ran.
+
+**Unlike the roll index, ASD records carry a name** (and a relative's name) —
+a deliberate exception to this site's usual "EPIC and serial only" stance,
+made because it helps confirm an entry is really the searcher's own. An ASD
+entry is the Booth Level Officer's own recorded assertion, not an adjudicated
+fact, and the UI says so next to every ASD result.
+
+### Pipeline
+
+| Stage | Script | Does |
+|---|---|---|
+| 9 | `9-extract-asd.py` | Process-pool fetch + parse, resumable. A 404 is a valid zero-row read (that booth had no uncollectable electors), not a failure. |
+| 10 | `10-build-asd-data.mjs` | Rows → hash buckets (same layout as the roll's), `docs/data-asd/manifest.json`. Full rebuild only — the dataset is small enough not to need stage 3's incremental-checkpoint machinery. |
+| 11 | `11-verify-asd.mjs` | Per-AC spot check: live-site consistency + a re-fetch/re-parse of the source PDF. |
+| 12 | `12-full-sweep-asd.mjs` | Statewide sweep (one booth, one sample, every constituency) plus corner cases: reason-code mix, names actually published, duplicate EPICs, a sampled cross-check against the roll. |
 
 ---
 
 ## Hosting
 
-The full draft roll is roughly **5.5 crore electors** — about five times the
-ASDDO deletion dataset, which already fills 800 MB. GitHub Pages caps a
-published site at 1 GB, so the data does not live on Pages.
-
-```
-site   →  GitHub Pages / Cloudflare Pages   (docs/, a few hundred KB)
-data   →  Cloudflare R2                     (buckets, ~4 GB)
-```
-
-R2's free tier is 10 GB of storage with no egress charge for public buckets,
-which leaves real headroom. The site is still fully static and fully
-client-side; only the bucket origin changes. `scripts/4-upload-r2.mjs` syncs
-`data/` to the bucket over the S3 API, and `docs/config.js` holds the public
-bucket URL.
+Both trees are served **directly from GitHub Pages** — `docs/data/` (roll,
+~1.2 GB) and `docs/data-asd/` (ASD, ~1.3 GB), pushed straight from the
+machine doing the OCR since the source CDN is unreachable from a hosted CI
+runner (see below). That is well past GitHub Pages' documented ~1 GB
+guideline for a site's total content, and it has kept working regardless —
+noted here as a real, currently-accepted risk rather than a hard limit that
+was actually hit. `scripts/4-upload-r2.mjs` exists as a ready fallback to
+Cloudflare R2 (10 GB free tier, no egress charge on public buckets) if GitHub
+ever does enforce it; `docs/config.js` already externalizes both `DATA_BASE`
+and `ASD_DATA_BASE` for exactly that switch.
 
 ---
 
@@ -279,11 +329,14 @@ bucket URL.
 | Stage | Script | Does |
 |---|---|---|
 | 1 | `1-discover.mjs` | District → AC → part tree into `cache/manifest.json`. |
-| 2 | `2-extract.py` | Streams each part PDF and OCRs it **in memory**, keeping only rows. Resumable. |
-| 3 | `3-build-data.mjs` | Rows → hash buckets, per-AC search index, `manifest.json`. |
-| 4 | `4-upload-r2.mjs` | Syncs `data/` to the R2 bucket. |
+| 2 | `2-extract.py` (`2-extract-forever.mjs` supervisor) | Streams each part PDF and OCRs it **in memory**, keeping only rows. Resumable. |
+| 3 | `3-build-data.mjs` | Rows → hash buckets, per-AC search index, `manifest.json`. Incremental after the first run. |
+| 4 | `4-upload-r2.mjs` | Syncs `docs/data/` to Cloudflare R2 — written and ready, **not currently used**; the site serves straight from GitHub Pages instead (see *Hosting*). |
+| 5–6 | `5-publish.mjs` (`6-auto-publish.mjs` loop) | Build → commit → push, on a cadence, while extraction runs. |
+| 7–8 | `7-verify.mjs`, `8-full-sweep.mjs` | Per-AC spot check and a full statewide sweep, both against the *live* site and a fresh re-fetch of the source PDF — never trusting the pipeline's own prior output. |
+| 9–12 | ASD stages | See *The ASD list* above. |
 
-PDF bytes are never written to disk — at ~58,000 parts that would be hundreds of
+PDF bytes are never written to disk — at 60,923 parts that would be hundreds of
 gigabytes of redundant storage, and the rows are the only part worth keeping.
 
 ### Requirements
@@ -299,29 +352,26 @@ apt-get install tesseract-ocr          # or: winget install UB-Mannheim.Tesserac
 
 ## Status
 
-Draft not yet published (due 24-08-2026). Built and verified so far:
+**Live and complete.** Both datasets fully imported and verified:
 
-- [x] District and AC discovery — live: **34 districts, 224 constituencies, 43,398 parts**
-- [x] CEO mirror URL pattern and the `ac_names.csv` part cascade
-- [x] Source triage — ECI portal ruled out, reasons above
-- [x] **OCR stage — 100% exact on two states, two resolutions** (see *Measured*)
-- [x] Crawl + OCR driver (`2-extract.py`), resumable, multiprocess
-- [x] Bucket builder (`3-build-data.mjs`) and R2 sync (`4-upload-r2.mjs`)
-- [x] The site (`docs/`) — **proven end to end** on a real constituency
-- [ ] CI workflow and the statewide run, once the draft source path is known
+- [x] Draft roll — **224/224 constituencies, 60,923/60,923 booths, 100%**,
+      ~44.4M electors, 0 unreadable parts
+- [x] ASD list — **224/224 constituencies, 100%**, 10,766,778 rows, 0
+      unreadable parts (85 minutes statewide, text-layer extraction)
+- [x] Cross-checked against the CEO's own 28-08-2026 press note: 99.4%
+      overall, every district in a 97.6%–99.8% band — the site's district
+      table shows this comparison live, with the gap explained in place
+- [x] The five-verdict search, both lists, one box — live
+- [x] Statewide sweep tests for both datasets, live-site + source-PDF
+      cross-checks, corner cases (approximate serials, withheld rows,
+      duplicate EPICs, boundary constituencies) — `8-full-sweep.mjs` /
+      `12-full-sweep-asd.mjs`
+- [ ] Full statewide duplicate/overlap audit across all 224 ACs (a sampled
+      version already runs inside the ASD sweep; the exhaustive pass is
+      still queued — see `HANDOFF.md`)
+- [ ] Root cause of the residual ~0.6% gap against the CEO's official count
+      — investigation queued, with an explicit constraint that any fix
+      re-pulls only the specific affected booths, never a full rebuild
 
-### End-to-end proof
-
-Run against Bihar AC 170 (a real, published SIR final roll, in Hindi):
-
-```
-45 of 275 booths  →  37,677 rows OCR'd  →  30,521 electors published
-                     7,156 rows (19%) withheld as low-confidence
-```
-
-Looking up a known EPIC returns its constituency, booth and serial, matching the
-source row exactly. Looking up an absent one returns **“Cannot say yet — only
-16.4% of the state has been imported”**, not “not on the roll”. That second
-behaviour is the one that matters: it is the difference between a tool that is
-merely incomplete and one that tells someone they have been struck off when they
-have not.
+See `HANDOFF.md` for the full session-by-session history, and
+`OBSERVATIONS-ASD.md` for the ASD dataset's original design derivation.

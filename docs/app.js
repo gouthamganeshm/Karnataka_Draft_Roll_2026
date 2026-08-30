@@ -110,7 +110,7 @@ const STRINGS = {
     notFoundEitherLede: 'This EPIC does not appear on the draft roll or on the separate uncollectable-elector list. This may mean you are not yet registered, or it may be a gap in this site’s own import — confirm on the official ECI portal. If you believe you should be on the roll, file a claim before {deadline}.',
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
-    tileCoverage: 'vs. CEO official count',
+    tileCoverage: 'vs. CEO official count', tileAsdRows: 'Uncollectable-elector records',
     coverageFull: 'All {parts} booths across {acs} constituencies have been read.',
     coveragePartial: 'Read {done} of {parts} booths ({pct}%). Constituencies still importing cannot be searched, and a “not on the roll” answer is withheld until coverage passes ' + NEGATIVE_VERDICT_COVERAGE + '%.',
     provenance: 'Draft roll published {published}. Data last rebuilt {built}.',
@@ -179,7 +179,7 @@ const STRINGS = {
     notFoundEitherLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿ ಅಥವಾ ಪ್ರತ್ಯೇಕ ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ಪಟ್ಟಿ ಯಾವುದರಲ್ಲೂ ಕಂಡುಬರುವುದಿಲ್ಲ. ಇದರರ್ಥ ನೀವು ಇನ್ನೂ ನೋಂದಾಯಿಸಿಲ್ಲ ಎಂದಿರಬಹುದು, ಅಥವಾ ಇದು ಈ ತಾಣದ ಆಮದಿನಲ್ಲಿನ ಕೊರತೆಯೂ ಆಗಿರಬಹುದು — ಅಧಿಕೃತ ಇಸಿಐ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ. ನೀವು ಪಟ್ಟಿಯಲ್ಲಿರಬೇಕು ಎಂದು ಭಾವಿಸಿದರೆ {deadline} ರೊಳಗೆ ಕ್ಲೇಮ್ ಸಲ್ಲಿಸಿ.',
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
-    tileCoverage: 'ಸಿಇಒ ಅಧಿಕೃತ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ',
+    tileCoverage: 'ಸಿಇಒ ಅಧಿಕೃತ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ', tileAsdRows: 'ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ದಾಖಲೆಗಳು',
     coverageFull: '{acs} ಕ್ಷೇತ್ರಗಳ ಎಲ್ಲಾ {parts} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ.',
     coveragePartial: '{parts} ರಲ್ಲಿ {done} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ ({pct}%).',
     provenance: 'ಕರಡು ಪಟ್ಟಿ {published} ರಂದು ಪ್ರಕಟವಾಗಿದೆ. ದತ್ತಾಂಶ {built} ರಂದು ಮರುನಿರ್ಮಿಸಲಾಗಿದೆ.',
@@ -496,6 +496,7 @@ function renderDashboard() {
     // the number that actually answers "how much of the electorate do we have".
     [t('tileCoverage'), `${(manifest.electors / CEO_OFFICIAL_TOTAL * 100).toFixed(1)}%`]
   ];
+  if (asdManifest) stats.push([t('tileAsdRows'), fmtNum(asdManifest.rows)]);
   for (const [label, value] of stats) {
     const tile = el('div', 'tile');
     tile.append(el('div', 'tile-value', value), el('div', 'tile-label', label));
