@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-30T00:33:37.440Z",
+  "builtAt": "2026-08-30T01:48:26.608Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 41687795,
+  "electors": 42018057,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 57336,
-  "coverage": 94.11,
+  "partsDone": 57779,
+  "coverage": 94.84,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -289,8 +289,8 @@
       "nameKn": "ಜೇವರ್ಗಿ",
       "district": "GULBARGA",
       "parts": 285,
-      "partsDone": 205,
-      "electors": 155599
+      "partsDone": 285,
+      "electors": 215653
     },
     "36": {
       "name": "Shorapur",
@@ -337,8 +337,8 @@
       "nameKn": "ಸೇಡಂ",
       "district": "GULBARGA",
       "parts": 264,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 264,
+      "electors": 194846
     },
     "42": {
       "name": "Chincholi",
@@ -1033,8 +1033,8 @@
       "nameKn": "ಚಿಕ್ಕನಾಯಕನಹಳ್ಳಿ",
       "district": "TUMKUR",
       "parts": 270,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 99,
+      "electors": 75362
     },
     "129": {
       "name": "Tiptur",
