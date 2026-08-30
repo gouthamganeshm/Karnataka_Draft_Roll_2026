@@ -3,14 +3,14 @@
   "rollType": "S10-2026-DR",
   "publishedAt": "2026-08-24",
   "claimsCloseAt": "2026-09-23",
-  "builtAt": "2026-08-30T05:09:58.092Z",
+  "builtAt": "2026-08-30T06:18:59.788Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 43071765,
+  "electors": 43415899,
   "constituencies": 224,
   "parts": 60923,
-  "partsDone": 59218,
-  "coverage": 97.2,
+  "partsDone": 59680,
+  "coverage": 97.96,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1041,8 +1041,8 @@
       "nameKn": "ತಿಪಟೂರು",
       "district": "TUMKUR",
       "parts": 232,
-      "partsDone": 0,
-      "electors": 0
+      "partsDone": 201,
+      "electors": 147198
     },
     "130": {
       "name": "Turuvekere",
@@ -1097,8 +1097,8 @@
       "nameKn": "ಶಿರಾ",
       "district": "TUMKUR",
       "parts": 282,
-      "partsDone": 21,
-      "electors": 14164
+      "partsDone": 282,
+      "electors": 211100
     },
     "137": {
       "name": "Pavagada",
