@@ -5,7 +5,13 @@
  * thousands of other numbers, so no request ever carries it. */
 
 const BASE = (window.ROLL_CONFIG?.DATA_BASE ?? './data').replace(/\/+$/, '');
-const EPIC_RE = /^[A-Z]{3}[0-9]{7}$/;
+const ASD_BASE = (window.ROLL_CONFIG?.ASD_DATA_BASE ?? './data-asd').replace(/\/+$/, '');
+// [A-Z]{3}[0-9]{7,8}, not just 7: AC174 issues a real 11-character EPIC
+// series (OBSERVATIONS-ASD.md §4.4) — this is not the roll OCR's grammar
+// (which repairs misreads), it is the actual national format, so both the
+// roll and ASD searches need to accept it or those voters cannot search at
+// all (§7b).
+const EPIC_RE = /^[A-Z]{3}[0-9]{7,8}$/;
 
 /* Every published part sits at a deterministic, public path on ECI's own CDN —
  * no captcha, no session (see HANDOFF.md section 2). A result can therefore
@@ -51,9 +57,10 @@ const STRINGS = {
     lookupHeading: 'Search the draft roll',
     intro: 'The draft roll for the Special Intensive Revision 2026 was published as one PDF per polling booth — around 58,000 of them. This searches all of them at once and tells you whether your number is on the roll, and which booth it sits in. If your entry is missing, that is what the claims and objections window is for.',
     scopeNote: 'The published rolls are page images, not text, so this site reads them by OCR and indexes only the two fields it can verify exactly: the EPIC number and the serial. Names, ages and relatives are not held here — check those on the official PDF.',
+    asdScopeNote: 'Every search also checks a second, separate list published by the BLOs — electors whose enumeration form could not be collected. That list does carry a name, since it helps confirm an entry is really yours.',
     privacyNote: 'The number you type never leaves this device. The search runs in your browser against pre-computed data files.',
     epicLabel: 'EPIC number',
-    epicHelp: 'Printed on the front of your voter ID card. Exactly 3 letters followed by 7 digits.',
+    epicHelp: 'Printed on the front of your voter ID card. 3 letters followed by 7 digits — occasionally 8.',
     checkBtn: 'Search this EPIC',
     dashHeading: 'What is in this dataset',
     districtTitle: 'Import coverage by district',
@@ -68,6 +75,9 @@ const STRINGS = {
     footerOffsetCompare: 'This site currently indexes {ours} electors — {pct}% of that official figure. See "Import coverage by district" above for why.',
 
     errFormat: 'That does not look like an EPIC number. It is 3 letters followed by 7 digits, like ABC1234567.',
+    reason_SHIFTED: 'Recorded as permanently shifted', reason_ABSENT: 'Recorded as not traced at the residence',
+    reason_DEAD: 'Recorded as deceased', reason_DUPLICATE: 'Recorded as already registered elsewhere',
+    reason_OTHER: 'Reason not classified',
     errNetwork: 'Could not load the data files. Check your connection and try again.',
     searching: 'Searching…',
 
@@ -82,6 +92,22 @@ const STRINGS = {
     print: 'Print this result', fAc: 'Constituency', fPart: 'Booth', fSerial: 'Serial number',
     approxSerialNote: 'Serial number is approximate — the booth PDF is the authoritative source.',
     viewSourcePdf: 'View this booth’s official roll PDF ↗',
+
+    fName: 'Name', fRelative: 'Relative’s name', fReason: 'Reason recorded',
+    fOldPart: 'Previous booth number', fOldSerial: 'Previous serial number',
+    viewAsdSourcePdf: 'View this booth’s official uncollectable-elector PDF ↗',
+    asdAssertionNote: 'This is the Booth Level Officer’s own recorded assertion, not an adjudicated fact — confirm your status with your BLO or on the official portal before treating it as final.',
+
+    asdFoundTitle: 'Not on the draft roll — but found on a second list',
+    asdFoundLede: 'This EPIC does not appear on the draft roll, but it is listed in a separate report of electors whose enumeration form the Booth Level Officer could not collect. If this entry is wrong, you may file a claim — with a copy of your Aadhaar — before {deadline}.',
+
+    conflictTitle: 'Found on both lists — they disagree',
+    conflictLede: 'This EPIC appears both on the draft roll and on the separate list of electors the BLO could not collect a form from. This site cannot say which one is current — it means the two official sources disagree for this EPIC, not that you are not a registered voter. Both records are shown below; check with your BLO or the official portal for the current status.',
+    conflictRollHeading: 'On the draft roll',
+    conflictAsdHeading: 'Also listed as uncollected',
+
+    notFoundEitherTitle: 'Not found on either list',
+    notFoundEitherLede: 'This EPIC does not appear on the draft roll or on the separate uncollectable-elector list. This may mean you are not yet registered, or it may be a gap in this site’s own import — confirm on the official ECI portal. If you believe you should be on the roll, file a claim before {deadline}.',
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
     tileCoverage: 'vs. CEO official count',
@@ -100,9 +126,10 @@ const STRINGS = {
     lookupHeading: 'ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ ಹುಡುಕಿ',
     intro: 'ವಿಶೇಷ ತೀವ್ರ ಪರಿಷ್ಕರಣೆ ೨೦೨೬ರ ಕರಡು ಪಟ್ಟಿಯನ್ನು ಪ್ರತಿ ಮತಗಟ್ಟೆಗೆ ಒಂದರಂತೆ ಸುಮಾರು ೫೮,೦೦೦ ಪಿಡಿಎಫ್‌ಗಳಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ. ಇಲ್ಲಿ ಎಲ್ಲವನ್ನೂ ಒಟ್ಟಿಗೆ ಹುಡುಕಿ ನಿಮ್ಮ ಸಂಖ್ಯೆ ಪಟ್ಟಿಯಲ್ಲಿದೆಯೇ ಮತ್ತು ಯಾವ ಮತಗಟ್ಟೆಯಲ್ಲಿದೆ ಎಂದು ತಿಳಿಯಬಹುದು.',
     scopeNote: 'ಪ್ರಕಟಿತ ಪಟ್ಟಿಗಳು ಪಠ್ಯವಲ್ಲ, ಪುಟದ ಚಿತ್ರಗಳು. ಆದ್ದರಿಂದ ಈ ತಾಣ ಅವುಗಳನ್ನು ಒಸಿಆರ್ ಮೂಲಕ ಓದಿ, ನಿಖರವಾಗಿ ಪರಿಶೀಲಿಸಬಹುದಾದ ಎರಡು ಕ್ಷೇತ್ರಗಳನ್ನು ಮಾತ್ರ ಸೂಚಿಸುತ್ತದೆ: ಇಪಿಐಸಿ ಸಂಖ್ಯೆ ಮತ್ತು ಕ್ರಮ ಸಂಖ್ಯೆ. ಹೆಸರು, ವಯಸ್ಸು, ಸಂಬಂಧಿಗಳ ವಿವರ ಇಲ್ಲಿಲ್ಲ — ಅವುಗಳನ್ನು ಅಧಿಕೃತ ಪಿಡಿಎಫ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.',
+    asdScopeNote: 'ಪ್ರತಿ ಹುಡುಕಾಟವು ಬಿಎಲ್‌ಒಗಳು ಪ್ರಕಟಿಸಿದ ಎರಡನೇ, ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿಯನ್ನೂ ಪರಿಶೀಲಿಸುತ್ತದೆ — ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಮತದಾರರು. ಆ ಪಟ್ಟಿ ಹೆಸರನ್ನು ಒಳಗೊಂಡಿದೆ, ಏಕೆಂದರೆ ಇದು ನಮೂದು ನಿಜವಾಗಿಯೂ ನಿಮ್ಮದೇ ಎಂದು ಖಚಿತಪಡಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.',
     privacyNote: 'ನೀವು ಟೈಪ್ ಮಾಡುವ ಸಂಖ್ಯೆ ಈ ಸಾಧನವನ್ನು ಬಿಟ್ಟು ಹೋಗುವುದಿಲ್ಲ. ಹುಡುಕಾಟ ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿಯೇ ನಡೆಯುತ್ತದೆ.',
     epicLabel: 'ಇಪಿಐಸಿ ಸಂಖ್ಯೆ',
-    epicHelp: 'ನಿಮ್ಮ ಮತದಾರ ಗುರುತಿನ ಚೀಟಿಯ ಮುಂಭಾಗದಲ್ಲಿದೆ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು.',
+    epicHelp: 'ನಿಮ್ಮ ಮತದಾರ ಗುರುತಿನ ಚೀಟಿಯ ಮುಂಭಾಗದಲ್ಲಿದೆ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು — ಕೆಲವೊಮ್ಮೆ ೮.',
     checkBtn: 'ಈ ಇಪಿಐಸಿ ಹುಡುಕಿ',
     dashHeading: 'ಈ ದತ್ತಾಂಶದಲ್ಲಿ ಏನಿದೆ',
     districtTitle: 'ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ',
@@ -117,6 +144,9 @@ const STRINGS = {
     footerOffsetCompare: 'ಈ ತಾಣ ಪ್ರಸ್ತುತ {ours} ಮತದಾರರನ್ನು ಸೂಚಿಸುತ್ತದೆ — ಅಧಿಕೃತ ಅಂಕಿಯ {pct}%. ಕಾರಣಕ್ಕಾಗಿ ಮೇಲಿನ "ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ" ನೋಡಿ.',
 
     errFormat: 'ಇದು ಇಪಿಐಸಿ ಸಂಖ್ಯೆಯಂತೆ ಕಾಣುತ್ತಿಲ್ಲ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು, ಉದಾ. ABC1234567.',
+    reason_SHIFTED: 'ಖಾಯಂ ಸ್ಥಳಾಂತರಗೊಂಡಿರುವುದಾಗಿ ದಾಖಲಾಗಿದೆ', reason_ABSENT: 'ವಾಸಸ್ಥಳದಲ್ಲಿ ಪತ್ತೆಯಾಗಿಲ್ಲ ಎಂದು ದಾಖಲಾಗಿದೆ',
+    reason_DEAD: 'ಮರಣ ಹೊಂದಿರುವುದಾಗಿ ದಾಖಲಾಗಿದೆ', reason_DUPLICATE: 'ಬೇರೆಡೆ ಈಗಾಗಲೇ ನೋಂದಣಿಯಾಗಿರುವುದಾಗಿ ದಾಖಲಾಗಿದೆ',
+    reason_OTHER: 'ಕಾರಣ ವರ್ಗೀಕರಿಸಲಾಗಿಲ್ಲ',
     errNetwork: 'ದತ್ತಾಂಶ ಕಡತಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
     searching: 'ಹುಡುಕಲಾಗುತ್ತಿದೆ…',
 
@@ -131,6 +161,22 @@ const STRINGS = {
     print: 'ಈ ಫಲಿತಾಂಶ ಮುದ್ರಿಸಿ', fAc: 'ಕ್ಷೇತ್ರ', fPart: 'ಮತಗಟ್ಟೆ', fSerial: 'ಕ್ರಮ ಸಂಖ್ಯೆ',
     approxSerialNote: 'ಕ್ರಮ ಸಂಖ್ಯೆ ಅಂದಾಜು — ಮತಗಟ್ಟೆ ಪಿಡಿಎಫ್ ಅಧಿಕೃತ ಮೂಲವಾಗಿದೆ.',
     viewSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಪಟ್ಟಿ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
+
+    fName: 'ಹೆಸರು', fRelative: 'ಸಂಬಂಧಿಯ ಹೆಸರು', fReason: 'ದಾಖಲಾದ ಕಾರಣ',
+    fOldPart: 'ಹಿಂದಿನ ಮತಗಟ್ಟೆ ಸಂಖ್ಯೆ', fOldSerial: 'ಹಿಂದಿನ ಕ್ರಮ ಸಂಖ್ಯೆ',
+    viewAsdSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
+    asdAssertionNote: 'ಇದು ಮತಗಟ್ಟೆ ಮಟ್ಟದ ಅಧಿಕಾರಿಯ ಸ್ವಂತ ದಾಖಲೆ, ಅಂತಿಮ ತೀರ್ಮಾನವಲ್ಲ — ಅಂತಿಮವೆಂದು ಪರಿಗಣಿಸುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ ಅಧಿಕೃತ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
+
+    asdFoundTitle: 'ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ — ಆದರೆ ಎರಡನೇ ಪಟ್ಟಿಯಲ್ಲಿ ಕಂಡುಬಂದಿದೆ',
+    asdFoundLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ, ಆದರೆ ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಮತದಾರರ ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿಯಲ್ಲಿ ಪಟ್ಟಿಮಾಡಲಾಗಿದೆ. ಈ ನಮೂದು ತಪ್ಪಾಗಿದ್ದರೆ, ನಿಮ್ಮ ಆಧಾರ್ ಪ್ರತಿಯೊಂದಿಗೆ {deadline} ರೊಳಗೆ ಕ್ಲೇಮ್ ಸಲ್ಲಿಸಬಹುದು.',
+
+    conflictTitle: 'ಎರಡೂ ಪಟ್ಟಿಗಳಲ್ಲಿ ಕಂಡುಬಂದಿದೆ — ಅವು ಭಿನ್ನಾಭಿಪ್ರಾಯ ಹೊಂದಿವೆ',
+    conflictLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿ ಮತ್ತು ಬಿಎಲ್‌ಒ ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿ ಎರಡರಲ್ಲೂ ಕಂಡುಬರುತ್ತದೆ. ಯಾವುದು ಪ್ರಸ್ತುತವೆಂದು ಈ ತಾಣ ಹೇಳಲಾಗುವುದಿಲ್ಲ — ಇದರರ್ಥ ಎರಡು ಅಧಿಕೃತ ಮೂಲಗಳು ಭಿನ್ನಾಭಿಪ್ರಾಯ ಹೊಂದಿವೆ ಎಂದಷ್ಟೇ, ನೀವು ನೋಂದಾಯಿತ ಮತದಾರರಲ್ಲ ಎಂದಲ್ಲ. ಎರಡೂ ದಾಖಲೆಗಳನ್ನು ಕೆಳಗೆ ತೋರಿಸಲಾಗಿದೆ; ಪ್ರಸ್ತುತ ಸ್ಥಿತಿಗಾಗಿ ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ ಅಧಿಕೃತ ಪೋರ್ಟಲ್ ಪರಿಶೀಲಿಸಿ.',
+    conflictRollHeading: 'ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ',
+    conflictAsdHeading: 'ಸಂಗ್ರಹಿಸದ ಮತದಾರ ಎಂದೂ ಪಟ್ಟಿಮಾಡಲಾಗಿದೆ',
+
+    notFoundEitherTitle: 'ಯಾವುದೇ ಪಟ್ಟಿಯಲ್ಲಿ ಕಂಡುಬಂದಿಲ್ಲ',
+    notFoundEitherLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿ ಅಥವಾ ಪ್ರತ್ಯೇಕ ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ಪಟ್ಟಿ ಯಾವುದರಲ್ಲೂ ಕಂಡುಬರುವುದಿಲ್ಲ. ಇದರರ್ಥ ನೀವು ಇನ್ನೂ ನೋಂದಾಯಿಸಿಲ್ಲ ಎಂದಿರಬಹುದು, ಅಥವಾ ಇದು ಈ ತಾಣದ ಆಮದಿನಲ್ಲಿನ ಕೊರತೆಯೂ ಆಗಿರಬಹುದು — ಅಧಿಕೃತ ಇಸಿಐ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ. ನೀವು ಪಟ್ಟಿಯಲ್ಲಿರಬೇಕು ಎಂದು ಭಾವಿಸಿದರೆ {deadline} ರೊಳಗೆ ಕ್ಲೇಮ್ ಸಲ್ಲಿಸಿ.',
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
     tileCoverage: 'ಸಿಇಒ ಅಧಿಕೃತ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ',
@@ -174,23 +220,26 @@ async function sha256hex(text) {
 }
 
 const cache = new Map();
-async function fetchJson(path) {
-  if (cache.has(path)) return cache.get(path);
-  const p = fetch(`${BASE}/${path}`, { referrerPolicy: 'no-referrer' })
+async function fetchJson(base, path) {
+  const key = `${base}/${path}`;
+  if (cache.has(key)) return cache.get(key);
+  const p = fetch(key, { referrerPolicy: 'no-referrer' })
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null);
-  cache.set(path, p);
+  cache.set(key, p);
   return p;
 }
 
 /* Bucket paths are two levels deep past the first two hex chars so no single
- * directory holds 65,536 files — some CDNs and most filesystems cope badly. */
+ * directory holds 65,536 files — some CDNs and most filesystems cope badly.
+ * Same layout for both trees (see scripts/10-build-asd-data.mjs). */
 const bucketPath = (prefix) =>
   prefix.length > 2 ? `roll/${prefix.slice(0, 2)}/${prefix.slice(2)}.json` : `roll/${prefix}.json`;
 
 // ---------------------------------------------------------------- state
 
 let manifest = null;
+let asdManifest = null; // null until loaded; a separate tree, see ASD_BASE above
 
 // ---------------------------------------------------------------- lookup
 
@@ -218,9 +267,23 @@ function findInBucket(records, suffix) {
 async function lookupEpic(epic) {
   const hash = await sha256hex(epic);
   const depth = manifest.shardDepth;
-  const bucket = await fetchJson(bucketPath(hash.slice(0, depth)));
+  const bucket = await fetchJson(BASE, bucketPath(hash.slice(0, depth)));
   if (!bucket) return [];
   return findInBucket(bucket, hash.slice(depth, depth + manifest.suffixLength));
+}
+
+/** As lookupEpic, but against the ASD tree — a fully independent lookup
+ * (own manifest, own shard depth, own coverage), never a fallback path off
+ * the roll lookup. Returns [] if the ASD manifest never loaded, so a network
+ * hiccup on this second dataset degrades to "not found in ASD" rather than
+ * breaking the roll search that already worked. */
+async function lookupAsdEpic(epic) {
+  if (!asdManifest) return [];
+  const hash = await sha256hex(epic);
+  const depth = asdManifest.shardDepth;
+  const bucket = await fetchJson(ASD_BASE, bucketPath(hash.slice(0, depth)));
+  if (!bucket) return [];
+  return findInBucket(bucket, hash.slice(depth, depth + asdManifest.suffixLength));
 }
 
 // ---------------------------------------------------------------- rendering
@@ -231,7 +294,7 @@ const acLabel = (acNo) => {
   return `${acNo} — ${lang === 'kn' && ac.nameKn ? ac.nameKn : ac.name}`;
 };
 
-function recordFields(rec, partName) {
+function rollRecordFields(rec, partName) {
   const [, acNo, partNo, serial, approx] = rec;
   return [
     [t('fAc'), acLabel(acNo)],
@@ -240,7 +303,42 @@ function recordFields(rec, partName) {
   ].filter(([, v]) => v !== '' && v != null);
 }
 
-function renderCard({ tone, title, lede, rec, partName, extra }) {
+/* [suffix, ac, part, serial, reasonCode, oldPart, oldSerial, name,
+ * relativeName] — see scripts/10-build-asd-data.mjs for the tuple's origin.
+ * This carries a name (unlike the roll record above) — a deliberate decision
+ * made for this dataset only; see the privacy note rendered with it. */
+function asdRecordFields(rec) {
+  const [, acNo, partNo, , reasonCode, oldPart, oldSerial, name, relativeName] = rec;
+  return [
+    [t('fName'), name],
+    [t('fRelative'), relativeName],
+    [t('fAc'), acLabel(acNo)],
+    [t('fReason'), t(`reason_${reasonCode}`)],
+    [t('fOldPart'), oldPart],
+    [t('fOldSerial'), oldSerial]
+  ].filter(([, v]) => v !== '' && v != null);
+}
+
+/** One record panel inside a result card: a heading, a field list, an
+ * optional caveat line, and a link to the source PDF it came from. Both the
+ * roll and the ASD verdicts are built from one or two of these — verdict 3
+ * (found on both lists) is the only case that ever renders two. */
+function renderPanel(container, { heading, fields, note, sourceHref, sourceLabel }) {
+  if (heading) container.append(el('h3', 'panel-heading', heading));
+  const dl = el('dl', 'record');
+  for (const [k, v] of fields) dl.append(el('dt', null, k), el('dd', null, String(v)));
+  container.append(dl);
+  if (note) container.append(el('p', 'meta', note));
+  if (sourceHref) {
+    const src = el('a', 'source-link', sourceLabel);
+    src.href = sourceHref;
+    src.target = '_blank';
+    src.rel = 'noopener noreferrer';
+    container.append(src);
+  }
+}
+
+function renderCard({ tone, title, lede, panels, extra }) {
   const result = $('#result');
   result.hidden = false;
   result.replaceChildren();
@@ -249,21 +347,7 @@ function renderCard({ tone, title, lede, rec, partName, extra }) {
   card.append(el('h2', null, title));
   if (lede) card.append(el('p', 'lede', lede));
 
-  if (rec) {
-    const dl = el('dl', 'record');
-    for (const [k, v] of recordFields(rec, partName)) {
-      dl.append(el('dt', null, k), el('dd', null, String(v)));
-    }
-    card.append(dl);
-    if (rec[4]) card.append(el('p', 'meta', t('approxSerialNote')));
-
-    const [, acNo, partNo] = rec;
-    const src = el('a', 'source-link', t('viewSourcePdf'));
-    src.href = partPdfUrl(acNo, partNo);
-    src.target = '_blank';
-    src.rel = 'noopener noreferrer';
-    card.append(src);
-  }
+  for (const panel of panels ?? []) renderPanel(card, panel);
   if (extra) card.append(extra);
 
   const actions = el('div', 'result-actions');
@@ -292,37 +376,107 @@ const renderMessage = (tone, title, lede) => renderCard({ tone, title, lede });
 
 // ---------------------------------------------------------------- handlers
 
+/* https://voters.eci.gov.in/eroll/asd/2026/s10/{ac}/uncollectable_elector_report_ac{ac}_part{part}_KAN.pdf
+ * — no casing split, unlike partPdfUrl above (OBSERVATIONS-ASD.md §1). */
+const asdPartPdfUrl = (acNo, partNo) =>
+  `https://voters.eci.gov.in/eroll/asd/2026/s10/${acNo}/` +
+  `uncollectable_elector_report_ac${acNo}_part${partNo}_KAN.pdf`;
+
+/* Both lookups always run, every time — never short-circuit on the first
+ * hit. §5a of OBSERVATIONS-ASD.md found real (if rare) reasons the two lists
+ * are not guaranteed disjoint (the DUPLICATE reason code itself, and timing
+ * skew between when each document was generated), so "found on the roll"
+ * cannot be trusted to mean "therefore not in ASD" without actually checking. */
 async function handleEpic() {
   const epic = $('#epic').value.trim().toUpperCase();
   if (!EPIC_RE.test(epic)) return renderMessage('warn', t('errFormat'), '');
 
   renderMessage('info', t('searching'), '');
-  let hits;
+  let rollHits;
+  let asdHits;
   try {
-    hits = await lookupEpic(epic);
+    [rollHits, asdHits] = await Promise.all([lookupEpic(epic), lookupAsdEpic(epic)]);
   } catch {
     return renderMessage('warn', t('errNetwork'), '');
   }
+  const rollHit = rollHits[0] ?? null;
+  const asdHit = asdHits[0] ?? null;
 
-  if (hits.length) {
-    const rec = hits[0];
-    const parts = await fetchJson(`parts/${rec[1]}.json`);
+  // Verdict 3: on both lists. The rare case the whole cascade exists for —
+  // shown as a disagreement between two sources, never arbitrated into one
+  // answer (OBSERVATIONS-ASD.md §6, verdict 3).
+  if (rollHit && asdHit) {
+    const parts = await fetchJson(BASE, `parts/${rollHit[1]}.json`);
+    return renderCard({
+      tone: 'conflict',
+      title: t('conflictTitle'),
+      lede: t('conflictLede'),
+      panels: [
+        {
+          heading: t('conflictRollHeading'),
+          fields: rollRecordFields(rollHit, parts?.[rollHit[2]] ?? ''),
+          note: rollHit[4] ? t('approxSerialNote') : null,
+          sourceHref: partPdfUrl(rollHit[1], rollHit[2]),
+          sourceLabel: t('viewSourcePdf')
+        },
+        {
+          heading: t('conflictAsdHeading'),
+          fields: asdRecordFields(asdHit),
+          note: t('asdAssertionNote'),
+          sourceHref: asdPartPdfUrl(asdHit[1], asdHit[2]),
+          sourceLabel: t('viewAsdSourcePdf')
+        }
+      ]
+    });
+  }
+
+  // Verdict 1: on the roll, not in ASD — unchanged from before the cascade.
+  if (rollHit) {
+    const parts = await fetchJson(BASE, `parts/${rollHit[1]}.json`);
     return renderCard({
       tone: 'found',
       title: t('foundTitle'),
       lede: t('foundLede', { date: fmtDate(manifest.publishedAt) }),
-      rec,
-      partName: parts?.[rec[2]] ?? ''
+      panels: [{
+        fields: rollRecordFields(rollHit, parts?.[rollHit[2]] ?? ''),
+        note: rollHit[4] ? t('approxSerialNote') : null,
+        sourceHref: partPdfUrl(rollHit[1], rollHit[2]),
+        sourceLabel: t('viewSourcePdf')
+      }]
     });
   }
 
-  // The honest-negative rule: only claim absence when the state is essentially
-  // fully imported. Anything less and a missing record is our gap, not theirs.
-  if (manifest.coverage >= NEGATIVE_VERDICT_COVERAGE) {
-    return renderMessage('notfound', t('notFoundTitle'),
-      t('notFoundLede', { deadline: fmtDate(manifest.claimsCloseAt) }));
+  // Verdict 2: not on the roll, found in ASD — the BLO's own stated reason,
+  // and the remedy the ASD report itself carries.
+  if (asdHit) {
+    return renderCard({
+      tone: 'warn',
+      title: t('asdFoundTitle'),
+      lede: t('asdFoundLede', { deadline: fmtDate(manifest.claimsCloseAt) }),
+      panels: [{
+        fields: asdRecordFields(asdHit),
+        note: t('asdAssertionNote'),
+        sourceHref: asdPartPdfUrl(asdHit[1], asdHit[2]),
+        sourceLabel: t('viewAsdSourcePdf')
+      }]
+    });
   }
-  return renderMessage('warn', t('unsureTitle'), t('unsureLede', { pct: manifest.coverage.toFixed(1) }));
+
+  // Neither list has it. The honest-negative rule applies to *both* lists
+  // independently (OBSERVATIONS-ASD.md §6, verdict 5) — a low-coverage ASD
+  // import must not silently read as "confirmed absent from ASD too".
+  const rollOk = manifest.coverage >= NEGATIVE_VERDICT_COVERAGE;
+  const asdOk = Boolean(asdManifest) && asdManifest.coverage >= NEGATIVE_VERDICT_COVERAGE;
+  if (!rollOk || !asdOk) {
+    const pct = Math.min(manifest.coverage, asdManifest ? asdManifest.coverage : 0);
+    return renderMessage('warn', t('unsureTitle'), t('unsureLede', { pct: pct.toFixed(1) }));
+  }
+
+  // Verdict 4: absent from both, both imports essentially complete. Still an
+  // honest "we don't know for certain", not a confident negative — see
+  // notFoundEitherLede.
+  return renderMessage('notfound', t('notFoundEitherTitle'),
+    t('notFoundEitherLede', { deadline: fmtDate(manifest.claimsCloseAt) }));
 }
 
 // ---------------------------------------------------------------- dashboard
@@ -481,7 +635,12 @@ applyTheme(localStorage.getItem('roll-theme')
   ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 wire();
 
-manifest = await fetchJson('manifest.json');
+manifest = await fetchJson(BASE, 'manifest.json');
+// Best-effort, not required: if the ASD manifest fails to load, every search
+// still runs the roll lookup exactly as before, and lookupAsdEpic already
+// degrades to "not found" rather than throwing — a second dataset going
+// missing should not take the working one down with it.
+asdManifest = await fetchJson(ASD_BASE, 'manifest.json');
 
 if (!manifest) {
   // No data yet — say so plainly rather than letting an empty dashboard imply

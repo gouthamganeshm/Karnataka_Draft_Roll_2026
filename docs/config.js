@@ -7,5 +7,9 @@
  *
  * './data' works for a local preview: `npm run serve` after `npm run build`. */
 window.ROLL_CONFIG = {
-  DATA_BASE: './data'
+  DATA_BASE: './data',
+  // The ASD ("uncollectable elector") dataset — a sibling tree, not a child
+  // of DATA_BASE, matching docs/data-asd's placement on disk (see
+  // scripts/10-build-asd-data.mjs for why that separation is load-bearing).
+  ASD_DATA_BASE: './data-asd'
 };

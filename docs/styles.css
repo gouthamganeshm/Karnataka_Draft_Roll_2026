@@ -262,6 +262,18 @@ main { padding-bottom: 56px; }
 .is-caution { border-left-color: var(--warning); background: var(--caution-wash); }
 .is-problem { border-left-color: var(--muted); background: var(--problem-wash); }
 
+/* The result card emits `tone-${tone}` (see app.js renderCard); nothing above
+ * matched that until now, so every verdict rendered with no border colour and
+ * no wash at all (OBSERVATIONS-ASD.md §7a). Reusing the same tokens above. */
+.tone-found { border-left-color: var(--good); background: var(--clear-wash); }
+.tone-notfound { border-left-color: var(--critical); background: var(--deleted-wash); }
+.tone-warn { border-left-color: var(--warning); background: var(--caution-wash); }
+.tone-info { border-left-color: var(--muted); background: var(--problem-wash); }
+/* Found on both lists at once — the one verdict that is neither good news nor
+ * bad news but a genuine disagreement between two sources. Distinct from
+ * tone-warn (an incomplete-data caveat) on purpose. */
+.tone-conflict { border-left-color: var(--warning); background: var(--caution-wash); }
+
 .searched-epic {
   font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
   font-weight: 700; letter-spacing: 0.06em; color: var(--ink);
@@ -282,9 +294,12 @@ main { padding-bottom: 56px; }
 }
 .record dd.reason { display: flex; align-items: center; gap: 8px; }
 .source-link {
-  display: inline-block; margin-top: 14px; font-size: 0.9rem;
+  display: inline-block; margin-top: 14px; margin-bottom: 14px; font-size: 0.9rem;
   color: var(--series-seq); font-weight: 600;
 }
+/* Only appears when a search hits both lists (tone-conflict) — two .record
+ * blocks in one card, each under its own heading. */
+.panel-heading { font-size: 0.95rem; font-weight: 700; margin: 0 0 6px; color: var(--ink); }
 
 .action-block { margin-top: 18px; border-top: 1px solid var(--hairline); padding-top: 16px; }
 .action-block h3 { font-size: 1.05rem; margin-bottom: 8px; }

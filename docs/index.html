@@ -57,6 +57,12 @@
         number and the serial. Names, ages and relatives are not held here —
         check those on the official PDF.
       </p>
+      <p class="help" data-i18n="asdScopeNote">
+        Every search also checks a second, separate list published by the
+        BLOs — electors whose enumeration form could not be collected. That
+        list does carry a name, since it helps confirm an entry is really
+        yours.
+      </p>
       <p class="privacy-note">
         <span aria-hidden="true">🔒</span>
         <span data-i18n="privacyNote">The number you type never leaves this device. The search runs in your browser against pre-computed data files.</span>
@@ -66,7 +72,7 @@
     <form id="lookup-form" class="lookup-form" novalidate>
       <label for="epic" data-i18n="epicLabel">EPIC number</label>
       <input id="epic" name="epic" type="text" inputmode="text" autocomplete="off"
-             autocapitalize="characters" spellcheck="false" maxlength="10"
+             autocapitalize="characters" spellcheck="false" maxlength="11"
              placeholder="ABC1234567" aria-describedby="epic-help">
       <p class="help" id="epic-help" data-i18n="epicHelp">
         Printed on the front of your voter ID card. Exactly 3 letters followed by 7 digits.
