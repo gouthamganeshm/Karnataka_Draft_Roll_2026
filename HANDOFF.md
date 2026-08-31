@@ -1521,6 +1521,49 @@ per-card rate), but not a number to wave away either.
   existing note below on `3-build-data.mjs`'s incremental path not
   handling in-place correction).
 
+- **Statewide scope check — 2026-08-31, before building anything.** User
+  asked to check how many other ACs show the WZU/WZZ pattern before
+  building a fix. Ran a per-AC analysis over all 42.4M `cache/rows` (no
+  fetching needed, already local): for every AC and every letter position,
+  grouped prefixes by their other two fixed positions and looked for
+  positions where **exactly two** distinct letters ever appear — the same
+  "other=0" signature WZU/WZZ had — with a material, meaningfully-skewed
+  minority (≥50 rows, 3-45% share). 188 such statistically-clean binary
+  splits exist across 224 ACs. Most trace back to ACs already known to be
+  tangled multi-prefix situations (AC191, AC207, AC219, and newly AC6 and
+  AC115 show the same pattern — 3+ genuinely different real prefixes
+  sharing two fixed positions, not a true binary — visible because the same
+  AC produces multiple overlapping candidate entries at different wildcard
+  positions). Filtering to ACs with **exactly one** candidate entry (not
+  part of a tangled cluster) leaves **10 genuinely isolated candidates**:
+  AC25, AC41, AC78, AC107, AC155, AC161 (already confirmed), AC168, AC171,
+  AC173, AC190.
+
+  **Pixel-checked two of the new ones — a 1-for-2 hit rate, even among the
+  cleanest-looking candidates:**
+  - **AC41 (FZT dominant / FZI minority, 5,052 minority rows): CONFIRMED
+    real.** AC41/part11/serial281's crop clearly reads `FZT3287976`,
+    published as `FZI3287976`. Notably, this specific part had *zero* FZT
+    rows at all (all locally misread as FZI), unlike WZU/WZZ's dense
+    per-card mixing within the same part — worth keeping in mind before
+    assuming every case behaves like WZU/WZZ did.
+  - **AC190 (GLV dominant / GYV minority, 3,621 minority rows): REFUTED.**
+    Both checked GYV cards (AC190/part16/serial3 and serial891) crop-match
+    their published value exactly — GYV is a real, distinct, correctly-read
+    prefix, not a misread of GLV.
+
+  **Conclusion: no candidate — however clean its statistics look — can be
+  trusted without individual manual pixel verification.** A blanket,
+  purely-statistical "dominant prefix wins" auto-fixer would have wrongly
+  overwritten every correct GYV row in AC190. Any prefix-consensus repair
+  needs a verification step per candidate pair (a small manual or
+  semi-automated pixel sample, same rigor used throughout this
+  investigation), not a rule applied automatically off the statistics
+  alone. The remaining 8 isolated candidates (AC25, AC78, AC107, AC155,
+  AC168, AC171, AC173) are not yet checked; magnitudes are mostly small
+  (a few hundred to ~1,900 rows) except none approach WZU/WZZ's 28,700.
+  **WZU/WZZ remains the only case confirmed at real statewide scale.**
+
 - A GitHub Actions + Tailscale-home-exit-node trial was scoped
   (`.github/workflows/probe-cdn-vpn.yml`) to test whether hosted-runner
   compute could speed up a larger version of this measurement, since
