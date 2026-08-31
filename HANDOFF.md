@@ -1457,6 +1457,70 @@ per-card rate), but not a number to wave away either.
     parts, or PDF producer/creation-date metadata to check for a shared
     print/scan batch — neither attempted yet.
 
+- **Root cause found — 2026-08-31, "shared EPIC prefix + per-instance glyph
+  confusion," not a per-part scan-quality effect.** Pulled every non-flagged
+  card from AC161/part138 and AC161/part203 (both flagged for a Z/U
+  confusion) whose EPIC's 3rd letter was Z or U — 9 such cards, none in the
+  original 15-card sample. All 9 visually confirmed the true letter is "U",
+  regardless of whether the batched OCR read it as U (correct) or Z (wrong)
+  — the identical glyph shape, read two different ways card to card, in the
+  same part, same font, same everything. Quantified via
+  `roll_ocr.read_part_bytes`'s own prefix distribution for these two parts:
+  `WZ?` accounts for 85% of part138 (565/662) and 75% of part203 (467/620)
+  — i.e. "WZU" is that AC's dominant, locally shared EPIC-issuance prefix —
+  and within it, `WZZ` (wrong) appears 29.9% and 25.9% of the time
+  respectively, with **zero** other variants (`other=0` both times: it is
+  never WZX, WZQ, anything else — a clean, isolated, two-way confusion).
+  Checked statewide against the 42.4M already-extracted `ok:true` rows in
+  `cache/rows/`: **115,939 rows carry this exact WZU/WZZ prefix pair,
+  28,703 of them (24.8%) read as the minority `WZZ`** — on the strength of
+  the 9-for-9 visual confirmation, essentially all of those 28,703 are very
+  likely genuinely wrong. That is **one specific, well-understood glyph
+  confusion accounting for roughly 28,700 wrong EPICs on its own** — far
+  more than the 15-per-1800-sample-cards headline number could show, because
+  that sample only ever looked at 15 cards out of each part regardless of
+  how many actually shared the hard prefix.
+
+  **This also explains the earlier inconclusive results**: it is not a
+  page-level scan-quality effect (ruled out by whole-page metrics already),
+  not a print-batch effect (PDF metadata is empty on every file checked,
+  every one of 19 parts, both bad and control — ECI's CDN strips producer/
+  creator/dates entirely), and not something batch-size-related (already
+  ruled out). It is a **per-instance Tesseract font-glyph ambiguity on
+  specific letter shapes** (here, U vs Z at this exact font/DPI), and a
+  "bad" part in the original sample is simply a part where many voters
+  happen to share a local EPIC prefix that contains one of these hard
+  letters — more at-bats for the same coin-flip, not a worse scan.
+
+  **Caution — do not over-extrapolate to the other letter pairs found**:
+  `WZU`/`WZZ` is uniquely clean because both statewide counts sit on the
+  same side of a genuine minority/majority split for what is almost
+  certainly one real prefix. The other confusions found during manual
+  review (AOH/AQH in AC219, UII/ULL/UIL in AC207, AOV/AQO/AQV in AC191) do
+  **not** have this property statewide — e.g. `AQH` (146,398 rows) is far
+  *more* common than `AOH` (8,770) in the full 42.4M-row dataset, the
+  opposite of what AC219/part43's local pixels showed. That almost
+  certainly means AOH and AQH are both genuinely real prefixes used by
+  *different* constituencies' issuing offices, not one uniformly misread as
+  the other — the manual pixel confirmation for those pairs only applies to
+  the specific cards checked in AC207/AC219/AC191, not the statewide
+  population. Any fix must be scoped locally (per part or per AC), not
+  applied as a blanket statewide substitution table.
+
+  **A concrete, well-justified fix candidate this suggests** (not built,
+  needs the user's go-ahead first): a **prefix-consensus repair**, in the
+  same spirit as `repair_serials()`'s existing sequence-fit consensus for
+  serial numbers — within a single part (or AC), if one 3-letter prefix
+  dominates overwhelmingly (as WZU does at 70-74% of all WZ? cards), any
+  reading that differs from it by exactly one character is very likely a
+  misread of the dominant prefix and can be corrected with high confidence.
+  Scoped locally, this avoids the AOH/AQH trap above (different regions
+  keep their own genuinely-different dominant prefixes). Not yet measured
+  how many of the ~44M rows this would actually touch beyond the WZU/WZZ
+  case, and no patch/republish mechanism exists yet either (see the
+  existing note below on `3-build-data.mjs`'s incremental path not
+  handling in-place correction).
+
 - A GitHub Actions + Tailscale-home-exit-node trial was scoped
   (`.github/workflows/probe-cdn-vpn.yml`) to test whether hosted-runner
   compute could speed up a larger version of this measurement, since
