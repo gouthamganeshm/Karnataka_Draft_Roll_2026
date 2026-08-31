@@ -1434,6 +1434,29 @@ per-card rate), but not a number to wave away either.
   script (unhash the wrong EPIC's bucket entry, hash-and-insert the
   correct one) — straightforward, but not built, and there's no point
   building it until the fix strategy above is decided.
+- **Deep-dive into what makes the 7 "bad" parts different — 2026-08-31,
+  inconclusive.** Checked district clustering (weak: only B.B.M.P(NORTH)
+  repeats, 2 of its 9 sampled parts, not much above the 7/120 base rate),
+  cards-per-part (bad avg 783 vs all-120 avg 730 — barely elevated), and
+  whole-page image quality metrics fetched for all 7 bad parts plus a
+  12-part control sample with zero flagged issues
+  (`scripts/ocr/_quality_probe.py`, not committed — throwaway). Findings:
+  - **Image resolution is identical across all 19 parts checked**
+    (1983x2806) — every Karnataka part renders at the same fixed DPI, ruled
+    out entirely.
+  - JPEG compression (bytes/megapixel) and sharpness (Laplacian variance)
+    are both slightly higher for bad parts (+3.4% and +3.9% respectively)
+    but the ranges overlap heavily (one control part scores higher than 5
+    of 7 bad parts) — not a reliable discriminator at this sample size.
+  - **The real signature is glyph-specific, not page-level**: each bad part
+    repeats one *specific* letter-pair confusion across its own confirmed
+    misreads (AC161: Z↔U; AC219/AC191: O↔Q↔V; AC207: I↔L) — localized to a
+    handful of cards out of 700-900 per part, which a whole-page average
+    necessarily dilutes away. Not yet explained further; would need
+    pixel-level comparison of that specific glyph pair's rendering across
+    parts, or PDF producer/creation-date metadata to check for a shared
+    print/scan batch — neither attempted yet.
+
 - A GitHub Actions + Tailscale-home-exit-node trial was scoped
   (`.github/workflows/probe-cdn-vpn.yml`) to test whether hosted-runner
   compute could speed up a larger version of this measurement, since
