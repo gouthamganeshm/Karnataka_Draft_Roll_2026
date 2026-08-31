@@ -6,7 +6,7 @@
   "builtAt": "2026-08-30T10:16:51.788Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 44385227,
+  "electors": 44385226,
   "constituencies": 224,
   "parts": 60923,
   "partsDone": 60923,
@@ -1458,7 +1458,7 @@
       "district": "BANGALORE RURAL",
       "parts": 281,
       "partsDone": 281,
-      "electors": 191517
+      "electors": 191516
     },
     "182": {
       "name": "Magadi",
