@@ -1647,6 +1647,73 @@ live-site check afterward, don't assume a clean local verification is
 enough**, since a genuine duplicate can only be caught by checking against
 what's actually already published.
 
+### 10,000-card statewide sample — 2026-08-31/09-01, the bug splits into two different problems
+
+User explicitly asked (after the AC161 fix) for a much larger sample to
+look for similar mismatches statewide and work toward a **generic** fix.
+Ran `measure_batching_error.py --parts 400 --cards-per-part 25 --seed
+1000`, detached, ~12.6 hours (rate varied a lot — long stretches at the
+expected ~80s/part, but two multi-hour stalls against the CDN, cause not
+investigated further since the process recovered on its own both times).
+
+Result: **9,955 cards sampled across 399 parts** (1 part failed to fetch),
+**99 raw candidates**. All 99 manually reviewed against source pixels
+(labeled composite sheets, same rigor as the earlier 1,800-card round) —
+**40 confirmed genuine misreads, 59 false positives** (isolation
+hallucinated, same known failure mode as before). Confirmed rate: 40/9955
+= 0.40%, broadly consistent with the earlier 1,800-card sample's 0.83%
+given the AC161 cluster that dominated that sample is now fixed and
+excluded from consideration going forward.
+
+**The 40 confirmed cases split into two genuinely different problems, not
+one bug:**
+
+1. **Letter-pair confusion within a locally-dominant EPIC prefix** (same
+   shape as WZU/WZZ) — 28 of 40 cases, across **13 different ACs**: 157
+   (STZ/ITZ/SIZ/SIT), 49 (XOJ/XOO), 207 (UII/ULL/UIL/ULI, the same messy
+   multi-way cluster flagged earlier — still messy, several new confirmed
+   cases here too), 191 (AOV/AOQ/AQV), 5 (IEL/LIE), 6 (ZTO/ZIO/ZIT), 180
+   (ZCS/ZZC), 20 (LYP/IYP), 219 (AOH/AOQ/AQH — 4 more confirmed, same
+   messy cluster as before), 152 (ZBG/ZZB), 53 (YFO/YFQ), 44 (UOB/UOQ).
+   One case (AC174/part245/serial209) is a **near-total misread** —
+   published `HGB3352671`, true value `SVF7788144`, almost every character
+   wrong, not a single-glyph confusion at all — worth remembering that
+   this bug's worst cases aren't always the "one letter flipped" shape.
+   AC157's own cluster (7 candidates checked, only 3 confirmed) is a good
+   reminder that a part having many candidates from the same prefix
+   pattern does **not** mean the pattern is real there — has to be
+   checked per-AC every time, exactly like AC190's GLV/GYV false lead
+   during the AC161 scoping work.
+   The AC161 prefix-consensus fix approach generalizes to all of these in
+   principle, but each pair needs its own verification pass first — no
+   shortcut around that.
+
+2. **Genuine digit confusions — a different, harder problem.** 11 of 40
+   cases: single-digit substitutions (`WEC5574111`→`WEC0574111`,
+   `AAN6670000`→`AAN0670000`, `AKB5591537`→`AKB0591537`,
+   `ZWF0098611`→`ZWF5098611`, `NMD4027800`→`NMD4027900`,
+   `AAN0022256`→`AAN5022256`) and digit-order scrambles
+   (`WBN2526093`→`WBN2252609`, `TQH4274117`→`TQH2427417`,
+   `NMD0390180`→`NMD3090180`, `AEC7888390`→`AEC3788890`,
+   `RPJ0553256`→`RPJ0053256`) in the numeric portion of the EPIC.
+   `coerce_epic()`'s existing translation table only fixes letter-shaped-
+   as-digit confusions at the 3/7 grammar boundary — it has never handled
+   genuine digit-to-digit misreads. **No consensus-based fix is possible
+   here**, unlike the letter-pair case: a shared EPIC prefix lets many
+   voters "vote" on what the correct local letters are, but each voter's
+   own number is essentially unique, so there is no dominant value to
+   fall back on. Catching these requires the same isolated-vs-batched
+   comparison at full scale — which forfeits contact-sheet batching's
+   ~10x speedup — so there is **no cheap generic fix for this category**
+   at the time of this write-up. Worth remembering as a hard limit on how
+   much this whole investigation can ultimately clean up automatically.
+
+All 99 manual verdicts logged to `test-logs/test-log.jsonl` (layer
+`ocr-batching-check-manual-review-10k`). Full candidate detail in
+`cache/ocr-batching-check-10k-summary.json` and
+`cache/silent-candidates-10k-reviewed.json` (both gitignored, local only —
+the log book entries are the durable record).
+
 ### Test log book — new standing convention, 2026-08-30
 
 Explicit user requirement: every verification test this project runs is now
