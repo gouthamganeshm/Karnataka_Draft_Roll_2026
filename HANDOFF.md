@@ -1605,6 +1605,48 @@ per-card rate), but not a number to wave away either.
   done** — workflow file was added then removed the same session, nothing
   ever ran. Local-only extraction remains the only active path.
 
+### AC161 WZU/WZZ fix applied, verified twice, and exhaustively live-tested — 2026-08-31
+
+Full remediation cycle for the one root cause confirmed at real scale
+(above): 27,865 rows corrected (`scripts/fix-ac161-wzu-wzz.mjs`), touching
+37,646 published bucket files. Three independent checks, not just the fix
+script's own tally:
+
+1. **`scripts/verify-ac161-fix.mjs`** — extracted the pre-fix `docs/data`
+   tree from git HEAD, diffed every touched bucket file byte-for-byte.
+   **25,483,869 untouched (non-corrected) records checked, zero unexpected
+   changes** — confirms nothing outside the intended AC161 corrections was
+   touched anywhere, including every other AC's data sharing those bucket
+   files.
+2. **`scripts/verify-ac161-live.mjs`** — exhaustive check of all 27,865
+   corrections against the *actually-deployed* GitHub Pages site (not just
+   local files), with automatic retry of transient fetch failures until
+   full coverage. Found **one genuine anomaly**: AC161/part79/serial276's
+   corrected EPIC (`WZU4244661`) is a real duplicate of an EPIC already
+   published under AC181/part24/serial1158 (literal same string, not a
+   hash collision) — the fix script's simple add/remove logic hadn't
+   replicated `3-build-data.mjs`'s own existing duplicate policy
+   ("the same EPIC can appear in two parts when a transfer is mid-flight",
+   first-file-processed wins, other silently dropped). Fixed by applying
+   that same policy (AC161 precedes AC181 in canonical `readdir` order, so
+   AC161 wins) — removed AC181's entry, decremented electors by 1 in both
+   `manifest.json` and `cache/build-state.json` (44385227 → 44385226,
+   AC181 191517 → 191516). Pushed as `c9ec5372367`.
+3. Final spot-check directly against the live URLs after that fix's Pages
+   deploy completed — confirmed the duplicate is gone and the manifest
+   electors count is correct.
+
+**Net result: all 27,865 AC161 corrections are live, correct, and verified
+at three independent layers** (local byte-for-byte diff, live-site
+exhaustive fetch, live-site spot-check post-fix). This is also the first
+real-world confirmation that the hash-only bucket addressing scheme's
+theoretical duplicate-EPIC risk (discussed earlier re: 48-bit collision
+math) is not just theoretical — worth remembering if another AC's
+misreads are ever corrected the same way: **always run the exhaustive
+live-site check afterward, don't assume a clean local verification is
+enough**, since a genuine duplicate can only be caught by checking against
+what's actually already published.
+
 ### Test log book — new standing convention, 2026-08-30
 
 Explicit user requirement: every verification test this project runs is now
