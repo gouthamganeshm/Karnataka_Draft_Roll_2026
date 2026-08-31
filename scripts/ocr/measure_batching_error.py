@@ -246,17 +246,32 @@ def main() -> int:
     ap.add_argument('--cards-per-part', type=int, default=15)
     ap.add_argument('--seed', type=int, default=None)
     ap.add_argument('--out', default=str(ROOT / 'cache' / 'ocr-batching-check-summary.json'))
+    ap.add_argument('--spread-acs', action='store_true',
+                     help='Sample --parts/224 parts from EVERY AC (rounded up), instead of pure random '
+                          'across all parts statewide -- guarantees every constituency is represented '
+                          'rather than leaving it to chance (large ACs have more parts and would '
+                          'otherwise dominate a pure random sample).')
     args = ap.parse_args()
 
     manifest = json.loads((CACHE / 'manifest.json').read_text('utf8'))
-    universe = []
-    for ac in manifest['constituencies']:
-        for part in ac['parts']:
-            universe.append((ac['acNumber'], part['partNumber']))
-
     rng = random.Random(args.seed)
-    sample = rng.sample(universe, min(args.parts, len(universe)))
-    print(f'{len(sample)} parts sampled statewide, out of {len(universe)} total parts.', flush=True)
+
+    if args.spread_acs:
+        acs = manifest['constituencies']
+        per_ac = max(1, round(args.parts / len(acs)))
+        sample = []
+        for ac in acs:
+            parts = [(ac['acNumber'], p['partNumber']) for p in ac['parts']]
+            sample.extend(rng.sample(parts, min(per_ac, len(parts))))
+        rng.shuffle(sample)
+        print(f'{len(sample)} parts sampled, spread {per_ac}/AC across all {len(acs)} constituencies.', flush=True)
+    else:
+        universe = []
+        for ac in manifest['constituencies']:
+            for part in ac['parts']:
+                universe.append((ac['acNumber'], part['partNumber']))
+        sample = rng.sample(universe, min(args.parts, len(universe)))
+        print(f'{len(sample)} parts sampled statewide, out of {len(universe)} total parts.', flush=True)
     print(f'Up to {args.cards_per_part} isolated cards per part.', flush=True)
 
     totals = {'silent_mismatch_candidates': 0, 'retry_recoverable_candidates': 0, 'agreements': 0,
