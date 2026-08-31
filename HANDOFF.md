@@ -1564,6 +1564,22 @@ per-card rate), but not a number to wave away either.
   (a few hundred to ~1,900 rows) except none approach WZU/WZZ's 28,700.
   **WZU/WZZ remains the only case confirmed at real statewide scale.**
 
+- **Larger statistical sample — 2026-08-31, 135 more cards, zero exceptions.**
+  User asked how much effort a full pixel-by-pixel verification would cost;
+  answer was that exhaustively checking all 28,703 WZZ rows isn't feasible
+  or necessary — a large enough consistent sample is the same tool
+  `repair_serials()` already relies on. Ran a bigger sample: 15 more AC161
+  parts (beyond the 138/203 already checked), ~6 WZZ + 3 WZU per part,
+  ~1-2 min per part fetch, reviewed via 23 labeled 6-per-sheet composite
+  images rather than one image per card. **Result: 90/90 WZZ cards
+  confirmed true letter U (misread), 45/45 WZU cards confirmed correct —
+  zero exceptions.** Combined with the original 9, that is **144 cards
+  checked across 17 different AC161 parts, 100% consistent.** This is now
+  strong enough evidence to build a fix on for AC161 specifically; the
+  other 8 isolated candidates outside AC161 (see above) remain unverified
+  at this sample size and should not be assumed to behave the same way —
+  AC190's GLV/GYV pair already showed the opposite (minority was correct).
+
 - A GitHub Actions + Tailscale-home-exit-node trial was scoped
   (`.github/workflows/probe-cdn-vpn.yml`) to test whether hosted-runner
   compute could speed up a larger version of this measurement, since
