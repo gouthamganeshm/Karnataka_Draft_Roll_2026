@@ -6,7 +6,7 @@
   "builtAt": "2026-08-30T10:16:51.788Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 44385222,
+  "electors": 44385227,
   "constituencies": 224,
   "parts": 60923,
   "partsDone": 60923,
@@ -1298,7 +1298,7 @@
       "district": "B.B.M.P(NORTH)",
       "parts": 244,
       "partsDone": 244,
-      "electors": 133030
+      "electors": 133035
     },
     "162": {
       "name": "Shivajinagar",

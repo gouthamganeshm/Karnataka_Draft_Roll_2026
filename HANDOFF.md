@@ -32,6 +32,23 @@ never suggest otherwise. The agreed wording is:
    carrying source/version metadata.
 6. Scope started deliberately small — one district — to be scaled after results.
 
+### Open data-quality issue — confirmed wrong, NOT fixed, do not lose track of this
+
+**AC112 (Bhadravathi)/part202/serial476: published `ok:true` EPIC is
+`INA8000960`, confirmed wrong — true value is `INA1800960`.** This is the
+original example that kicked off the whole "OCR misreads that pass every
+check" investigation (see that section below). Unlike AC161's WZU/WZZ
+(a letter confusion, fixed 2026-08-31 by `scripts/fix-ac161-wzu-wzz.mjs`),
+this is a **digit** confusion, and the batch-size experiment found it reads
+wrong at *every* batch size tested, including fully isolated (size 1) — not
+a batching artifact, Tesseract just misreads this specific glyph regardless
+of context. **No fix method is known for this one yet.** Still sitting
+unfixed in `cache/rows/112.jsonl` as of 2026-08-31 — confirmed by directly
+grepping that file, still reads `INA8000960`. Revisit once the 10,000-card
+generic-fix sampling work (requested by the user, see the task list) is
+underway — this exact case is a good test of whatever generic detection
+method comes out of that.
+
 ---
 
 ## 2. The decisive finding (verified)
