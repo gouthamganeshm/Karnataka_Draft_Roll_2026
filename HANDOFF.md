@@ -1310,12 +1310,11 @@ wrong rather than silently uncertain.
 **Deterministic, not a rare glitch**: re-ran extraction on this exact PDF
 twice and got `INA8000960` both times.
 
-**Status: root cause understood, scope not yet measured.** Confirmed on this
-one example. Not yet known how many of the ~44M published `ok:true` rows are
-affected by the same contact-sheet-batching degradation — this is
-**explicitly queued as the top-priority next task** (see the task pipeline
-below), ahead of the CEO-gap investigation that surfaced the retry-recovery
-finding just below.
+**Status, updated 2026-08-31: scope now measured on a large statewide
+sample. See the two subsections immediately below** — the batch-size theory
+of the fix turned out not to hold, and the true confirmed rate (manually
+verified against source pixels, not just re-OCR agreement) is lower than
+the raw automated-candidate rate but still real and statewide.
 
 **Related, found the same session while investigating the CEO gap**:
 `ROLL_OCR_RETRY` (an opt-in second-pass re-read for EPICs that *fail
@@ -1329,6 +1328,119 @@ only fires for EPICs that already **fail** grammar, so it would **not** have
 caught the `INA8000960` case above (which passes grammar) — the two findings
 are related (both trace back to contact-sheet OCR degradation) but need
 separate fixes.
+
+### Batch-size experiment — 2026-08-30/31, "just shrink the contact sheet" does not fix it
+
+Before measuring scope, tested the obvious candidate fix directly: re-OCR
+the two known-bad cards (`INA8000960` and a second pair found during this
+step, `AC218/part281/serial786+713`, both wrongly flagged — see below) at
+contact-sheet batch sizes 1, 2, 3, 5, 10, 15, 30 (production uses ~30, one
+full page). Result (`scripts/ocr/_experiment_batch_size.py`, not committed
+— throwaway):
+
+- `INA8000960`/`INA1800960`: **wrong at every batch size tested, including
+  1.** Batch size is not the cause for this card — Tesseract misreads this
+  specific glyph combination regardless of how much context surrounds it.
+- The AC218 pair: **correct at sizes 5–30 (matches production), wrong at
+  sizes 1–3.** For this card, the production batch size is fine and
+  isolating too aggressively is what breaks it — the opposite direction.
+
+**Conclusion: there is no single batch-size change that is a safe global
+fix.** It would fix some cards and break others that are currently correct.
+Isolating a single card is not a reliable "ground truth" oracle either — it
+has its own failure mode, distinct from and not obviously better than
+batching's. This also surfaced real Tesseract non-determinism: the same
+`INA8000960` crop, same method, gave three different wrong readings across
+attempts in this session. No single re-OCR, run once or repeated, is a
+verdict — only a candidate worth a human pixel-check.
+
+### Scope measurement — 2026-08-31, 120 parts / 1,800 cards statewide, manually verified
+
+`scripts/ocr/measure_batching_error.py` (committed): samples parts spread
+across the whole state, and for a fixed number of cards per part (15, chosen
+for tractability — isolating a card forfeits contact-sheet's ~10x speedup),
+compares the production batched read against an isolated re-read of the same
+crop. Every disagreement is a **candidate only** — both the docstring and
+the code are explicit that isolation itself is unreliable (per the
+experiment above), so nothing is counted as confirmed without a human
+looking at the actual crop pixels. Every candidate's crop image is saved to
+`cache/ocr-batching-candidates/` (gitignored, local only) specifically for
+that review step.
+
+Run: `--parts 120 --cards-per-part 15 --seed 42`, ~2.5h detached
+(`nohup ... & disown`, verified parented to `nohup.exe`, survives the
+session). Result: **1,800 cards sampled, 0 fetch/align failures.**
+
+- 23 raw `SILENT_MISMATCH_CANDIDATE` (batched and isolated both grammar-valid,
+  disagree) — 1.28% of sampled cards.
+- 88 raw `RETRY_RECOVERABLE_CANDIDATE` (batched fails grammar, isolated
+  recovers a valid EPIC) — the already-documented `ROLL_OCR_RETRY` finding,
+  a separate bug; not manually reviewed this round, already independently
+  measured earlier (~75-80% recovery on a small sample).
+- 1,683 agreements, 6 both-unreadable.
+
+**All 23 `SILENT_MISMATCH_CANDIDATE`s were manually reviewed against the
+actual crop pixels** (8x-upscaled labeled composite sheets, see
+`test-logs/test-log.jsonl` layer `ocr-batching-check-manual-review` for the
+full per-card record — `expected` is the manually-read true EPIC, `verdict`
+is `CONFIRMED_SILENT_MISREAD` or `FALSE_POSITIVE_CANDIDATE`). Result:
+
+- **15 of 23 confirmed**: the published `ok:true` EPIC is genuinely wrong.
+  Some are clean single-glyph confusions (`WZZ...`→true `WZU...`); at least
+  one is a serious digit-order scramble, not just a letter swap
+  (`YYV9231557` published, true `YYV4923157`, AC106/part143/serial292;
+  similarly `AQH7841112` published vs true `AOH4784112`, AC219/part43/serial102).
+  In 4 of the 15, **neither** the published value nor the isolated
+  "candidate correction" was actually right (e.g. AC207/part45/serial433:
+  published `ULL2335156`, isolated `UIL2335156`, true `UII2335156`) — the
+  isolated read is useful for *flagging* a card as wrong, not for
+  automatically supplying the fix.
+- **8 of 23 false positives**: the published batched value was correct all
+  along; isolating the crop hallucinated the disagreement (same failure
+  mode as the batch-size experiment's AC218 case above).
+
+**Confirmed rate: 15/1800 = 0.83% of sampled cards** — lower than the raw
+1.28% candidate rate, but real, and not evenly spread. All 15 confirmed
+misreads came from only **7 of the 120 sampled parts**
+(AC207/part45, AC161/part138, AC39/part166, AC161/part203, AC219/part43,
+AC191/part150, AC106/part143) — the remaining 113 parts had zero confirmed
+issues among their 15 sampled cards each. Within a "bad" part the local
+rate is much higher than the statewide average (AC219/part43: 4 of 15
+sampled cards confirmed wrong = 27%). This looks like a **per-part/per-PDF
+scan-or-font-quality effect** (each bad part repeats the *same* letter-pair
+confusion across its own multiple confirmed cards — AC161 confuses Z↔U
+repeatedly, AC219/AC191 confuse O↔Q↔V repeatedly, AC207 confuses I↔L
+repeatedly), not a uniform per-card error rate — worth investigating
+whether "bad" parts correlate with a specific district, print batch, or
+scan date before assuming 0.83% applies evenly statewide.
+
+Extrapolated naively (0.83% × ~44M published rows) that is on the order of
+**~365,000 rows** — almost certainly an overestimate given the clustering
+just described (a handful of genuinely bad-quality source PDFs, not a flat
+per-card rate), but not a number to wave away either.
+
+**Not yet done, still open:**
+- No fix identified yet beyond "shrinking the batch size" (ruled out
+  above). Possible directions not yet tried: a *third* independent re-read
+  method (different psm, different upscale) requiring 2-of-3 agreement
+  before accepting a change; identifying what specifically makes a part
+  "bad" (scan quality metric?) and targeting only those; accepting the
+  withhold-rather-than-guess tradeoff for specific ambiguous letter pairs
+  per part.
+- No republish has happened for any of these 15 confirmed-wrong EPICs.
+  `3-build-data.mjs`'s incremental-build checkpoint is row-count-based (new
+  *appended* rows only) — it does not have a mechanism yet for correcting
+  an already-published row in place. That needs a small, separate patch
+  script (unhash the wrong EPIC's bucket entry, hash-and-insert the
+  correct one) — straightforward, but not built, and there's no point
+  building it until the fix strategy above is decided.
+- A GitHub Actions + Tailscale-home-exit-node trial was scoped
+  (`.github/workflows/probe-cdn-vpn.yml`) to test whether hosted-runner
+  compute could speed up a larger version of this measurement, since
+  every hosted-runner IP range is otherwise flat-blocked by this CDN (see
+  section 5). **User abandoned this before the tailnet-side setup was
+  done** — workflow file was added then removed the same session, nothing
+  ever ran. Local-only extraction remains the only active path.
 
 ### Test log book — new standing convention, 2026-08-30
 
