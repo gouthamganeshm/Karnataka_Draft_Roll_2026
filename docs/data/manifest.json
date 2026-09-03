@@ -6,7 +6,7 @@
   "builtAt": "2026-08-30T10:16:51.788Z",
   "shardDepth": 4,
   "suffixLength": 8,
-  "electors": 44385226,
+  "electors": 44385225,
   "constituencies": 224,
   "parts": 60923,
   "partsDone": 60923,
@@ -1402,7 +1402,7 @@
       "district": "BANGALORE URBAN",
       "parts": 533,
       "partsDone": 533,
-      "electors": 387995
+      "electors": 387994
     },
     "175": {
       "name": "Bommanahalli",

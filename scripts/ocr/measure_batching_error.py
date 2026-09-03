@@ -251,12 +251,24 @@ def main() -> int:
                           'across all parts statewide -- guarantees every constituency is represented '
                           'rather than leaving it to chance (large ACs have more parts and would '
                           'otherwise dominate a pure random sample).')
+    ap.add_argument('--parts-file', default=None,
+                     help='Skip sampling entirely; retry the exact "AC PART" pairs listed one per line '
+                          'in this file (e.g. parts that failed to fetch in a previous run).')
     args = ap.parse_args()
 
     manifest = json.loads((CACHE / 'manifest.json').read_text('utf8'))
     rng = random.Random(args.seed)
 
-    if args.spread_acs:
+    if args.parts_file:
+        sample = []
+        for line in Path(args.parts_file).read_text('utf8').splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            ac, part = line.split()
+            sample.append((int(ac), int(part)))
+        print(f'{len(sample)} parts loaded from {args.parts_file} for retry.', flush=True)
+    elif args.spread_acs:
         acs = manifest['constituencies']
         per_ac = max(1, round(args.parts / len(acs)))
         sample = []
