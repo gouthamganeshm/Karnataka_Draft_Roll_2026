@@ -254,6 +254,11 @@ def main() -> int:
     ap.add_argument('--parts-file', default=None,
                      help='Skip sampling entirely; retry the exact "AC PART" pairs listed one per line '
                           'in this file (e.g. parts that failed to fetch in a previous run).')
+    ap.add_argument('--only-acs', default=None,
+                     help='Comma-separated AC numbers to restrict sampling to (e.g. "145,115,207"). '
+                          'Combine with --spread-acs to sample --parts/N parts from EACH of these ACs '
+                          'instead of all 224 statewide -- for a deeper per-AC confirmation pass on '
+                          'ACs already flagged by a broader sample.')
     args = ap.parse_args()
 
     manifest = json.loads((CACHE / 'manifest.json').read_text('utf8'))
@@ -270,13 +275,16 @@ def main() -> int:
         print(f'{len(sample)} parts loaded from {args.parts_file} for retry.', flush=True)
     elif args.spread_acs:
         acs = manifest['constituencies']
+        if args.only_acs:
+            wanted = {int(x) for x in args.only_acs.split(',')}
+            acs = [ac for ac in acs if ac['acNumber'] in wanted]
         per_ac = max(1, round(args.parts / len(acs)))
         sample = []
         for ac in acs:
             parts = [(ac['acNumber'], p['partNumber']) for p in ac['parts']]
             sample.extend(rng.sample(parts, min(per_ac, len(parts))))
         rng.shuffle(sample)
-        print(f'{len(sample)} parts sampled, spread {per_ac}/AC across all {len(acs)} constituencies.', flush=True)
+        print(f'{len(sample)} parts sampled, spread {per_ac}/AC across {len(acs)} constituencies.', flush=True)
     else:
         universe = []
         for ac in manifest['constituencies']:
