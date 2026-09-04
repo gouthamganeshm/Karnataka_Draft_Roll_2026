@@ -1868,3 +1868,75 @@ Queued, in order:
     live site's actual verdict-3 UI path once picked up cold — not done
     this session, just noting the data now exists to make that check
     meaningful rather than theoretical.
+
+### 8-AC deep confirmation pass applied; 50k-sample live-check false alarm closed — 2026-09-04
+
+Picked up two loose ends left by the previous session (item 11's ongoing
+work), both now resolved:
+
+1. **The 50k-sample live-verification's one open "wrong location" flag was
+   a false alarm in the checker, not a live-deploy bug.** Re-ran
+   `verify-confirmed-rows-live.mjs` (written last session, never re-run
+   after its first failing result) and got the same single flag as before:
+   AC174/part424 — corrected serial713's new EPIC (`HGB3064268`) resolves
+   on the live site to serial712, not 713. Root cause: serial712's own
+   *un*corrected, genuinely-printed EPIC is verbatim `HGB3064268` — a
+   pre-existing duplicate the correction collided into. The commit that
+   applied the 288 corrections (`58d75e5789c`) already documented this
+   exact case as "correctly resolved via the existing first-processed-wins
+   policy" — i.e., already known-benign, just not reflected in the
+   checker's classification logic, which only recognized the "hit not
+   found at all" shape of a benign duplicate, not "hit found but under the
+   other duplicate's serial." Fixed the classification (same-part,
+   different-serial hits now also count as benign) and re-ran: **CLEAN,
+   287 found + 1 known-benign duplicate, 0 real issues, 300/300 untouched
+   buckets spot-checked clean.** Pushed as `77c758b2ba2`.
+2. **8-AC deep confirmation pass — reviewed, applied, verified.** Last
+   session added `--only-acs` to `measure_batching_error.py` and ran a
+   deeper per-AC sample (25 cards/part across every part) on 8 ACs already
+   flagged by broader sampling: 6, 20, 115, 145, 191, 207, 215, 219. That
+   run finished unattended (`cache/ocr-batching-check-deep8-summary.json`,
+   211 silent-mismatch candidates) with nobody having reviewed the crops
+   yet. Built composite review sheets
+   (`build_candidate_review_sheets.py`, 36 sheets) and manually pixel-
+   reviewed **all 211** against their crops directly (not sampled — every
+   one, per this bug's own standing rule that a clean-looking statistical
+   pattern still needs individual verification; see AC190 GYV/GLV above
+   for why that rule exists).
+
+   **Result: every one of the 8 ACs turned out to be a single clean,
+   consistent dominant prefix** — AC6→`ZTO`, AC20→`IYP`, AC115→`IOP`,
+   AC145→`IUO`, AC191→`AOV`, AC207→`UII`, AC215→`IQG`, AC219→`AOH` — with
+   **one unrelated outlier** (AC215/part46/serial481: prefix `GGB`, a
+   pure digit-order scramble between batched/isolated readings, unrelated
+   to the letter-confusion cluster; the published value was already
+   correct there, no fix needed). Cross-checked every derived correction
+   against whichever of batched/isolated actually shared the crop's digit
+   suffix (7 candidates had batched/isolated digit suffixes that
+   disagreed with each other — each of those 7 re-checked individually
+   against its own crop rather than assumed).
+
+   Of 211 candidates: **130 genuine misreads** (confirmed corrections)
+   and **81 false positives** (batched/published was already correct;
+   isolated was the false lead — consistent with this bug's known
+   false-positive rate on the isolation side). Applied via
+   `fix-confirmed-rows.mjs`, dry-run verified first (0 skipped, 0
+   duplicate collisions), 260 bucket files touched across 8 ACs. All 211
+   individual manual-review verdicts logged to `test-logs/test-log.jsonl`
+   under layer `ocr-batching-check-manual-review-deep8` (via a small new
+   `scripts/log-deep8-review.mjs`, same shape as the 10k pass's
+   `-manual-review-10k` entries). Pushed as `6d383361d3f`.
+
+   **These 8 ACs are now done** — no longer part of item 11's unmeasured
+   scope. The two harder categories item 11 already identified (messy
+   multi-prefix clusters needing per-pair verification like this one just
+   got; genuine digit-to-digit misreads with no consensus-based fix) still
+   apply to the rest of the state — this pass narrowed the list, it didn't
+   close item 11 out entirely. Live-site verification of these 130
+   corrections still needs to be run once the Pages deploy for
+   `6d383361d3f` finishes (in progress as of this write-up) —
+   `node scripts/verify-confirmed-rows-live.mjs cache/confirmed-corrections-deep8.json`
+   (note: `cache/` is gitignored, so that exact file only exists on the
+   machine that ran this session — regenerate from
+   `cache/silent-candidates-deep8-reviewed.json`'s `CONFIRMED` entries if
+   it's gone, same shape as the 50k pass's corrections file).
