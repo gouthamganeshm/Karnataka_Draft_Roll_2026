@@ -1956,3 +1956,67 @@ work), both now resolved:
    against what's actually published; no action needed, just worth
    re-checking periodically since a real Revision 2 would obsolete
    everything scraped so far.
+
+### ASD exhaustive sweep resumed; a real script bug found and fixed — 2026-09-04
+
+Resumed `14-exhaustive-sweep.mjs --dataset asd` (item 14) from its
+1,661/60,923 pause point, per explicit user instruction. Found and fixed a
+real correctness bug in the script itself while it ran: `fetchBucket()`
+cached a transient network failure as a permanent `null` for that hash
+prefix (`.catch(() => null)`, then `bucketCache.set`), so one CDN blip
+meant every later EPIC hashing to the same bucket silently read as
+"missing from the live site" for the rest of the run — a false site-layer
+fail indistinguishable from a real one. Caught by 6 fails landing in the
+same ~3-second window across unrelated ACs (6, 8, 11, 39, 127, 176); all 6
+individually re-verified live and correct. Fixed to match
+`verifyBoothAgainstPdf`'s existing retry pattern — 3 attempts with
+backoff, only caching on success — committed as `ba80c42cb04`. Sweep
+restarted clean (done-ledger meant zero lost progress) and ran the rest of
+the way with 0 further script-caused false alarms.
+
+One more fail surfaced (`RSG4075990`, ac179/part110/serial66) that turned
+out to be a **genuine duplicate EPIC in the raw published ASD data**, not
+a bug: the same EPIC, name, and relative-name are printed twice by ECI —
+once at ac179/part110/serial66, once at ac168/part161/serial307 — and the
+live site's existing first-processed-wins policy (already documented in
+the 50k live-check section above) keeps only the ac168 copy. Confirmed
+directly against `cache/asd-rows/168.jsonl` and `179.jsonl`. Not fixed,
+because there is nothing to fix — this is the same known-benign
+duplicate-handling shape, just a new instance of it, this time spanning
+two different ACs rather than two parts within one.
+
+**Status as of this write-up: still running, not finished** — 56,835/60,923
+booths done, ~157 booths/min, 0 unresolved site-layer or PDF-layer
+failures (the 8 fails logged so far are the 7 pre-fix false alarms above
+plus the one confirmed-benign duplicate — nothing unaccounted for). At
+this rate it finishes in well under an hour. Detached (`nohup`+`disown`),
+same as before; `16-commit-test-log.mjs` is still running alongside it, so
+its results keep landing on `origin/main` without further action.
+
+### CEO press note, 04.09.2026 — not a Revision 2, but confirms project numbers and a hard deadline
+
+The CEO's office posted a routine SIR-2026 status press note (via
+`x.com/ceo_karnataka`, PDF at
+`ceo.karnataka.gov.in/uploads/PRESS NOTE 04-09-2026.pdf`). Read in full
+(21 pages). **Not a new roll publication** — it's notice-generation/
+delivery progress, Form 6/6A/7/8 guidance, nothing that changes what this
+project scrapes. Worth recording three things from it that are not
+derivable from this repo:
+
+1. **Independent confirmation of this project's part count.** Annexure-2
+   states **60,923 polling stations statewide**, matching exactly what
+   `1-discover.mjs`'s CDN probing already found and what the ASD
+   exhaustive sweep (above) just finished checking against.
+2. **Official explanation for the ABSENT/SHIFTED/DUPLICATE reason codes**
+   already in the ASD dataset: item 8 of the note states plainly that "due
+   to rationalisation of polling stations and re-serialisation of
+   electors, the Part Number and Serial Number may have changed" — i.e.
+   this is by design on ECI's side, not a data-quality problem, matching
+   this project's own findings.
+3. **A hard deadline that will eventually obsolete the current dataset**:
+   the claims/objections window closes 23.09.2026, and the **Final
+   Electoral Roll will be published 27.10.2026**. Everything this project
+   has scraped is the *Draft* Roll; once the Final Roll ships, revisit
+   whether it needs to be scraped as a distinct, newer dataset. Total
+   statewide electors as of 04.09.2026: 4,46,38,124 (district breakdown in
+   the note's Annexure-1), for whatever future cross-check that's worth.
