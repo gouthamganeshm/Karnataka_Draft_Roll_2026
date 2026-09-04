@@ -98,9 +98,27 @@ const bucketCache = new Map();
 async function fetchBucket(prefix) {
   if (bucketCache.has(prefix)) return bucketCache.get(prefix);
   const path = prefix.length > 2 ? `roll/${prefix.slice(0, 2)}/${prefix.slice(2)}.json` : `roll/${prefix}.json`;
-  const p = getJson(`${site}/${DATA_BASE}/${path}`).catch(() => null);
-  bucketCache.set(prefix, p);
-  return p;
+  const url = `${site}/${DATA_BASE}/${path}`;
+  // Retry transient failures rather than caching them: a bare `.catch(() =>
+  // null)` here previously meant one network blip permanently poisoned this
+  // prefix for the rest of the run — every later EPIC hashing to it would
+  // silently read as "not on the site" (a false site-layer fail) with no way
+  // to tell that apart from a genuine miss. Only a *successful* result is
+  // cached; a final failure after retries returns null uncached, so the next
+  // EPIC on this prefix gets a fresh attempt instead of inheriting the miss.
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const bucket = await getJson(url);
+      bucketCache.set(prefix, bucket);
+      return bucket;
+    } catch (err) {
+      if (attempt === 3) {
+        log(`  bucket fetch failed 3x for prefix ${prefix}: ${err.message}`);
+        return null;
+      }
+      await new Promise((r) => setTimeout(r, 1000 * attempt));
+    }
+  }
 }
 async function lookupLive(epic, manifest) {
   const hash = sha256hex(epic);
