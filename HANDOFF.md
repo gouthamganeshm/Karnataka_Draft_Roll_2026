@@ -1940,3 +1940,19 @@ work), both now resolved:
    machine that ran this session — regenerate from
    `cache/silent-candidates-deep8-reviewed.json`'s `CONFIRMED` entries if
    it's gone, same shape as the 50k pass's corrections file).
+
+   **Update, same session: ran once the deploy finished — CLEAN.** All 130
+   corrections live and correct (130/130 old EPICs gone, 130/130 new EPICs
+   found at the right ac/part/serial, 0 duplicate-collision anomalies this
+   time), 300/300 untouched buckets spot-checked clean. This item is now
+   fully closed, not just applied.
+
+   Also worth recording since it came up mid-session: **checked whether
+   ECI has published Revision 2 of the SIR Draft Roll yet — no.** Probed
+   the CDN directly (`.../SIR-DraftRoll-Revision2-KAN-1-WI.pdf` in place
+   of the `Revision1` this project's URLs use) across 5 ACs spread across
+   the state (1, 50, 100, 150, 161, 224) — all 404, `Revision1` still 200
+   for the same parts. The dataset this project scrapes is still current
+   against what's actually published; no action needed, just worth
+   re-checking periodically since a real Revision 2 would obsolete
+   everything scraped so far.
