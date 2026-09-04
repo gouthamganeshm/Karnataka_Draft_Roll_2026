@@ -1856,9 +1856,12 @@ Queued, in order:
     `node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8`
     (or similar) is ready to run; realistic cost is ~4 days continuous,
     CDN-bound. **Do not start it without being asked.**
-14. Resume the ASD exhaustive sweep once items 11-12 are settled —
-    `node scripts/14-exhaustive-sweep.mjs --dataset asd --concurrency 10`,
-    picks up from 1,661/60,923 automatically.
+14. ~~Resume the ASD exhaustive sweep~~ — **done, 2026-09-04.** Resumed
+    per explicit user instruction (ahead of items 11-12 being fully
+    settled — user's call, not this project's usual ordering), ran to
+    completion: 60,923/60,923 booths, 0 real failures statewide. Found and
+    fixed a real script bug along the way (bucket-fetch cache poisoning,
+    `ba80c42cb04`). See the dedicated section above for full detail.
 15. Publish/republish loop for ASD data going forward — no auto-publish
     script written yet. Low priority: ASD extraction is a one-shot, already-
     finished pass; revisit only if ECI revises ASD reports in place (untested
@@ -1985,13 +1988,41 @@ because there is nothing to fix — this is the same known-benign
 duplicate-handling shape, just a new instance of it, this time spanning
 two different ACs rather than two parts within one.
 
-**Status as of this write-up: still running, not finished** — 56,835/60,923
-booths done, ~157 booths/min, 0 unresolved site-layer or PDF-layer
-failures (the 8 fails logged so far are the 7 pre-fix false alarms above
-plus the one confirmed-benign duplicate — nothing unaccounted for). At
-this rate it finishes in well under an hour. Detached (`nohup`+`disown`),
-same as before; `16-commit-test-log.mjs` is still running alongside it, so
-its results keep landing on `origin/main` without further action.
+**Completed the same session: 60,923/60,923 ASD booths swept, 0 real
+site-layer or PDF-layer failures statewide.** The only 8 fails logged
+across the entire run were the 7 pre-fix false alarms above and the one
+confirmed-benign cross-AC duplicate — every single one individually
+accounted for, none left unexplained. This closes item 14.
+
+### Roll dataset spot-check — 200-booth random sample, clean
+
+Prompted by the same "check for data updates" request, and since the roll
+dataset's own full extraction is separately confirmed complete (all
+224 ACs, 60,923/60,923 parts in `cache/done/`, matching the CEO's own
+polling-station count), ran a bounded random sample rather than the full
+~4-day statewide sweep (item 13, still deliberately not started without
+being asked): `node scripts/14-exhaustive-sweep.mjs --dataset roll --limit
+200 --concurrency 8`. Also directly re-fetched AC196/part227, the exact
+file the original CDN discovery hashed — **still byte-identical**, same
+SHA-256 (`01e9555e…c402699e`), same 10,198,409 bytes, weeks later.
+
+**Result: 200/200 booths, 0 site-layer fails, 1 PDF-layer fail — and that
+one fail is a false alarm, pixel-verified.** AC161/part89/serial16 came
+back "EPIC not found on re-read" because a *fresh* full-part OCR pass
+misread the card as `WZZ3105590`; cropped and visually inspected the
+actual card image directly (not just re-OCR'd again) and it unambiguously
+reads `WZU3105590` — matching the already-published value exactly. This
+is the same OCR-batching noise item 11 already documents at length (a
+second automated pass disagreeing with a correctly-published first pass),
+now caught going the *opposite* direction from every prior instance: here
+the fresh re-read was the wrong one, not the cached data. No fix needed;
+no real defect found in the 200-booth sample.
+
+**Bottom line on "is there a data update": no, on either dataset.** No
+Revision 2, no silent Revision-1 content change (byte-identical hash), no
+ASD drift (0/60,923 real fails, full statewide sweep), no roll drift found
+in a 200-booth statewide sample plus the one specific file the whole
+project's CDN-legitimacy finding rests on.
 
 ### CEO press note, 04.09.2026 — not a Revision 2, but confirms project numbers and a hard deadline
 
