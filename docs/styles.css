@@ -303,6 +303,16 @@ main { padding-bottom: 56px; }
 
 .action-block { margin-top: 18px; border-top: 1px solid var(--hairline); padding-top: 16px; }
 .action-block h3 { font-size: 1.05rem; margin-bottom: 8px; }
+
+/* A notices hit is layered onto any verdict tone via renderCard's `extra`
+ * slot (app.js) — always the same warning treatment regardless of what tone
+ * the rest of the card carries, since it is a separate, additive finding. */
+.notices-callout {
+  margin-top: 18px; border-top: 1px solid var(--hairline); padding-top: 16px;
+  border-left: 4px solid var(--warning); background: var(--caution-wash);
+  border-radius: 8px; padding: 16px 18px;
+}
+.notices-callout .lede { margin: 0 0 12px; }
 .action-block ol { margin: 0; padding-left: 20px; color: var(--ink-2); }
 .action-block li { margin-bottom: 6px; }
 

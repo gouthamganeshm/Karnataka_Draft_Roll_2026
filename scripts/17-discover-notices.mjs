@@ -1,0 +1,157 @@
+#!/usr/bin/env node
+/* Stage 17 — discover the CEO's "notices issued" dataset.
+ *
+ * New third dataset, alongside the roll (stage 1-6) and ASD (stage 9-12):
+ * https://ceo.karnataka.gov.in/notices_issued.html lists the electors given
+ * notice for a discrepancy or "no mapping with last SIR", one PDF per part,
+ * with a real text layer (columns: S.No, Part Serial, EPIC, Name, Age,
+ * Gender, Reason) — no OCR needed, unlike the roll. See HANDOFF.md's
+ * "notices feature" section for the full investigation.
+ *
+ * Unlike the roll/ASD CDN, this is not a deterministic path: it is 34
+ * independently-uploaded Google Drive folders (one per district), each with
+ * its own folder depth before reaching the actual per-part PDFs — BBMP
+ * Central nests through an extra "{ac}-{name}" folder, Kodagu does not, and
+ * more variants are expected across the rest. This script therefore walks
+ * each district's tree generically (`scripts/lib/gdrive.mjs`) rather than
+ * assuming one fixed depth, stopping at whichever folder actually holds the
+ * `..._partN.pdf` files.
+ *
+ * Writes ONLY to cache/notices-manifest.json — never touches
+ * cache/manifest.json, cache/rows/, or cache/asd-rows/, so this cannot
+ * disturb the roll or ASD datasets no matter what it finds.
+ *
+ *     node scripts/17-discover-notices.mjs                # all 34 districts
+ *     node scripts/17-discover-notices.mjs --district Kodagu,"BBMP Central"
+ */
+
+import { resolve } from 'node:path';
+import { CACHE, log, pool, writeJson } from './lib/common.mjs';
+import { listFolder } from './lib/gdrive.mjs';
+
+const args = process.argv.slice(2);
+const argValue = (flag) => {
+  const i = args.indexOf(flag);
+  return i === -1 ? null : args[i + 1];
+};
+const onlyDistricts = argValue('--district')?.split(',').map((s) => s.trim());
+const MAX_DEPTH = 6;
+
+/* Hand-transcribed from https://ceo.karnataka.gov.in/notices_issued.html —
+ * the CEO does not publish this as structured data either, same situation as
+ * app.js's CEO_OFFICIAL_ELECTORS. Re-scrape that page if a district's folder
+ * ever moves. */
+const DISTRICT_FOLDERS = {
+  'BBMP Central': '1qTM---AuN7dEu7-hJrMAUOVAJdTMkV7x',
+  'BBMP North': '1fRha0qA3vjhgf5dYpWTTEiP_DY56qOig',
+  'BBMP South': '1N4NW1FZVNKMwFpCqXsFp5Ouo-xlzJFkp',
+  Bagalkot: '1wYwL70UBcm7z4_7F5BgoYIB7iUSTnYwj',
+  'Bangalore Rural': '1bzoI2GxURGOtLvqVc8o0jAyoNvJ0Zhgw',
+  'Bangalore Urban': '1fUxpmUCH1SRxsNkPzmzra7fcztb9hFk0',
+  Belgaum: '13foCIO2depQsEltcxLy6qqwJCBeXbVwN',
+  Bellary: '1Q8SuyGSTClbiTZv1m2vapA9J8pKrKVWu',
+  Bidar: '1Xq1T_cmGrEQ5BMS5rdny_7TEup2oDwDl',
+  Chamarajanagar: '1Ffvbp7HQ7XHc8ji7EyPojeQ8S3xZvUNF',
+  Chikkaballapur: '1SAb_4Bw70AS27GKj1dKYF46h6MIUX_y3',
+  Chikkamagalur: '1ZHNoJCwH5x4HA6PwJwdkiKD4PfcRuMu_',
+  Chitradurga: '15kdxOBogzEawR8dghSZWXJkFZwEnuZyV',
+  'Dakshina Kannada': '1etqwGKtt4_lTpM7KvxCs2YuZZID1TNxa',
+  Davanagere: '1L8NAYUNt4JLHy9hDt-VFE-hStW7D4j2_',
+  Dharwad: '1i734w_bNnBK7wXjq-k-MqHnGq0okfURV',
+  Gadag: '1sKN9mHWAsBXDsAO-sLDQczy-ipgpVpLD',
+  Gulbarga: '1PRySOKO5yqBbRoqiI_kXeTlBfyDG21vw',
+  Hassan: '1JSqIaFKUKW8oPNL4hC-8oltrwlUkNQPT',
+  Haveri: '1J2WZDhf--qi0AOA0UfIOEdbz2YyYUROM',
+  Kodagu: '1zh54tXmxr-BfAza2uqJfLpsIg1RZ_P5a',
+  Kolar: '1drF7259zyvSr6UmhJr5Gk-rYoC-jwuTx',
+  Koppal: '1g7hpZr58R3E5NOBXwgr4ZTUaJx6dDbX5',
+  Mandya: '1pAG4LVNV165YMvLEizrnVjv146si-0jJ',
+  Mysore: '1l3y2IP5SMyD5Sk4I0S-RvmjGMZJCNhdc',
+  Raichur: '1yyVTnX3JxjAzCRKvMWbK9pja5qK3T7ae',
+  Ramanagara: '1HWZivIJrY0B0O-Sf0odH--JS1gNcZReG',
+  Shimoga: '10X2J54KZ3o0wHHQbk8cq-TVOeIYj2oIC',
+  Tumkur: '1CxPwRcF_HO2g70QW1ttrNYtuGilCPRfu',
+  Udupi: '1iJhbi3jrOxXy7igSPpuusgpZoieN_1_u',
+  'Uttara Kannada': '1ygNrgoiSyPEIWv3HqhEAP37JqkarEKmO',
+  Vijayanagara: '16KSoRpSRztXVnCHpjEZQtlS4xsKK_GXl',
+  Vijayapura: '1E0uH1P8FJ9z5L7OW0PO5dK4ikSczWKpX',
+  Yadgir: '1lDuv-b0XM3083pap3THDYvGQs_UAWAQD'
+};
+
+/* Deliberately no filename filter here. The first version of this script
+ * only kept files matching one "..._ac{n}_part{n}.pdf" pattern and silently
+ * dropped everything else — which is exactly how it missed AC163 entirely
+ * (its files are named "S10_163_100_{booth name}_{date}.pdf", no "part"
+ * substring at all) and 11 of Belgaum's 18 ACs, with no error or log line to
+ * say so. At least 3 filename conventions and 2 different PDF content
+ * templates are already known to coexist across districts (see HANDOFF.md).
+ * Identifying the AC and part number is deferred entirely to the extraction
+ * stage (18-extract-notices.py), which can read each PDF's own header text
+ * as the authoritative source — far more reliable than guessing from
+ * whichever naming convention that particular office happened to use. This
+ * stage's only job is: find every PDF, wherever it is nested, and record
+ * which ancestor folder names led to it (a strong hint for extraction when
+ * the PDF itself has no header, e.g. "163-Shantinagar" implies ac=163 even
+ * without ever parsing a filename). */
+
+/** Walk one district's tree, collecting every PDF found at any depth,
+ * however it is named. */
+async function crawlDistrict(district, rootId) {
+  const files = []; // { fileId, name, path: [ancestor folder names] }
+  const seen = new Set();
+
+  async function walk(folderId, depth, path) {
+    if (depth > MAX_DEPTH || seen.has(folderId)) return;
+    seen.add(folderId);
+    const entries = await listFolder(folderId);
+    for (const e of entries) {
+      if (e.kind === 'file' && /\.pdf$/i.test(e.name)) {
+        files.push({ fileId: e.id, name: e.name, path });
+      }
+    }
+    for (const sub of entries.filter((e) => e.kind === 'folder')) {
+      await walk(sub.id, depth + 1, [...path, sub.name]);
+    }
+  }
+
+  await walk(rootId, 0, []);
+  return { files };
+}
+
+async function main() {
+  const districts = Object.keys(DISTRICT_FOLDERS).filter(
+    (d) => !onlyDistricts || onlyDistricts.includes(d)
+  );
+  log(`Discovering notices data for ${districts.length} district(s)...`);
+
+  const results = await pool(districts, 4, async (district) => {
+    const rootId = DISTRICT_FOLDERS[district];
+    try {
+      const { files } = await crawlDistrict(district, rootId);
+      log(`  ${district}: ${files.length} PDF(s) found`);
+      return { district, files };
+    } catch (err) {
+      log(`  ${district}: FAILED — ${err.message}`);
+      return { district, files: [], error: err.message };
+    }
+  });
+
+  // Flat list — identifying AC/part is 18-extract-notices.py's job, using
+  // each PDF's own content as the authority. `path` (the chain of ancestor
+  // folder names) travels with each file since it is often the only signal
+  // available when a PDF has no header of its own (see AC163 above).
+  const allFiles = [];
+  const errors = [];
+  for (const { district, files, error } of results) {
+    if (error) errors.push({ district, error });
+    for (const f of files) allFiles.push({ district, ...f });
+  }
+
+  await writeJson(resolve(CACHE, 'notices-manifest.json'), { files: allFiles, errors }, true);
+
+  log(`\nDone. ${allFiles.length} PDF(s) found across ${districts.length} district(s), ` +
+      `${errors.length} district-level failure(s).`);
+  log('Wrote cache/notices-manifest.json — extraction determines AC/part per file.');
+}
+
+main();

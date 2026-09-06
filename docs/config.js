@@ -11,5 +11,8 @@ window.ROLL_CONFIG = {
   // The ASD ("uncollectable elector") dataset — a sibling tree, not a child
   // of DATA_BASE, matching docs/data-asd's placement on disk (see
   // scripts/10-build-asd-data.mjs for why that separation is load-bearing).
-  ASD_DATA_BASE: './data-asd'
+  ASD_DATA_BASE: './data-asd',
+  // The CEO's "notices issued" dataset — third sibling tree, same reasoning
+  // (see scripts/19-build-notices-data.mjs).
+  NOTICES_DATA_BASE: './data-notices'
 };

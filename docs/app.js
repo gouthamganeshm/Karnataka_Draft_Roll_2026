@@ -6,6 +6,14 @@
 
 const BASE = (window.ROLL_CONFIG?.DATA_BASE ?? './data').replace(/\/+$/, '');
 const ASD_BASE = (window.ROLL_CONFIG?.ASD_DATA_BASE ?? './data-asd').replace(/\/+$/, '');
+// A third, independent dataset: the CEO's "notices issued" lists (see
+// HANDOFF.md's notices section, and scripts/17-19 for how it is built).
+// Unlike the roll and ASD trees, this one can never back a negative verdict
+// — its source is 34 independently-uploaded Drive folders with no reliable
+// way to confirm "this booth genuinely has zero notices" the way ASD's own
+// 404-means-empty convention does, so a "not found" here is never shown to
+// the user as an answer, only a "found" is (see renderNoticesExtra below).
+const NOTICES_BASE = (window.ROLL_CONFIG?.NOTICES_DATA_BASE ?? './data-notices').replace(/\/+$/, '');
 // [A-Z]{3}[0-9]{7,8}, not just 7: AC174 issues a real 11-character EPIC
 // series (OBSERVATIONS-ASD.md §4.4) — this is not the roll OCR's grammar
 // (which repairs misreads), it is the actual national format, so both the
@@ -58,6 +66,7 @@ const STRINGS = {
     intro: 'The draft roll for the Special Intensive Revision 2026 was published as one PDF per polling booth — around 58,000 of them. This searches all of them at once and tells you whether your number is on the roll, and which booth it sits in. If your entry is missing, that is what the claims and objections window is for.',
     scopeNote: 'The published rolls are page images, not text, so this site reads them by OCR and indexes only the two fields it can verify exactly: the EPIC number and the serial. Names, ages and relatives are not held here — check those on the official PDF.',
     asdScopeNote: 'Every search also checks a second, separate list published by the BLOs — electors whose enumeration form could not be collected. That list does carry a name, since it helps confirm an entry is really yours.',
+    noticesScopeNote: 'A third check looks for a discrepancy or no-mapping notice against the EPIC, compiled from documents each district election office publishes on its own. Coverage here is not yet complete enough to promise a "no notice" answer, so only a match is shown — it appears as an extra note alongside whatever the main search finds.',
     privacyNote: 'The number you type never leaves this device. The search runs in your browser against pre-computed data files.',
     epicLabel: 'EPIC number',
     epicHelp: 'Printed on the front of your voter ID card. 3 letters followed by 7 digits — occasionally 8.',
@@ -95,11 +104,16 @@ const STRINGS = {
 
     fName: 'Name', fRelative: 'Relative’s name', fReason: 'Reason recorded',
     fOldPart: 'Previous booth number', fOldSerial: 'Previous serial number',
+    fAge: 'Age', fGender: 'Gender',
     viewAsdSourcePdf: 'View this booth’s official uncollectable-elector PDF ↗',
     asdAssertionNote: 'This is the Booth Level Officer’s own recorded assertion, not an adjudicated fact — confirm your status with your BLO or on the official portal before treating it as final.',
 
     asdFoundTitle: 'Not on the draft roll — but found on a second list',
     asdFoundLede: 'This EPIC does not appear on the draft roll, but it is listed in a separate report of electors whose enumeration form the Booth Level Officer could not collect. If this entry is wrong, you may file a claim — with a copy of your Aadhaar — before {deadline}.',
+
+    noticesFoundHeading: 'A notice has been issued for this EPIC',
+    noticesFoundLede: 'Separately from the result above, the Chief Electoral Officer’s office has issued a discrepancy or no-mapping notice for this EPIC. Respond with the required documents before {deadline} if this concerns you.',
+    noticesCaveat: 'This notices list is compiled from documents each district office publishes independently, and this site cannot yet confirm every booth’s notices are included — so treat only a match here as meaningful; no match does not mean no notice was issued. Confirm with your BLO either way.',
 
     conflictTitle: 'Found on both lists — they disagree',
     conflictLede: 'This EPIC appears both on the draft roll and on the separate list of electors the BLO could not collect a form from. This site cannot say which one is current — it means the two official sources disagree for this EPIC, not that you are not a registered voter. Both records are shown below; check with your BLO or the official portal for the current status.',
@@ -127,6 +141,7 @@ const STRINGS = {
     intro: 'ವಿಶೇಷ ತೀವ್ರ ಪರಿಷ್ಕರಣೆ ೨೦೨೬ರ ಕರಡು ಪಟ್ಟಿಯನ್ನು ಪ್ರತಿ ಮತಗಟ್ಟೆಗೆ ಒಂದರಂತೆ ಸುಮಾರು ೫೮,೦೦೦ ಪಿಡಿಎಫ್‌ಗಳಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ. ಇಲ್ಲಿ ಎಲ್ಲವನ್ನೂ ಒಟ್ಟಿಗೆ ಹುಡುಕಿ ನಿಮ್ಮ ಸಂಖ್ಯೆ ಪಟ್ಟಿಯಲ್ಲಿದೆಯೇ ಮತ್ತು ಯಾವ ಮತಗಟ್ಟೆಯಲ್ಲಿದೆ ಎಂದು ತಿಳಿಯಬಹುದು.',
     scopeNote: 'ಪ್ರಕಟಿತ ಪಟ್ಟಿಗಳು ಪಠ್ಯವಲ್ಲ, ಪುಟದ ಚಿತ್ರಗಳು. ಆದ್ದರಿಂದ ಈ ತಾಣ ಅವುಗಳನ್ನು ಒಸಿಆರ್ ಮೂಲಕ ಓದಿ, ನಿಖರವಾಗಿ ಪರಿಶೀಲಿಸಬಹುದಾದ ಎರಡು ಕ್ಷೇತ್ರಗಳನ್ನು ಮಾತ್ರ ಸೂಚಿಸುತ್ತದೆ: ಇಪಿಐಸಿ ಸಂಖ್ಯೆ ಮತ್ತು ಕ್ರಮ ಸಂಖ್ಯೆ. ಹೆಸರು, ವಯಸ್ಸು, ಸಂಬಂಧಿಗಳ ವಿವರ ಇಲ್ಲಿಲ್ಲ — ಅವುಗಳನ್ನು ಅಧಿಕೃತ ಪಿಡಿಎಫ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.',
     asdScopeNote: 'ಪ್ರತಿ ಹುಡುಕಾಟವು ಬಿಎಲ್‌ಒಗಳು ಪ್ರಕಟಿಸಿದ ಎರಡನೇ, ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿಯನ್ನೂ ಪರಿಶೀಲಿಸುತ್ತದೆ — ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಮತದಾರರು. ಆ ಪಟ್ಟಿ ಹೆಸರನ್ನು ಒಳಗೊಂಡಿದೆ, ಏಕೆಂದರೆ ಇದು ನಮೂದು ನಿಜವಾಗಿಯೂ ನಿಮ್ಮದೇ ಎಂದು ಖಚಿತಪಡಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.',
+    noticesScopeNote: 'ಮೂರನೇ ಪರಿಶೀಲನೆ ಇಪಿಐಸಿ ವಿರುದ್ಧ ಅಸಂಗತತೆ ಅಥವಾ ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ ನೋಟಿಸ್ ಅನ್ನು ಹುಡುಕುತ್ತದೆ, ಪ್ರತಿ ಜಿಲ್ಲಾ ಚುನಾವಣಾ ಕಚೇರಿ ಸ್ವಂತವಾಗಿ ಪ್ರಕಟಿಸಿದ ದಾಖಲೆಗಳಿಂದ ಸಂಗ್ರಹಿಸಲಾಗಿದೆ. ಇಲ್ಲಿನ ವ್ಯಾಪ್ತಿ "ನೋಟಿಸ್ ಇಲ್ಲ" ಎಂದು ಭರವಸೆ ನೀಡುವಷ್ಟು ಪೂರ್ಣವಾಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಹೊಂದಾಣಿಕೆ ಮಾತ್ರ ತೋರಿಸಲಾಗುತ್ತದೆ — ಮುಖ್ಯ ಹುಡುಕಾಟ ಫಲಿತಾಂಶದ ಜೊತೆಗೆ ಹೆಚ್ಚುವರಿ ಟಿಪ್ಪಣಿಯಾಗಿ ಕಾಣಿಸುತ್ತದೆ.',
     privacyNote: 'ನೀವು ಟೈಪ್ ಮಾಡುವ ಸಂಖ್ಯೆ ಈ ಸಾಧನವನ್ನು ಬಿಟ್ಟು ಹೋಗುವುದಿಲ್ಲ. ಹುಡುಕಾಟ ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿಯೇ ನಡೆಯುತ್ತದೆ.',
     epicLabel: 'ಇಪಿಐಸಿ ಸಂಖ್ಯೆ',
     epicHelp: 'ನಿಮ್ಮ ಮತದಾರ ಗುರುತಿನ ಚೀಟಿಯ ಮುಂಭಾಗದಲ್ಲಿದೆ. ೩ ಅಕ್ಷರ ನಂತರ ೭ ಅಂಕಿಗಳು — ಕೆಲವೊಮ್ಮೆ ೮.',
@@ -164,11 +179,16 @@ const STRINGS = {
 
     fName: 'ಹೆಸರು', fRelative: 'ಸಂಬಂಧಿಯ ಹೆಸರು', fReason: 'ದಾಖಲಾದ ಕಾರಣ',
     fOldPart: 'ಹಿಂದಿನ ಮತಗಟ್ಟೆ ಸಂಖ್ಯೆ', fOldSerial: 'ಹಿಂದಿನ ಕ್ರಮ ಸಂಖ್ಯೆ',
+    fAge: 'ವಯಸ್ಸು', fGender: 'ಲಿಂಗ',
     viewAsdSourcePdf: 'ಈ ಮತಗಟ್ಟೆಯ ಅಧಿಕೃತ ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
     asdAssertionNote: 'ಇದು ಮತಗಟ್ಟೆ ಮಟ್ಟದ ಅಧಿಕಾರಿಯ ಸ್ವಂತ ದಾಖಲೆ, ಅಂತಿಮ ತೀರ್ಮಾನವಲ್ಲ — ಅಂತಿಮವೆಂದು ಪರಿಗಣಿಸುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ ಅಧಿಕೃತ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
 
     asdFoundTitle: 'ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ — ಆದರೆ ಎರಡನೇ ಪಟ್ಟಿಯಲ್ಲಿ ಕಂಡುಬಂದಿದೆ',
     asdFoundLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ, ಆದರೆ ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಮತದಾರರ ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿಯಲ್ಲಿ ಪಟ್ಟಿಮಾಡಲಾಗಿದೆ. ಈ ನಮೂದು ತಪ್ಪಾಗಿದ್ದರೆ, ನಿಮ್ಮ ಆಧಾರ್ ಪ್ರತಿಯೊಂದಿಗೆ {deadline} ರೊಳಗೆ ಕ್ಲೇಮ್ ಸಲ್ಲಿಸಬಹುದು.',
+
+    noticesFoundHeading: 'ಈ ಇಪಿಐಸಿಗೆ ಒಂದು ನೋಟಿಸ್ ನೀಡಲಾಗಿದೆ',
+    noticesFoundLede: 'ಮೇಲಿನ ಫಲಿತಾಂಶದ ಹೊರತಾಗಿ, ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಕಚೇರಿ ಈ ಇಪಿಐಸಿಗೆ ಅಸಂಗತತೆ ಅಥವಾ ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ ನೋಟಿಸ್ ನೀಡಿದೆ. ಇದು ನಿಮಗೆ ಸಂಬಂಧಿಸಿದ್ದರೆ, {deadline} ಮೊದಲು ಅಗತ್ಯ ದಾಖಲೆಗಳೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿ.',
+    noticesCaveat: 'ಈ ನೋಟಿಸ್ ಪಟ್ಟಿಯನ್ನು ಪ್ರತಿ ಜಿಲ್ಲಾ ಕಚೇರಿ ಪ್ರತ್ಯೇಕವಾಗಿ ಪ್ರಕಟಿಸಿದ ದಾಖಲೆಗಳಿಂದ ಸಂಗ್ರಹಿಸಲಾಗಿದೆ, ಮತ್ತು ಪ್ರತಿ ಮತಗಟ್ಟೆಯ ನೋಟಿಸ್‌ಗಳು ಸೇರಿವೆ ಎಂದು ಈ ತಾಣ ಇನ್ನೂ ಖಚಿತಪಡಿಸಲಾಗುವುದಿಲ್ಲ — ಆದ್ದರಿಂದ ಇಲ್ಲಿ ಹೊಂದಾಣಿಕೆ ಕಂಡುಬಂದರೆ ಮಾತ್ರ ಅರ್ಥಪೂರ್ಣ; ಹೊಂದಾಣಿಕೆ ಕಂಡುಬರದಿದ್ದರೆ ನೋಟಿಸ್ ಇಲ್ಲ ಎಂದಲ್ಲ. ಎರಡೂ ಸಂದರ್ಭದಲ್ಲಿ ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅವರೊಂದಿಗೆ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
 
     conflictTitle: 'ಎರಡೂ ಪಟ್ಟಿಗಳಲ್ಲಿ ಕಂಡುಬಂದಿದೆ — ಅವು ಭಿನ್ನಾಭಿಪ್ರಾಯ ಹೊಂದಿವೆ',
     conflictLede: 'ಈ ಇಪಿಐಸಿ ಕರಡು ಪಟ್ಟಿ ಮತ್ತು ಬಿಎಲ್‌ಒ ಗಣತಿ ನಮೂನೆ ಸಂಗ್ರಹಿಸಲಾಗದ ಪ್ರತ್ಯೇಕ ಪಟ್ಟಿ ಎರಡರಲ್ಲೂ ಕಂಡುಬರುತ್ತದೆ. ಯಾವುದು ಪ್ರಸ್ತುತವೆಂದು ಈ ತಾಣ ಹೇಳಲಾಗುವುದಿಲ್ಲ — ಇದರರ್ಥ ಎರಡು ಅಧಿಕೃತ ಮೂಲಗಳು ಭಿನ್ನಾಭಿಪ್ರಾಯ ಹೊಂದಿವೆ ಎಂದಷ್ಟೇ, ನೀವು ನೋಂದಾಯಿತ ಮತದಾರರಲ್ಲ ಎಂದಲ್ಲ. ಎರಡೂ ದಾಖಲೆಗಳನ್ನು ಕೆಳಗೆ ತೋರಿಸಲಾಗಿದೆ; ಪ್ರಸ್ತುತ ಸ್ಥಿತಿಗಾಗಿ ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ ಅಧಿಕೃತ ಪೋರ್ಟಲ್ ಪರಿಶೀಲಿಸಿ.',
@@ -240,6 +260,7 @@ const bucketPath = (prefix) =>
 
 let manifest = null;
 let asdManifest = null; // null until loaded; a separate tree, see ASD_BASE above
+let noticesManifest = null; // null until loaded; see NOTICES_BASE above
 
 // ---------------------------------------------------------------- lookup
 
@@ -286,6 +307,19 @@ async function lookupAsdEpic(epic) {
   return findInBucket(bucket, hash.slice(depth, depth + asdManifest.suffixLength));
 }
 
+/** As lookupAsdEpic, against the notices tree. A hit here is added as extra
+ * information alongside whichever roll/ASD verdict already applies — it is
+ * never treated as a verdict of its own (see NOTICES_BASE above for why a
+ * miss here proves nothing). */
+async function lookupNoticesEpic(epic) {
+  if (!noticesManifest) return [];
+  const hash = await sha256hex(epic);
+  const depth = noticesManifest.shardDepth;
+  const bucket = await fetchJson(NOTICES_BASE, bucketPath(hash.slice(0, depth)));
+  if (!bucket) return [];
+  return findInBucket(bucket, hash.slice(depth, depth + noticesManifest.suffixLength));
+}
+
 // ---------------------------------------------------------------- rendering
 
 const acLabel = (acNo) => {
@@ -317,6 +351,35 @@ function asdRecordFields(rec) {
     [t('fOldPart'), oldPart],
     [t('fOldSerial'), oldSerial]
   ].filter(([, v]) => v !== '' && v != null);
+}
+
+/* [suffix, ac, part, serial, reason, age, gender, name] — see
+ * scripts/19-build-notices-data.mjs. `reason` is free text straight from the
+ * source PDF (e.g. "Parent Name Mismatch", "NO MAPPING"), not a fixed enum
+ * like the ASD reasonCode above — 34 independently-uploaded offices do not
+ * share one vocabulary, so this is shown verbatim rather than translated. */
+function noticesRecordFields(rec) {
+  const [, acNo, partNo, , reason, age, gender, name] = rec;
+  return [
+    [t('fName'), name],
+    [t('fAc'), acLabel(acNo)],
+    [t('fPart'), String(partNo)],
+    [t('fReason'), reason],
+    [t('fAge'), age],
+    [t('fGender'), gender]
+  ].filter(([, v]) => v !== '' && v != null);
+}
+
+/** A notices hit is layered onto whatever roll/ASD verdict already applies —
+ * appended as `extra` on the result card, never its own tone or title. See
+ * NOTICES_BASE's comment for why a miss here is never shown at all. */
+function renderNoticesExtra(hit) {
+  const box = el('div', 'notices-callout');
+  box.append(el('h3', 'panel-heading', t('noticesFoundHeading')));
+  box.append(el('p', 'lede', t('noticesFoundLede', { deadline: fmtDate(manifest.claimsCloseAt) })));
+  renderPanel(box, { fields: noticesRecordFields(hit) });
+  box.append(el('p', 'help', t('noticesCaveat')));
+  return box;
 }
 
 /** One record panel inside a result card: a heading, a field list, an
@@ -372,7 +435,7 @@ function renderCard({ tone, title, lede, panels, extra }) {
   result.focus();
 }
 
-const renderMessage = (tone, title, lede) => renderCard({ tone, title, lede });
+const renderMessage = (tone, title, lede, extra) => renderCard({ tone, title, lede, extra });
 
 // ---------------------------------------------------------------- handlers
 
@@ -394,13 +457,17 @@ async function handleEpic() {
   renderMessage('info', t('searching'), '');
   let rollHits;
   let asdHits;
+  let noticesHits;
   try {
-    [rollHits, asdHits] = await Promise.all([lookupEpic(epic), lookupAsdEpic(epic)]);
+    [rollHits, asdHits, noticesHits] = await Promise.all([lookupEpic(epic), lookupAsdEpic(epic), lookupNoticesEpic(epic)]);
   } catch {
     return renderMessage('warn', t('errNetwork'), '');
   }
   const rollHit = rollHits[0] ?? null;
   const asdHit = asdHits[0] ?? null;
+  // Layered onto every branch below via `extra` — never its own verdict, and
+  // never rendered at all on a miss (see NOTICES_BASE's comment).
+  const noticesExtra = noticesHits[0] ? renderNoticesExtra(noticesHits[0]) : null;
 
   // Verdict 3: on both lists. The rare case the whole cascade exists for —
   // shown as a disagreement between two sources, never arbitrated into one
@@ -426,7 +493,8 @@ async function handleEpic() {
           sourceHref: asdPartPdfUrl(asdHit[1], asdHit[2]),
           sourceLabel: t('viewAsdSourcePdf')
         }
-      ]
+      ],
+      extra: noticesExtra
     });
   }
 
@@ -442,7 +510,8 @@ async function handleEpic() {
         note: rollHit[4] ? t('approxSerialNote') : null,
         sourceHref: partPdfUrl(rollHit[1], rollHit[2]),
         sourceLabel: t('viewSourcePdf')
-      }]
+      }],
+      extra: noticesExtra
     });
   }
 
@@ -458,7 +527,8 @@ async function handleEpic() {
         note: t('asdAssertionNote'),
         sourceHref: asdPartPdfUrl(asdHit[1], asdHit[2]),
         sourceLabel: t('viewAsdSourcePdf')
-      }]
+      }],
+      extra: noticesExtra
     });
   }
 
@@ -469,14 +539,14 @@ async function handleEpic() {
   const asdOk = Boolean(asdManifest) && asdManifest.coverage >= NEGATIVE_VERDICT_COVERAGE;
   if (!rollOk || !asdOk) {
     const pct = Math.min(manifest.coverage, asdManifest ? asdManifest.coverage : 0);
-    return renderMessage('warn', t('unsureTitle'), t('unsureLede', { pct: pct.toFixed(1) }));
+    return renderMessage('warn', t('unsureTitle'), t('unsureLede', { pct: pct.toFixed(1) }), noticesExtra);
   }
 
   // Verdict 4: absent from both, both imports essentially complete. Still an
   // honest "we don't know for certain", not a confident negative — see
   // notFoundEitherLede.
   return renderMessage('notfound', t('notFoundEitherTitle'),
-    t('notFoundEitherLede', { deadline: fmtDate(manifest.claimsCloseAt) }));
+    t('notFoundEitherLede', { deadline: fmtDate(manifest.claimsCloseAt) }), noticesExtra);
 }
 
 // ---------------------------------------------------------------- dashboard
@@ -642,6 +712,9 @@ manifest = await fetchJson(BASE, 'manifest.json');
 // degrades to "not found" rather than throwing — a second dataset going
 // missing should not take the working one down with it.
 asdManifest = await fetchJson(ASD_BASE, 'manifest.json');
+// Same best-effort degradation as the ASD manifest above — lookupNoticesEpic
+// already returns [] when this never loads.
+noticesManifest = await fetchJson(NOTICES_BASE, 'manifest.json');
 
 if (!manifest) {
   // No data yet — say so plainly rather than letting an empty dashboard imply
