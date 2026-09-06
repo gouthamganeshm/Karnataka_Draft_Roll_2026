@@ -2051,3 +2051,124 @@ derivable from this repo:
    whether it needs to be scraped as a distinct, newer dataset. Total
    statewide electors as of 04.09.2026: 4,46,38,124 (district breakdown in
    the note's Annexure-1), for whatever future cross-check that's worth.
+
+## 11. Third dataset — CEO "notices issued" search — 2026-09-06, built, data ~24% loaded, currently paused
+
+User spotted `https://ceo.karnataka.gov.in/notices_issued.html` — the CEO's
+office started publishing lists of electors issued a discrepancy or
+no-mapping notice (name, EPIC, reason) and asked for it to be added as a
+third searchable dataset, "without disturbing the current data." Committed
+as `a272f9101ab`.
+
+**Not on ECI's CDN, no captcha, no login — but not clean either.** The page
+links to 34 independently-uploaded Google Drive folders, one per district,
+each hand-populated by that district's own office. Investigated before
+building anything (see the questions asked and answered mid-session):
+
+- **Folder depth varies by district** — BBMP Central nests through an extra
+  `"{ac}-{name}"` folder before a `"... No Mapping and Discrepancies"`
+  subfolder; Kodagu goes straight to `"{ac} Notice Issued List"`. A naive
+  fixed-depth crawl would miss whichever shape it didn't expect.
+- **At least 3 filename conventions** coexist:
+  `discrepency_2026_s10_SR_FORM_{ac}_discrepency_elector_report_ac{ac}_part{N}.pdf`
+  (the common case), `S10_{ac}_{part}_{booth name}_{date}.pdf` (BBMP
+  Central's AC163), and Koppal publishes `.zip`/`.rar` archives instead of
+  PDFs at all (not yet handled — flagged, not silently dropped, see below).
+- **At least 2 PDF content templates** — one with a clean text header
+  (`AC No and Name: ...` / `Part No and Name: ...`) and a named
+  `Reason for discrepancy` column; the other (AC163 only, so far) has no
+  header at all and a different column set (`Mapping Category`, `Relative
+  Details`, `DOB/Age`, `Photo Uploaded`) — AC/part must come from the
+  filename or folder name instead.
+- A first, naive filename-pattern-only discovery pass **silently missed
+  AC163 entirely and 11 of Belgaum's 18 ACs** — not because they were
+  empty, but because their files didn't match the one pattern assumed.
+  Rebuilt to catch every `.pdf` regardless of name before this shipped —
+  see `17-discover-notices.mjs`'s own header comment for why identifying
+  AC/part is deferred entirely to extraction (reading the PDF's own text is
+  more reliable than guessing from whichever convention that office used).
+
+User picked **staged rollout** over full upfront characterization, narrow
+single-template scope, or pausing — ship whatever parses cleanly now,
+labelled as partial, expand template coverage later (same shape as this
+project's own district-by-district rollout history).
+
+**Pipeline built**: `scripts/lib/gdrive.mjs` (unauthenticated folder
+listing via Drive's `embeddedfolderview` endpoint — no API key, no
+OAuth — plus direct file download); `17-discover-notices.mjs` (generic
+recursive crawl, found **42,699 PDFs across 32 of 34 districts** —
+Davanagere's linked folder is genuinely empty, Koppal uses zip/rar, both
+flagged for later, not retried blindly); `scripts/ocr/notices_parser.py`
+(anchor-based row parser — anchors on the `(int, int, EPIC)` triple every
+row starts with, since cell text wraps across PDF text-extraction lines
+unpredictably and a fixed column-width assumption breaks); `18-extract-notices.py`
+(fetch + parse + write to `cache/notices-rows/<ac>.jsonl`, resumable by
+Drive file ID since AC/part isn't known until a file is actually read);
+`19-build-notices-data.mjs` (hash-bucketed exactly like the roll/ASD trees,
+built to `docs/data-notices` — sibling of `docs/data`, never a child, same
+reasoning as `10-build-asd-data.mjs`'s own comment on why that placement is
+load-bearing). UI wired into `docs/app.js`/`index.html`/`styles.css`: a
+notices hit renders as an additional callout appended to whatever roll/ASD
+verdict already applies, in both languages — deliberately **never its own
+verdict, and never shown at all on a miss**, since this dataset's coverage
+cannot yet back a trustworthy negative the way the roll's 99% rule or ASD's
+404-means-empty convention can.
+
+**Two real bugs found and fixed while running this, both worth remembering:**
+
+1. **A silent full-stall with no exception** — the first full-scale
+   extraction attempt (32,250 files queued) stopped making any progress at
+   all with nothing in the log and no crash. Root cause not fully confirmed
+   but consistent with a PyMuPDF hang on some adversarial PDF (see
+   `9-extract-asd.py`'s own note that PyMuPDF is not thread-safe and has
+   been unstable "the hard way" before) — one giant `ProcessPoolExecutor`
+   submitted up front has no way to recover from that short of killing the
+   whole process by hand. Fixed by processing in batches of 300 with a
+   fresh pool per batch and a hard 600s per-batch timeout that force-shuts
+   the pool (`wait=False, cancel_futures=True`) rather than hanging on
+   graceful shutdown — bounds the blast radius of a repeat to one batch
+   instead of the entire remaining run.
+2. **Google Drive's anonymous-download quota** — after downloading roughly
+   10,000 files via `uc?export=download` in one run, every further request,
+   even for a completely fresh file never touched before, started silently
+   200-ing with an HTML sign-in redirect (`ServiceLogin`) instead of the
+   PDF — confirmed directly by testing an untouched file in isolation, not
+   assumed. Not fixable without a real Google login, which was deliberately
+   not added (same reasoning as this project's standing captcha rule: don't
+   reach for credentials/bypasses when the honest answer is "wait").
+   `fetch()` now detects the sign-in-wall pattern on the first response (no
+   wasted retries) and the whole run stops immediately with a clear
+   message instead of grinding through the remaining queue at ~19s/file of
+   pure retry-and-fail. **Rerun `python scripts/18-extract-notices.py
+   --workers 8` later** once the block has had time to cool down (duration
+   not measured — try after a few hours); it resumes from
+   `cache/notices-done.txt` automatically, currently at 10,449/42,699.
+
+**Also mid-session: a live resource-contention lesson.** Running the roll
+exhaustive sweep (item 13, resumed this session per explicit request —
+"4 day exhaustive sweep during night") concurrently with the
+notices extraction's 8 workers produced a real spike in the sweep's own
+fail count (67 site fails + 69 pdf fails in 700 booths, vs. 0 across the
+entire prior ASD sweep) and a throughput collapse to 1.4 booths/min, with
+the sweep's own `fetchBucket` retries (from the fix earlier this session,
+`ba80c42cb04`) visibly exhausting against a live site that normally answers
+instantly. Pausing the notices extraction stopped new fails from
+accumulating immediately. Not root-caused with certainty (GitHub Pages
+rate-limiting one very busy client is also plausible, not just local
+network saturation), but the practical lesson either way: **do not run the
+roll sweep and the notices extraction at full worker counts at the same
+time on this machine** — pick one as the active job. User's explicit
+instruction mid-session was to pause the sweep and prioritize notices
+instead; both are cleanly paused as of this write-up (sweep at 931/60,923,
+notices at 10,449/42,699), each resumable independently with zero lost
+progress via their own done-ledgers.
+
+**To resume, once you know which one you want running:**
+```
+node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8    # roll sweep, item 13
+python scripts/18-extract-notices.py --workers 8                       # notices extraction
+```
+Do not run both at once, per the above. Once notices extraction finishes,
+run `node scripts/19-build-notices-data.mjs` to actually publish it to
+`docs/data-notices` — the UI code is already live, it just has no data
+behind it yet.
