@@ -1,9 +1,9 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T13:57:47.453Z",
+  "builtAt": "2026-09-07T14:41:55.226Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4032576,
+  "rows": 4032577,
   "constituencies": 189,
   "acs": {
     "1": {
