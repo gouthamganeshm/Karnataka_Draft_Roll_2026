@@ -26,7 +26,7 @@
  */
 
 import { resolve } from 'node:path';
-import { CACHE, log, pool, writeJson } from './lib/common.mjs';
+import { CACHE, log, pool, sleep, writeJson } from './lib/common.mjs';
 import { listFolder } from './lib/gdrive.mjs';
 
 const args = process.argv.slice(2);
@@ -96,7 +96,7 @@ const DISTRICT_FOLDERS = {
 
 /** Walk one district's tree, collecting every PDF found at any depth,
  * however it is named. */
-async function crawlDistrict(district, rootId) {
+async function crawlOnce(rootId) {
   const files = []; // { fileId, name, path: [ancestor folder names] }
   const seen = new Set();
 
@@ -115,6 +115,27 @@ async function crawlDistrict(district, rootId) {
   }
 
   await walk(rootId, 0, []);
+  return files;
+}
+
+/* A statewide run found Belgaum, Bellary and Tumkur — all three confirmed
+ * to have real files in an earlier, uncontended local run (1,456, 703 and
+ * 866 PDFs respectively) — coming back with 0 files and no error at all.
+ * `listFolder`'s own retries only cover a request that outright failed; a
+ * request that returns HTTP 200 with a genuinely empty (or truncated)
+ * parse under load looks identical to a real empty folder like Davanagere's,
+ * and nothing was checking for that difference. This is exactly the
+ * "silent narrowing" failure karnataka-asddo-dashboard's own history
+ * warns about (a district present at the source but missing from the
+ * import, with nothing flagging it) — so a 0-file result is now treated as
+ * suspicious enough to double-check, not accepted on the first pass. */
+async function crawlDistrict(district, rootId) {
+  let files = await crawlOnce(rootId);
+  for (let attempt = 1; files.length === 0 && attempt <= 2; attempt++) {
+    await sleep(3000 * attempt);
+    log(`  ${district}: came back empty, re-checking (attempt ${attempt + 1})...`);
+    files = await crawlOnce(rootId);
+  }
   return { files };
 }
 
