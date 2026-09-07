@@ -1,9 +1,31 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T04:13:06.489Z",
-  "shardDepth": 1,
+  "builtAt": "2026-09-07T04:25:54.923Z",
+  "shardDepth": 2,
   "suffixLength": 8,
-  "rows": 0,
-  "constituencies": 0,
-  "acs": {}
+  "rows": 60688,
+  "constituencies": 3,
+  "acs": {
+    "96": {
+      "name": "Kudligi",
+      "nameKn": "ಕೂಡ್ಲಿಗಿ",
+      "district": "VIJAYANAGARA",
+      "parts": 264,
+      "partsWithData": 130
+    },
+    "208": {
+      "name": "Madikeri",
+      "nameKn": "ಮಡಿಕೇರಿ",
+      "district": "KODAGU",
+      "parts": 285,
+      "partsWithData": 281
+    },
+    "209": {
+      "name": "Virajpet",
+      "nameKn": "ವೀರಾಜಪೇಟೆ",
+      "district": "KODAGU",
+      "parts": 282,
+      "partsWithData": 280
+    }
+  }
 }
