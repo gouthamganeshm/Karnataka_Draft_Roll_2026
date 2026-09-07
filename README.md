@@ -14,9 +14,10 @@ number and gets their entry back. It reformats official data; it is not
 official. As of 30-08-2026 the draft roll is fully imported: **224/224
 constituencies, 100% of booths, ~44.4M electors**.
 
-It also indexes a second, separate ECI dataset — see
-[**The ASD list — a second, separate search**](#the-asd-list--a-second-separate-search)
-below — and checks both on every search.
+It also indexes two more, separate datasets — see
+[**The ASD list**](#the-asd-list--a-second-separate-search) and
+[**The notices list**](#the-notices-list--a-third-separate-search)
+below — and checks all three on every search.
 
 ---
 
@@ -241,9 +242,10 @@ published data being trivially scraped into an EPIC-to-name table.
 
 ### The verdicts
 
-Every search runs **two independent lookups** — the draft roll and the ASD
-list below — and never short-circuits on the first hit, because the two are
-not guaranteed to be mutually exclusive (see the next section):
+Every search runs **three independent lookups** — the draft roll, the ASD
+list, and the notices list below — and never short-circuits on the first
+hit, because none of the three are guaranteed to be mutually exclusive
+(see the next two sections):
 
 | Verdict | Condition |
 |---|---|
@@ -259,6 +261,14 @@ would send someone to an ERO office for nothing, or worse, reassure someone who
 really is missing. Coverage is tracked per constituency in each dataset's own
 `manifest.json`, independently, and the client refuses to render a negative
 verdict while either import is incomplete.
+
+**The notices list is not a sixth verdict — it is layered on top of
+whichever of the five above already applies.** A notices hit is shown as
+an additional callout appended to the roll/ASD result, never its own tone
+or title, and — unlike the roll and ASD lookups — **a miss there is never
+shown to the user at all.** See the notices section below for why: that
+dataset's coverage cannot yet back a trustworthy negative the way the
+roll's 99% rule or ASD's own completeness can.
 
 ---
 
@@ -309,18 +319,123 @@ fact, and the UI says so next to every ASD result.
 
 ---
 
+## The notices list — a third, separate search
+
+The CEO's office separately publishes lists of electors issued a
+**discrepancy or no-mapping notice** — a different, narrower thing than
+the ASD list above: this is specifically people whose SIR paperwork has
+an unresolved issue (couldn't be matched to their last electoral roll
+entry, a mismatched parent/relative name, an implausible age gap between
+generations), not people the BLO simply couldn't reach. Source page:
+`https://ceo.karnataka.gov.in/notices_issued.html`.
+
+### The source is 34 independently-uploaded Google Drive folders, not one CDN
+
+This is where the story diverges hardest from the roll and ASD datasets
+above. There is no single deterministic URL scheme here at all — each of
+Karnataka's 34 districts uploaded its own notice PDFs to its own
+publicly-shared Google Drive folder, by hand, with no shared convention
+enforced between offices. Investigated directly rather than assumed, and
+confirmed to vary in every dimension:
+
+- **Folder depth varies by district.** Some nest through an extra
+  `{ac}-{name}` folder before reaching a `"... No Mapping and
+  Discrepancies"` subfolder; others put the files straight in the AC's
+  own folder.
+- **At least three filename conventions coexist**, including one with no
+  `part` substring in it at all (`S10_{ac}_{part}_{booth name}_{date}.pdf`) —
+  a naive filename-pattern crawl silently missed one whole AC and 11 of
+  Belgaum's 18 ACs before this was caught and fixed.
+- **At least two different PDF table layouts coexist.** Most carry a
+  clean header (`AC No and Name:` / `Part No and Name:`) and a named
+  `Reason for discrepancy` column; at least one AC's files have no header
+  at all and a different column set (`Mapping Category`, `Relative
+  Details`, `DOB/Age`, `Photo Uploaded`) — AC/part has to come from the
+  filename or the enclosing folder name instead, there.
+- **One district's files are `.zip`/`.rar` archives, not PDFs at all**
+  (not yet handled); **one district's linked folder is genuinely empty.**
+
+`scripts/17-discover-notices.mjs` therefore never assumes a folder depth
+or a filename shape — it crawls every folder it finds recursively and
+collects every `.pdf`, however it is named, however deep it sits.
+Identifying which AC/part a given file belongs to is deferred entirely to
+extraction, which reads each PDF's own header text as the authoritative
+source when one exists.
+
+These PDFs carry a **real text layer**, the same as the ASD list — no
+OCR needed. `scripts/ocr/notices_parser.py` anchors each row on the
+`(S.No, Serial No, EPIC)` triple every row starts with, rather than
+assuming fixed column widths, because cell text wraps unpredictably
+across PDF-extracted lines. One real bug worth naming: the table header
+repeats at every page break mid-document, and header tokens don't match
+that anchor shape — so they were silently swallowed into whichever
+field was being read when the page turned, corrupting the `reason` text
+for roughly 1 in every 12–15 rows statewide before this was caught and
+fixed.
+
+### Built and published on GitHub Actions, not the local machine
+
+Unlike the roll and ASD pipelines, this one runs entirely on GitHub's
+own runners (`.github/workflows/notices-import.yml`), for a concrete,
+measured reason: Google Drive's own anonymous-download endpoint
+(`uc?export=download`) started silently serving a sign-in page instead
+of files after roughly 10,000 downloads in one run from one IP — a real
+quota, not a bug, confirmed by testing a completely untouched file from
+the same blocked machine. A single Actions job hosted on a fresh runner
+IP downloaded the same "blocked" files immediately, so the import runs
+as a **matrix, one job per district**, capped at `max-parallel: 6` — the
+same number a companion project of the same author's
+(`karnataka-asddo-dashboard`) settled on after finding higher values
+"trade throughput for throttling and 403s" on the identical problem.
+
+The build step does a **merge, not a full rebuild**: it rebuilds fresh
+buckets only for the districts a given run actually produced rows for,
+and reads every other AC's already-published records straight out of
+the currently-committed `docs/data-notices` to carry forward unchanged.
+This exists because the obvious alternative — rebuild everything from
+just this run's fresh data — meant one unrelated district's Drive
+hiccup discarded real, safe improvements to every other district in the
+same run. A coverage guard (`guard-notices-coverage.mjs`, ported from
+the same companion project) still refuses to publish if any AC's row
+count collapses below 70% of the last build, so a partial or throttled
+run can't silently overwrite good data with a worse result either.
+
+### Source links, and what the CEO's own numbers say about coverage
+
+Each result links straight to the exact Google Drive PDF it was read
+from — carried through the pipeline as data (a Drive file ID), since
+Drive has no predictable per-file URL the way ECI's own CDN does for the
+roll and ASD links above.
+
+The CEO's own 04-09-2026 press note gives a district-wise count of every
+notice the SIR process has generated (Annexure-2) — a different, broader
+number than this dataset, since it counts every notice reason together
+where this dataset only ever covers the discrepancy/no-mapping category.
+The site's district table compares against it anyway, with that caveat
+shown in place, because most districts land close enough to be a useful
+sanity check regardless: **Bangalore Urban, Gulbarga and Mysore all land
+at 99–101%** of the CEO's per-district figure (Mysore slightly over —
+plausibly more notices were generated after the press note's 04-09
+snapshot than before this dataset was last crawled), which is strong
+evidence the extraction itself is sound even though the two totals were
+never going to match exactly by design.
+
+---
+
 ## Hosting
 
-Both trees are served **directly from GitHub Pages** — `docs/data/` (roll,
-~1.2 GB) and `docs/data-asd/` (ASD, ~1.3 GB), pushed straight from the
-machine doing the OCR since the source CDN is unreachable from a hosted CI
-runner (see below). That is well past GitHub Pages' documented ~1 GB
-guideline for a site's total content, and it has kept working regardless —
-noted here as a real, currently-accepted risk rather than a hard limit that
-was actually hit. `scripts/4-upload-r2.mjs` exists as a ready fallback to
-Cloudflare R2 (10 GB free tier, no egress charge on public buckets) if GitHub
-ever does enforce it; `docs/config.js` already externalizes both `DATA_BASE`
-and `ASD_DATA_BASE` for exactly that switch.
+All three trees are served **directly from GitHub Pages** — `docs/data/`
+(roll), `docs/data-asd/` (ASD), and `docs/data-notices/` (notices, pushed
+by `.github/workflows/notices-import.yml` rather than a local machine —
+see the notices section above), together comfortably past GitHub Pages'
+documented ~1 GB guideline for a site's total content. It has kept
+working regardless — noted here as a real, currently-accepted risk
+rather than a hard limit that was actually hit; revisit only if that
+changes, not proactively. `scripts/4-upload-r2.mjs` exists as a ready
+fallback to Cloudflare R2 (10 GB free tier, no egress charge on public
+buckets) if GitHub ever does enforce it; `docs/config.js` already
+externalizes `DATA_BASE`, `ASD_DATA_BASE` and `NOTICES_DATA_BASE` for
+exactly that switch.
 
 ---
 
@@ -335,6 +450,9 @@ and `ASD_DATA_BASE` for exactly that switch.
 | 5–6 | `5-publish.mjs` (`6-auto-publish.mjs` loop) | Build → commit → push, on a cadence, while extraction runs. |
 | 7–8 | `7-verify.mjs`, `8-full-sweep.mjs` | Per-AC spot check and a full statewide sweep, both against the *live* site and a fresh re-fetch of the source PDF — never trusting the pipeline's own prior output. |
 | 9–12 | ASD stages | See *The ASD list* above. |
+| 17 | `17-discover-notices.mjs` | Recursively crawls all 34 district Drive folders, collecting every PDF regardless of naming or depth, into `cache/notices-manifest.json`. |
+| 18 | `18-extract-notices.py` | Fetch + parse, resumable by Drive file ID (AC/part isn't known until a file is read). Batched with a hard per-batch timeout — a Drive quota or a stuck worker aborts that batch, not the whole run. |
+| 19 | `19-build-notices-data.mjs` | Merge build — fresh buckets for districts this run touched, prior published records carried forward for everything else — plus `guard-notices-coverage.mjs`. Runs inside `.github/workflows/notices-import.yml`, not locally; see *The notices list* above for why. |
 
 PDF bytes are never written to disk — at 60,923 parts that would be hundreds of
 gigabytes of redundant storage, and the rows are the only part worth keeping.
@@ -352,20 +470,30 @@ apt-get install tesseract-ocr          # or: winget install UB-Mannheim.Tesserac
 
 ## Status
 
-**Live and complete.** Both datasets fully imported and verified:
+**Live.** All three datasets imported and cross-checked against the CEO's
+own numbers:
 
 - [x] Draft roll — **224/224 constituencies, 60,923/60,923 booths, 100%**,
       ~44.4M electors, 0 unreadable parts
 - [x] ASD list — **224/224 constituencies, 100%**, 10,766,778 rows, 0
       unreadable parts (85 minutes statewide, text-layer extraction)
-- [x] Cross-checked against the CEO's own 28-08-2026 press note: 99.4%
-      overall, every district in a 97.6%–99.8% band — the site's district
-      table shows this comparison live, with the gap explained in place
-- [x] The five-verdict search, both lists, one box — live
-- [x] Statewide sweep tests for both datasets, live-site + source-PDF
-      cross-checks, corner cases (approximate serials, withheld rows,
-      duplicate EPICs, boundary constituencies) — `8-full-sweep.mjs` /
-      `12-full-sweep-asd.mjs`
+- [x] Cross-checked against the CEO's own 04-09-2026 press note: both the
+      elector count and, separately, the notices count — the site's
+      district table shows both comparisons live, with each gap explained
+      in place
+- [x] Notices list — **32/34 districts, 189/224 constituencies,
+      4,032,576 rows**, cross-checked at **94% of the CEO's own
+      per-district notices-generated total** for the districts covered
+      (several individual districts land at 99–101%). Two districts
+      (Chitradurga, Vijayapura) remain uncovered — their Drive folders
+      return a stable 401 regardless of source IP, a genuine access
+      problem at those two folders specifically, not throttling. See
+      *The notices list* above for the full pipeline.
+- [x] The five-verdict search, all three lists, one box — live
+- [x] Statewide sweep tests for the roll and ASD datasets, live-site +
+      source-PDF cross-checks, corner cases (approximate serials,
+      withheld rows, duplicate EPICs, boundary constituencies) —
+      `8-full-sweep.mjs` / `12-full-sweep-asd.mjs`
 - [x] **Full statewide overlap audit — exhaustive, not sampled — complete.**
       **3,191 EPICs genuinely appear on both lists** (0.007% of the roll),
       contradicting the earlier sampled "zero overlap" conclusion. Full
@@ -377,12 +505,12 @@ apt-get install tesseract-ocr          # or: winget install UB-Mannheim.Tesserac
       expected, actual, verdict), committed automatically on a cadence by
       `16-commit-test-log.mjs`. See `test-logs/README.md`.
 - [ ] Exhaustive per-booth sweep (`14-exhaustive-sweep.mjs`, every booth
-      rather than one per AC): ASD dataset running (~1.5h); the roll
-      dataset (~4 days, CDN-bound) is built and ready but deliberately
-      deferred until explicitly requested.
-- [ ] Root cause of the residual ~0.6% gap against the CEO's official count
-      — investigation queued next, with an explicit constraint that any fix
-      re-pulls only the specific affected booths, never a full rebuild
+      rather than one per AC): ASD dataset complete, 0 real failures
+      statewide. The roll dataset's own pass is running (~4 days,
+      CDN-bound), started on explicit request.
+- [ ] Notices coverage for Chitradurga and Vijayapura — needs the source
+      offices to fix their folder sharing settings, not further retries;
+      worth an occasional manual re-check.
 
 See `HANDOFF.md` for the full session-by-session history, and
 `OBSERVATIONS-ASD.md` for the ASD dataset's original design derivation.
