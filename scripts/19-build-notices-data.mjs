@@ -37,6 +37,51 @@ import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
 import { CACHE, ROOT, fmtBytes, log, progress, readJson, sha256hex, writeJson } from './lib/common.mjs';
 
+/* Merge build, not a blind full rebuild — this is the fix for a real,
+ * repeated failure this project's own Actions runs hit: a single flaky
+ * district (Bangalore Rural, Hassan, Chitradurga, at various points) would
+ * make guard-notices-coverage.mjs correctly refuse to publish ANYTHING,
+ * even though the other 25+ districts in the same run genuinely improved
+ * (a bug fix, a new field, a district that finally cleared Drive's
+ * throttling) — three runs in a row lost real progress to one unrelated
+ * failure. Modelled on karnataka-asddo-dashboard's own merge-build step
+ * (3b-merge-build.mjs): rebuild fresh only for ACs this run actually
+ * produced rows for, and carry every other AC's already-published records
+ * forward unchanged, read straight out of the currently-checked-out
+ * docs/data-notices rather than re-deriving them.
+ *
+ * Only safe when the shard depth does not change between builds — a bucket
+ * record stores a hash *suffix*, not the EPIC itself (same privacy
+ * reasoning as the roll/ASD datasets' own bucket format: a leaked bucket
+ * exposes far less than a full EPIC list), so a carried-over record cannot
+ * be rehashed into a different-depth prefix. At the current ~4M-row scale
+ * this needs a roughly 16x change in row count to ever trip (see the
+ * shardDepth formula below), so treated as the expected common case, with
+ * a loud, explicit fallback — not a crash — if it ever does not hold. */
+async function loadOldBuckets(oldManifest) {
+  const byPrefix = new Map(); // prefix -> records[]
+  const acPartsWithData = new Map(); // acNo -> Set(partNo)
+  let files;
+  try {
+    files = await readdir(resolve(NOTICES_DATA, 'roll'), { recursive: true });
+  } catch {
+    return { byPrefix, acPartsWithData };
+  }
+  for (const rel of files.filter((f) => f.endsWith('.json'))) {
+    const prefix = rel.replace(/\.json$/, '').replace(/[\\/]/g, '');
+    const records = await readJson(resolve(NOTICES_DATA, 'roll', rel));
+    if (!records) continue;
+    byPrefix.set(prefix, records);
+    for (const rec of records) {
+      const [, acNo, partNo] = rec;
+      if (!acPartsWithData.has(acNo)) acPartsWithData.set(acNo, new Set());
+      acPartsWithData.get(acNo).add(partNo);
+    }
+  }
+  void oldManifest;
+  return { byPrefix, acPartsWithData };
+}
+
 const NOTICES_ROWS = resolve(CACHE, 'notices-rows');
 const NOTICES_DATA = resolve(ROOT, 'docs', 'data-notices');
 
@@ -77,6 +122,18 @@ if (!rowFiles.length) {
   log('Nothing to build.');
   process.exit(1);
 }
+const freshAcs = new Set(rowFiles.map((f) => +f.replace('.jsonl', '')));
+
+const oldManifest = await readJson(resolve(NOTICES_DATA, 'manifest.json'));
+const { byPrefix: oldByPrefix, acPartsWithData: oldAcParts } = await loadOldBuckets(oldManifest);
+// Only the ACs this run did NOT touch get carried forward — an AC present
+// in both is fresh data entirely replacing its old records, never a mix.
+const preservedAcs = [...oldAcParts.keys()].filter((ac) => !freshAcs.has(ac));
+const preservedRowCount = preservedAcs.reduce((n, ac) => {
+  let c = 0;
+  for (const records of oldByPrefix.values()) for (const r of records) if (r[1] === ac) c++;
+  return n + c;
+}, 0);
 
 log(`Counting notices rows across ${rowFiles.length} constituencies…`);
 let total = 0;
@@ -88,11 +145,22 @@ for (const file of rowFiles) {
   progress(`  ${file}: ${total} so far`);
 }
 progress('');
-log(`${total} notices rows`);
+log(`${total} fresh notices rows, ${preservedRowCount} preserved from ${preservedAcs.length} untouched AC(s)`);
+total += preservedRowCount;
 
 const shardDepth = Math.min(4, Math.max(1,
   Math.round(Math.log(Math.max(total, 1) / TARGET_PER_BUCKET) / Math.log(16))
 ));
+// Merge is only valid if the depth this run computes matches the depth the
+// preserved records were already sharded under — see this file's header
+// comment for why a mismatch can't be rehashed from a bucket record alone.
+const canMerge = !oldManifest || shardDepth === oldManifest.shardDepth;
+if (!canMerge && preservedAcs.length) {
+  log(`::warning::shard depth would change (${oldManifest.shardDepth} -> ${shardDepth}) — ` +
+      `cannot merge ${preservedAcs.length} preserved AC(s) into a different-depth rebuild. ` +
+      `Falling back to a fresh-only build; guard-notices-coverage.mjs will correctly block ` +
+      `publishing if this run's own coverage is not a superset of what is already live.`);
+}
 log(`Bucket depth ${shardDepth} (${16 ** shardDepth} buckets, ~${Math.round(total / 16 ** shardDepth)} each)`);
 
 const buckets = new Map();
@@ -147,6 +215,28 @@ for (const file of rowFiles) {
   acStats[acNo] = { rows: [...partsWithData].length ? electors : 0, partsWithData: partsWithData.size };
 }
 progress('');
+
+// Carry forward every preserved AC's already-published records verbatim —
+// they were already deduped and validated in whichever earlier run produced
+// them, so no suffix-collision or EPIC_RE re-check here, unlike fresh rows
+// above. Skipped entirely (falls through to the fresh-only build) if the
+// shard depth changed — see `canMerge` above.
+let preserved = 0;
+if (canMerge) {
+  for (const ac of preservedAcs) {
+    const parts = oldAcParts.get(ac) ?? new Set();
+    acStats[ac] = { rows: 0, partsWithData: parts.size };
+  }
+  for (const [prefix, records] of oldByPrefix) {
+    const keep = records.filter((r) => preservedAcs.includes(r[1]));
+    if (!keep.length) continue;
+    if (!buckets.has(prefix)) buckets.set(prefix, []);
+    buckets.get(prefix).push(...keep);
+    preserved += keep.length;
+  }
+  if (preserved) log(`Carried forward ${preserved} rows across ${preservedAcs.length} untouched AC(s)`);
+}
+electors += preserved;
 
 log(`\nWriting ${buckets.size} buckets…`);
 let bytes = 0;
