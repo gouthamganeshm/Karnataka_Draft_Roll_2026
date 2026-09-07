@@ -130,10 +130,14 @@ for (const file of rowFiles) {
     electors++;
 
     if (!buckets.has(prefix)) buckets.set(prefix, []);
-    // [suffix, ac, part, serial, reason, age, gender, name]
+    // [suffix, ac, part, serial, reason, age, gender, name, fileId]
+    // fileId is the Google Drive file this row was read from — lets the UI
+    // link straight to the source PDF, same idea as the roll/ASD datasets'
+    // own deterministic-URL source links, just carried as data instead of
+    // built from a formula (Drive has no predictable per-file URL scheme).
     buckets.get(prefix).push([
       suffix, acNo, partNo, +row.serial || 0, row.reason || '',
-      row.age ?? null, row.gender || '', row.name || ''
+      row.age ?? null, row.gender || '', row.name || '', row.fileId || ''
     ]);
 
     partsWithData.add(partNo);

@@ -113,7 +113,7 @@ def do_file(job: dict) -> dict:
     out_rows = [
         {'ac': ac, 'part': part, 'serial': r.serial, 'epic': r.epic, 'name': r.name,
          'reason': r.reason, 'age': r.age, 'gender': r.gender, 'ok': True,
-         'method': method, 'template': template}
+         'method': method, 'template': template, 'fileId': job['fileId']}
         for r in rows
     ]
     return {**job, 'ac': ac, 'part': part, 'method': method, 'template': template, 'rows': out_rows}

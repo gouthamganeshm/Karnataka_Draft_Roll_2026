@@ -113,6 +113,7 @@ const STRINGS = {
 
     noticesFoundHeading: 'A notice has been issued for this EPIC',
     noticesFoundLede: 'Separately from the result above, the Chief Electoral Officer’s office has issued a discrepancy or no-mapping notice for this EPIC. Respond with the required documents before {deadline} if this concerns you.',
+    viewNoticesSourcePdf: 'View the official notice PDF this was read from ↗',
     noticesCaveat: 'This notices list is compiled from documents each district office publishes independently, and this site cannot yet confirm every booth’s notices are included — so treat only a match here as meaningful; no match does not mean no notice was issued. Confirm with your BLO either way.',
 
     conflictTitle: 'Found on both lists — they disagree',
@@ -188,6 +189,7 @@ const STRINGS = {
 
     noticesFoundHeading: 'ಈ ಇಪಿಐಸಿಗೆ ಒಂದು ನೋಟಿಸ್ ನೀಡಲಾಗಿದೆ',
     noticesFoundLede: 'ಮೇಲಿನ ಫಲಿತಾಂಶದ ಹೊರತಾಗಿ, ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಕಚೇರಿ ಈ ಇಪಿಐಸಿಗೆ ಅಸಂಗತತೆ ಅಥವಾ ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ ನೋಟಿಸ್ ನೀಡಿದೆ. ಇದು ನಿಮಗೆ ಸಂಬಂಧಿಸಿದ್ದರೆ, {deadline} ಮೊದಲು ಅಗತ್ಯ ದಾಖಲೆಗಳೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿ.',
+    viewNoticesSourcePdf: 'ಇದನ್ನು ಓದಲಾದ ಅಧಿಕೃತ ನೋಟಿಸ್ ಪಿಡಿಎಫ್ ನೋಡಿ ↗',
     noticesCaveat: 'ಈ ನೋಟಿಸ್ ಪಟ್ಟಿಯನ್ನು ಪ್ರತಿ ಜಿಲ್ಲಾ ಕಚೇರಿ ಪ್ರತ್ಯೇಕವಾಗಿ ಪ್ರಕಟಿಸಿದ ದಾಖಲೆಗಳಿಂದ ಸಂಗ್ರಹಿಸಲಾಗಿದೆ, ಮತ್ತು ಪ್ರತಿ ಮತಗಟ್ಟೆಯ ನೋಟಿಸ್‌ಗಳು ಸೇರಿವೆ ಎಂದು ಈ ತಾಣ ಇನ್ನೂ ಖಚಿತಪಡಿಸಲಾಗುವುದಿಲ್ಲ — ಆದ್ದರಿಂದ ಇಲ್ಲಿ ಹೊಂದಾಣಿಕೆ ಕಂಡುಬಂದರೆ ಮಾತ್ರ ಅರ್ಥಪೂರ್ಣ; ಹೊಂದಾಣಿಕೆ ಕಂಡುಬರದಿದ್ದರೆ ನೋಟಿಸ್ ಇಲ್ಲ ಎಂದಲ್ಲ. ಎರಡೂ ಸಂದರ್ಭದಲ್ಲಿ ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅವರೊಂದಿಗೆ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
 
     conflictTitle: 'ಎರಡೂ ಪಟ್ಟಿಗಳಲ್ಲಿ ಕಂಡುಬಂದಿದೆ — ಅವು ಭಿನ್ನಾಭಿಪ್ರಾಯ ಹೊಂದಿವೆ',
@@ -353,7 +355,7 @@ function asdRecordFields(rec) {
   ].filter(([, v]) => v !== '' && v != null);
 }
 
-/* [suffix, ac, part, serial, reason, age, gender, name] — see
+/* [suffix, ac, part, serial, reason, age, gender, name, fileId] — see
  * scripts/19-build-notices-data.mjs. `reason` is free text straight from the
  * source PDF (e.g. "Parent Name Mismatch", "NO MAPPING"), not a fixed enum
  * like the ASD reasonCode above — 34 independently-uploaded offices do not
@@ -370,6 +372,13 @@ function noticesRecordFields(rec) {
   ].filter(([, v]) => v !== '' && v != null);
 }
 
+/* Unlike the roll/ASD source links, which are built from a formula against
+ * ECI's own deterministic CDN paths, this dataset's source is 34
+ * independently-uploaded Google Drive files with no predictable URL scheme —
+ * so the file ID travels as data (see 18-extract-notices.py, 19-build-
+ * notices-data.mjs) and the link is just Drive's own viewer URL for it. */
+const noticesPdfUrl = (fileId) => `https://drive.google.com/file/d/${fileId}/view`;
+
 /** A notices hit is layered onto whatever roll/ASD verdict already applies —
  * appended as `extra` on the result card, never its own tone or title. See
  * NOTICES_BASE's comment for why a miss here is never shown at all. */
@@ -377,7 +386,12 @@ function renderNoticesExtra(hit) {
   const box = el('div', 'notices-callout');
   box.append(el('h3', 'panel-heading', t('noticesFoundHeading')));
   box.append(el('p', 'lede', t('noticesFoundLede', { deadline: fmtDate(manifest.claimsCloseAt) })));
-  renderPanel(box, { fields: noticesRecordFields(hit) });
+  const fileId = hit[8];
+  renderPanel(box, {
+    fields: noticesRecordFields(hit),
+    sourceHref: fileId ? noticesPdfUrl(fileId) : null,
+    sourceLabel: fileId ? t('viewNoticesSourcePdf') : null
+  });
   box.append(el('p', 'help', t('noticesCaveat')));
   return box;
 }
