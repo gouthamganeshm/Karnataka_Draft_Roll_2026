@@ -1,0 +1,167 @@
+# Statewide notices-issued import, run entirely on GitHub's runners.
+#
+# Modelled directly on the same author's karnataka-asddo-dashboard
+# (.github/workflows/import.yml) — same underlying problem (per-district
+# Google Drive PDFs, Drive's own anonymous-download throttling), solved
+# there first. See HANDOFF.md's notices section for why this dataset needs
+# this rather than the single-machine approach the roll/ASD datasets use:
+# Drive started serving a sign-in wall after ~10,000 downloads in one run
+# from one IP, confirmed to persist across brand-new local connections.
+# Splitting the pull across many runners (each with a fresh IP, verified
+# directly: see the removed test-drive-access.yml run) sidesteps that.
+#
+# Districts run as a matrix, capped at max-parallel 6 — the same number the
+# reference project settled on after finding that raising it "trades
+# throughput for throttling and 403s". No district here exceeds ~3,300
+# files (Bangalore Urban), comfortably under the ~10,000 that triggered the
+# local block, so a single job should never need Drive to grant it a second
+# wind.
+
+name: Import notices data
+
+on:
+  workflow_dispatch:
+    inputs:
+      districts:
+        description: 'Comma-separated district names to import (matches plan-notices-matrix.mjs), or blank for all'
+        default: ''
+        type: string
+      workers_per_job:
+        description: 'Parallel PDF fetches per runner'
+        default: '6'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      total: ${{ steps.plan.outputs.total }}
+      districts: ${{ steps.plan.outputs.districts }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Crawl the 34 district Drive folders
+        run: node scripts/17-discover-notices.mjs
+
+      - name: Plan the district matrix
+        id: plan
+        env:
+          ONLY_DISTRICTS: ${{ inputs.districts }}
+        run: node scripts/plan-notices-matrix.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notices-manifest
+          path: cache/notices-manifest.json
+          retention-days: 1
+
+  extract:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install pymupdf
+
+      - uses: actions/download-artifact@v4
+        with: { name: notices-manifest, path: cache }
+
+      - name: Extract ${{ matrix.name }} (${{ matrix.files }} PDFs)
+        run: |
+          python scripts/18-extract-notices.py \
+            --district "${{ matrix.name }}" \
+            --workers "${{ inputs.workers_per_job || '6' }}"
+
+      - name: Rows extracted
+        run: wc -l cache/notices-rows/*.jsonl 2>/dev/null || echo "no rows for this district"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notices-rows-${{ matrix.slug }}
+          path: |
+            cache/notices-rows/*.jsonl
+            cache/notices-unresolved.jsonl
+          if-no-files-found: ignore
+          retention-days: 3
+
+  build:
+    needs: [discover, extract]
+    if: always() && needs.discover.result == 'success' && needs.extract.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: notices-rows-*
+          merge-multiple: true
+          path: cache/notices-rows
+
+      - name: Require some fresh rows to build
+        run: |
+          GOT=$(ls cache/notices-rows/*.jsonl 2>/dev/null | wc -l)
+          echo "constituencies with rows: ${GOT}"
+          if [ "$GOT" -eq 0 ]; then
+            echo "::error::No rows extracted — nothing to build."
+            exit 1
+          fi
+
+      - name: Snapshot previous coverage
+        run: cp docs/data-notices/manifest.json /tmp/prev-notices-stats.json 2>/dev/null || echo '{"acs":{}}' > /tmp/prev-notices-stats.json
+
+      - name: Build hash buckets
+        run: node scripts/19-build-notices-data.mjs
+
+      - name: Guard against a collapsed AC
+        run: PREV_STATS=/tmp/prev-notices-stats.json node scripts/guard-notices-coverage.mjs
+
+      - name: Report size
+        run: du -sh docs/data-notices 2>/dev/null || true
+
+      - name: Commit the rebuilt data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data-notices
+          if git diff --cached --quiet; then
+            echo "No change to publish."
+            exit 0
+          fi
+          ROWS=$(node -e 'console.log(require("./docs/data-notices/manifest.json").rows)')
+          ACS=$(node -e 'console.log(require("./docs/data-notices/manifest.json").constituencies)')
+          git commit -m "Import notices data: ${ROWS} rows across ${ACS} constituencies
+
+          ${{ needs.discover.outputs.total }} PDFs discovered across
+          ${{ needs.discover.outputs.districts }} districts. Streamed and
+          parsed on the runner; no PDFs stored."
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt) — rebasing onto origin/main"
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; echo "rebase conflict"; exit 1; }
+            sleep 3
+          done
+          echo "push still failing after 5 attempts"
+          exit 1
