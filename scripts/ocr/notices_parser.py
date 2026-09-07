@@ -125,6 +125,15 @@ def parse_template_a(full_text: str) -> list[NoticeRow]:
         name_parts = []
         age = gender = None
         while i < n:
+            # The header row ("S.No", "Part Serial Number", ...) repeats at
+            # every page break, mid-table — a real PDF confirmed this
+            # directly (AC121 part4, serial 188's own reason text was found
+            # concatenated with a full repeated header before this fix).
+            # "S.No" never appears in real name/reason text, so it is a safe,
+            # exact marker to bail on rather than swallowing the header into
+            # whichever field was being consumed when the page turned.
+            if tokens[i] == 'S.No':
+                break
             if INT_RE.match(tokens[i]) and i + 1 < n and tokens[i + 1] in ('M', 'F'):
                 age = int(tokens[i])
                 gender = tokens[i + 1]
@@ -136,11 +145,17 @@ def parse_template_a(full_text: str) -> list[NoticeRow]:
             i += 1
         name = ' '.join(name_parts).strip()
         reason_parts = []
-        while i < n and not _is_row_anchor(tokens, i):
+        while i < n and not _is_row_anchor(tokens, i) and tokens[i] != 'S.No':
             reason_parts.append(tokens[i])
             i += 1
         reason = ' '.join(reason_parts).strip()
         rows.append(NoticeRow(serial=serial, epic=epic, name=name, reason=reason, age=age, gender=gender))
+        # Skip the repeated header block itself so the outer loop does not
+        # waste time re-scanning it one token at a time before finding the
+        # next real anchor — harmless if there is no header here (skips 0).
+        while i < n and tokens[i] in ('S.No', 'Part Serial Number', 'EPIC Number', 'Elector Name',
+                                       'Age', 'Gender', 'Reason for', 'discrepancy'):
+            i += 1
     return rows
 
 
@@ -159,6 +174,15 @@ def parse_template_b(full_text: str) -> list[NoticeRow]:
         blob_parts = []
         category = None
         while i < n:
+            # Same page-break header repeat as Template A (see its own
+            # comment) — this template's header starts "S.No." (with the
+            # period), not Template A's "S.No". Not confirmed on a real
+            # multi-page Template B file the way Template A's case was, but
+            # AC163 (194 rows, so certainly multi-page) uses this template,
+            # and the failure mode is structurally identical, so guarded the
+            # same way rather than waiting to find it broken live too.
+            if tokens[i] == 'S.No.':
+                break
             if DOB_RE.match(tokens[i]):
                 i += 1  # DOB itself is not stored — age (if present) is more useful and is the row's next token
                 if i < n and re.match(r'^\(\d+\)$', tokens[i]):
@@ -178,6 +202,10 @@ def parse_template_b(full_text: str) -> list[NoticeRow]:
             category = blob_parts.pop()
         name = ' '.join(blob_parts).strip()
         rows.append(NoticeRow(serial=serial, epic=epic, name=name, reason=category or ''))
+        while i < n and tokens[i] in ('S.No.', 'Serial', 'No.', 'EPIC', 'Number', 'Elector Name',
+                                       'Relative Details', 'Mapping', 'Category', 'DOB/Age',
+                                       'Photo', 'Uploaded'):
+            i += 1
     return rows
 
 
