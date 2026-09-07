@@ -55,6 +55,27 @@ const CEO_OFFICIAL_ELECTORS = {
 };
 const CEO_OFFICIAL_TOTAL = 44638124;
 
+/* District-wise "notices to be generated" counts, same press note as above
+ * (Annexure-2) — a different table than CEO_OFFICIAL_ELECTORS, and a
+ * different kind of comparison: this is the CEO's own count of *every*
+ * notice the SIR process generates (discrepancy, no-mapping, and other
+ * reasons together), while this site's notices dataset only ever covers
+ * the "discrepancy and no-mapping" subset those specific PDFs state on
+ * their own first page — so this site reading somewhat under the CEO
+ * total is expected even at full coverage, not just a gap to close. */
+const CEO_OFFICIAL_NOTICES = {
+  'UTTARA KANNADA': 65248, 'B.B.M.P(CENTRAL)': 429311, 'BANGALORE URBAN': 945720,
+  'B.B.M.P(NORTH)': 613266, 'B.B.M.P(SOUTH)': 418043, 'MANDYA': 150112,
+  'DAKSHINA KANNADA': 150125, 'KOLAR': 142181, 'MYSORE': 128183, 'TUMKUR': 111873,
+  'GULBARGA': 105485, 'UDUPI': 97673, 'CHIKKMAGALUR': 91609, 'BELGAUM': 84394,
+  'HASSAN': 79774, 'CHITRADURGA': 68750, 'RAICHUR': 68940, 'HAVERI': 60011,
+  'KODAGU': 58883, 'BANGALORE RURAL': 56349, 'CHIKKABALLAPUR': 55798, 'YADGIR': 55081,
+  'SHIMOGA': 48659, 'DHARWAD': 47938, 'BAGALKOT': 47425, 'BELLARY': 37868,
+  'BIDAR': 32666, 'VIJAYANAGARA': 30622, 'GADAG': 25973, 'BIJAPUR': 24524,
+  'RAMANAGARAM': 19695, 'KOPPAL': 14401, 'CHAMARAJNAGAR': 7480, 'DAVANGERE': 7085
+};
+const CEO_OFFICIAL_NOTICES_TOTAL = Object.values(CEO_OFFICIAL_NOTICES).reduce((a, b) => a + b, 0);
+
 // ---------------------------------------------------------------- i18n
 
 const STRINGS = {
@@ -75,7 +96,8 @@ const STRINGS = {
     districtTitle: 'Import coverage by district',
     districtSub: 'A constituency is only searchable once every one of its booths has been read. Click a column heading to sort.',
     colOfficial: 'CEO official', colOffset: 'vs. official',
-    offsetReasonNote: 'The "CEO official" column is the district-wise elector count from the Chief Electoral Officer\'s press note of 04 September 2026 — a fixed snapshot, shown for comparison only. This site\'s own count runs slightly behind it in every district, for one deliberate reason: where the source page image is too smudged, folded or low-contrast for the OCR reader to form a valid EPIC with confidence, that entry is withheld from search rather than published as a guess. The CEO\'s figure comes from their own source records, not OCR, so it is not subject to the same gap.',
+    colNotices: 'Notices (ours)', colOfficialNotices: 'Notices (CEO)', colNoticesOffset: 'vs. CEO notices',
+    offsetReasonNote: 'The "CEO official" column is the district-wise elector count from the Chief Electoral Officer\'s press note of 04 September 2026 — a fixed snapshot, shown for comparison only. This site\'s own count runs slightly behind it in every district, for one deliberate reason: where the source page image is too smudged, folded or low-contrast for the OCR reader to form a valid EPIC with confidence, that entry is withheld from search rather than published as a guess. The CEO\'s figure comes from their own source records, not OCR, so it is not subject to the same gap. The "Notices" columns compare separately, against the same press note\'s count of every notice the SIR process generated statewide — but this site\'s notices dataset only ever covers the "discrepancy and no-mapping" reason, one category among several the CEO\'s total includes, so running noticeably under 100% there is expected even once every district is fully covered, not just a gap still to close.',
     footerSource: 'Source: the draft electoral roll published by the Chief Electoral Officer, Karnataka for the Special Intensive Revision 2026. This site is an independent, unofficial reformatting of those documents. Always confirm with your BLO or voters.eci.gov.in before acting.',
     footerLink: 'Official draft roll download on voters.eci.gov.in',
     footerCeo: 'Chief Electoral Officer, Karnataka',
@@ -126,6 +148,7 @@ const STRINGS = {
 
     tileElectors: 'Electors indexed', tileAcs: 'Constituencies', tileParts: 'Polling booths',
     tileCoverage: 'vs. CEO official count', tileAsdRows: 'Uncollectable-elector records',
+    tileNoticesRows: 'Notice records', tileNoticesCoverage: 'vs. CEO notices count',
     coverageFull: 'All {parts} booths across {acs} constituencies have been read.',
     coveragePartial: 'Read {done} of {parts} booths ({pct}%). Constituencies still importing cannot be searched, and a “not on the roll” answer is withheld until coverage passes ' + NEGATIVE_VERDICT_COVERAGE + '%.',
     provenance: 'Draft roll published {published}. Data last rebuilt {built}.',
@@ -151,7 +174,8 @@ const STRINGS = {
     districtTitle: 'ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ',
     districtSub: 'ಎಲ್ಲಾ ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಿದ ನಂತರವೇ ಕ್ಷೇತ್ರವನ್ನು ಹುಡುಕಬಹುದು.',
     colOfficial: 'ಸಿಇಒ ಅಧಿಕೃತ', colOffset: 'ಅಧಿಕೃತಕ್ಕೆ ಹೋಲಿಸಿ',
-    offsetReasonNote: '"ಸಿಇಒ ಅಧಿಕೃತ" ಅಂಕಣವು ೦೪ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರ ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ಜಿಲ್ಲಾವಾರು ಎಣಿಕೆ — ಹೋಲಿಕೆಗಾಗಿ ಮಾತ್ರ ತೋರಿಸಲಾಗಿದೆ, ಇದು ಬದಲಾಗುವುದಿಲ್ಲ. ಈ ತಾಣದ ಸ್ವಂತ ಎಣಿಕೆ ಪ್ರತಿ ಜಿಲ್ಲೆಯಲ್ಲಿ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರುತ್ತದೆ, ಏಕೆಂದರೆ ಮೂಲ ಪುಟದ ಚಿತ್ರ ಅಸ್ಪಷ್ಟ ಅಥವಾ ಮಸುಕಾಗಿದ್ದಲ್ಲಿ, ಒಸಿಆರ್ ಊಹಿಸಿ ಪ್ರಕಟಿಸುವ ಬದಲು ಆ ನಮೂದನ್ನು ತಡೆಹಿಡಿಯುತ್ತದೆ. ಸಿಇಒ ಅಂಕಿ ಅವರ ಸ್ವಂತ ಮೂಲ ದಾಖಲೆಗಳಿಂದ ಬಂದಿದೆ, ಒಸಿಆರ್‌ನಿಂದಲ್ಲ.',
+    colNotices: 'ನೋಟಿಸ್ (ನಮ್ಮದು)', colOfficialNotices: 'ನೋಟಿಸ್ (ಸಿಇಒ)', colNoticesOffset: 'ಸಿಇಒ ನೋಟಿಸ್‌ಗೆ ಹೋಲಿಸಿ',
+    offsetReasonNote: '"ಸಿಇಒ ಅಧಿಕೃತ" ಅಂಕಣವು ೦೪ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರ ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ಜಿಲ್ಲಾವಾರು ಎಣಿಕೆ — ಹೋಲಿಕೆಗಾಗಿ ಮಾತ್ರ ತೋರಿಸಲಾಗಿದೆ, ಇದು ಬದಲಾಗುವುದಿಲ್ಲ. ಈ ತಾಣದ ಸ್ವಂತ ಎಣಿಕೆ ಪ್ರತಿ ಜಿಲ್ಲೆಯಲ್ಲಿ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರುತ್ತದೆ, ಏಕೆಂದರೆ ಮೂಲ ಪುಟದ ಚಿತ್ರ ಅಸ್ಪಷ್ಟ ಅಥವಾ ಮಸುಕಾಗಿದ್ದಲ್ಲಿ, ಒಸಿಆರ್ ಊಹಿಸಿ ಪ್ರಕಟಿಸುವ ಬದಲು ಆ ನಮೂದನ್ನು ತಡೆಹಿಡಿಯುತ್ತದೆ. ಸಿಇಒ ಅಂಕಿ ಅವರ ಸ್ವಂತ ಮೂಲ ದಾಖಲೆಗಳಿಂದ ಬಂದಿದೆ, ಒಸಿಆರ್‌ನಿಂದಲ್ಲ. "ನೋಟಿಸ್" ಅಂಕಣಗಳು ಪ್ರತ್ಯೇಕವಾಗಿ, ಅದೇ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ರಾಜ್ಯಾದ್ಯಂತ ಎಸ್‌ಐಆರ್ ಪ್ರಕ್ರಿಯೆ ಸೃಷ್ಟಿಸಿದ ಎಲ್ಲಾ ನೋಟಿಸ್‌ಗಳ ಎಣಿಕೆಗೆ ಹೋಲಿಸುತ್ತವೆ — ಆದರೆ ಈ ತಾಣದ ನೋಟಿಸ್ ದತ್ತಾಂಶ "ಅಸಂಗತತೆ ಮತ್ತು ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ" ಕಾರಣವನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿದೆ, ಸಿಇಒ ಎಣಿಕೆ ಒಳಗೊಂಡ ಹಲವು ವರ್ಗಗಳಲ್ಲಿ ಒಂದು — ಆದ್ದರಿಂದ ಪ್ರತಿ ಜಿಲ್ಲೆ ಪೂರ್ಣವಾಗಿ ಒಳಗೊಂಡ ನಂತರವೂ ೧೦೦%ಗಿಂತ ಗಮನಾರ್ಹವಾಗಿ ಕಡಿಮೆ ಇರುವುದು ನಿರೀಕ್ಷಿತ, ಇನ್ನೂ ಮುಚ್ಚಬೇಕಾದ ಕೊರತೆಯಲ್ಲ.',
     footerSource: 'ಮೂಲ: ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ ಪ್ರಕಟಿಸಿದ ಎಸ್‌ಐಆರ್ ೨೦೨೬ ಕರಡು ಮತದಾರರ ಪಟ್ಟಿ. ಇದು ಅನಧಿಕೃತ ಮರುರಚನೆ. ಕ್ರಮ ಕೈಗೊಳ್ಳುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ voters.eci.gov.in ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
     footerLink: 'voters.eci.gov.in ನಲ್ಲಿ ಅಧಿಕೃತ ಕರಡು ಪಟ್ಟಿ',
     footerCeo: 'ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ',
@@ -202,6 +226,7 @@ const STRINGS = {
 
     tileElectors: 'ಸೂಚಿಸಲಾದ ಮತದಾರರು', tileAcs: 'ಕ್ಷೇತ್ರಗಳು', tileParts: 'ಮತಗಟ್ಟೆಗಳು',
     tileCoverage: 'ಸಿಇಒ ಅಧಿಕೃತ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ', tileAsdRows: 'ಅಸಂಗ್ರಹಿತ-ಮತದಾರ ದಾಖಲೆಗಳು',
+    tileNoticesRows: 'ನೋಟಿಸ್ ದಾಖಲೆಗಳು', tileNoticesCoverage: 'ಸಿಇಒ ನೋಟಿಸ್ ಎಣಿಕೆಗೆ ಹೋಲಿಸಿ',
     coverageFull: '{acs} ಕ್ಷೇತ್ರಗಳ ಎಲ್ಲಾ {parts} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ.',
     coveragePartial: '{parts} ರಲ್ಲಿ {done} ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಲಾಗಿದೆ ({pct}%).',
     provenance: 'ಕರಡು ಪಟ್ಟಿ {published} ರಂದು ಪ್ರಕಟವಾಗಿದೆ. ದತ್ತಾಂಶ {built} ರಂದು ಮರುನಿರ್ಮಿಸಲಾಗಿದೆ.',
@@ -581,6 +606,13 @@ function renderDashboard() {
     [t('tileCoverage'), `${(manifest.electors / CEO_OFFICIAL_TOTAL * 100).toFixed(1)}%`]
   ];
   if (asdManifest) stats.push([t('tileAsdRows'), fmtNum(asdManifest.rows)]);
+  if (noticesManifest) {
+    stats.push([t('tileNoticesRows'), fmtNum(noticesManifest.rows)]);
+    // Against the CEO's full statewide notices total, not a per-district
+    // one — see offsetReasonNote for why this is expected to sit well
+    // under 100% even at full coverage (one reason-category out of several).
+    stats.push([t('tileNoticesCoverage'), `${(noticesManifest.rows / CEO_OFFICIAL_NOTICES_TOTAL * 100).toFixed(1)}%`]);
+  }
   for (const [label, value] of stats) {
     const tile = el('div', 'tile');
     tile.append(el('div', 'tile-value', value), el('div', 'tile-label', label));
@@ -625,10 +657,24 @@ function districtRows() {
     row.electors += a.electors;
     void no;
   }
+  // Notices district names come from seed/ac-metadata.json, itself derived
+  // from this same roll manifest — so they match these district keys
+  // exactly, no fuzzy matching needed the way a hand-typed comparison would.
+  if (noticesManifest) {
+    for (const a of Object.values(noticesManifest.acs)) {
+      const row = by.get(a.district);
+      if (row) row.notices = (row.notices ?? 0) + (a.rows ?? 0);
+    }
+  }
   return [...by.values()].map((r) => {
     const official = CEO_OFFICIAL_ELECTORS[r.district] ?? null;
     const offsetPct = official ? (r.electors / official) * 100 : null;
-    return { ...r, pct: r.parts ? (r.done / r.parts) * 100 : 0, official, offsetPct };
+    const officialNotices = CEO_OFFICIAL_NOTICES[r.district] ?? null;
+    const noticesOffsetPct = officialNotices && r.notices != null ? (r.notices / officialNotices) * 100 : null;
+    return {
+      ...r, pct: r.parts ? (r.done / r.parts) * 100 : 0, official, offsetPct,
+      officialNotices, noticesOffsetPct
+    };
   });
 }
 
@@ -639,6 +685,10 @@ function renderDistrictTable() {
     ['done', t('colDone')], ['electors', t('colElectors')], ['pct', t('colPct')],
     ['official', t('colOfficial')], ['offsetPct', t('colOffset')]
   ];
+  if (noticesManifest) {
+    cols.push(['notices', t('colNotices')], ['officialNotices', t('colOfficialNotices')],
+               ['noticesOffsetPct', t('colNoticesOffset')]);
+  }
   const thead = el('tr');
   for (const [key, label] of cols) {
     const th = el('th', key === sortKey ? 'is-sorted' : null, label);
@@ -674,6 +724,13 @@ function renderDistrictTable() {
       el('td', 'num', r.official != null ? fmtNum(r.official) : '—'),
       el('td', 'num', r.offsetPct != null ? `${r.offsetPct.toFixed(1)}%` : '—')
     );
+    if (noticesManifest) {
+      tr.append(
+        el('td', 'num', r.notices != null ? fmtNum(r.notices) : '—'),
+        el('td', 'num', r.officialNotices != null ? fmtNum(r.officialNotices) : '—'),
+        el('td', 'num', r.noticesOffsetPct != null ? `${r.noticesOffsetPct.toFixed(1)}%` : '—')
+      );
+    }
     body.append(tr);
   }
 }
