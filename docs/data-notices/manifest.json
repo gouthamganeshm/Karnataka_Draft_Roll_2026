@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T06:00:55.775Z",
+  "builtAt": "2026-09-07T06:46:03.843Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 3804605,
-  "constituencies": 149,
+  "rows": 3814935,
+  "constituencies": 154,
   "acs": {
     "2": {
       "name": "Chikkodi-Sadalga",
@@ -13,12 +13,33 @@
       "parts": 255,
       "partsWithData": 204
     },
+    "7": {
+      "name": "Hukkeri",
+      "nameKn": "ಹುಕ್ಕೇರಿ",
+      "district": "BELGAUM",
+      "parts": 234,
+      "partsWithData": 204
+    },
+    "10": {
+      "name": "Yemkanamardi",
+      "nameKn": "ಯಮಕನಮರಡಿ",
+      "district": "BELGAUM",
+      "parts": 243,
+      "partsWithData": 193
+    },
     "11": {
       "name": "Belgaum Uttar",
       "nameKn": "ಬೆಳಗಾವಿ ಉತ್ತರ",
       "district": "BELGAUM",
       "parts": 260,
       "partsWithData": 257
+    },
+    "14": {
+      "name": "Khanapur",
+      "nameKn": "ಖಾನಾಪೂರ",
+      "district": "BELGAUM",
+      "parts": 319,
+      "partsWithData": 204
     },
     "15": {
       "name": "Kittur",
@@ -27,12 +48,19 @@
       "parts": 232,
       "partsWithData": 163
     },
+    "16": {
+      "name": "Bailahongal",
+      "nameKn": "ಬೈಲಹೊಂಗಲ",
+      "district": "BELGAUM",
+      "parts": 225,
+      "partsWithData": 216
+    },
     "17": {
       "name": "Saundatti Yellamma",
       "nameKn": "ಸವದತ್ತಿ ಯಲ್ಲಮ್ಮ",
       "district": "BELGAUM",
       "parts": 238,
-      "partsWithData": 64
+      "partsWithData": 183
     },
     "18": {
       "name": "Ramdurg",
@@ -131,6 +159,13 @@
       "district": "YADGIR",
       "parts": 289,
       "partsWithData": 242
+    },
+    "40": {
+      "name": "Chittapur",
+      "nameKn": "ಚಿತ್ತಾಪೂರ",
+      "district": "GULBARGA",
+      "parts": 263,
+      "partsWithData": 29
     },
     "41": {
       "name": "Sedam",
