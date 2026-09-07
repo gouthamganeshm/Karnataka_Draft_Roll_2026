@@ -21,6 +21,8 @@ as reduced coverage, not as a booth that looks clean because nobody looked.
 
     python scripts/18-extract-notices.py                 # everything found
     python scripts/18-extract-notices.py --limit 50       # a taste
+    python scripts/18-extract-notices.py --pull-size 5000 --cooldown-s 600
+                                                           # pace against Drive's quota
 """
 
 from __future__ import annotations
@@ -122,6 +124,11 @@ def main() -> int:
     ap.add_argument('--limit', type=int)
     ap.add_argument('--district', help='comma-separated, matches 17-discover-notices.mjs district names')
     ap.add_argument('--workers', type=int, default=max(1, (os.cpu_count() or 4) - 1))
+    ap.add_argument('--pull-size', type=int, default=5000,
+                     help='pause for --cooldown-s after this many files, to pace requests against '
+                          "Drive's anonymous-download quota (see DriveRateLimited's docstring) "
+                          'rather than hammering it continuously')
+    ap.add_argument('--cooldown-s', type=int, default=600)
     args = ap.parse_args()
 
     NOTICES_ROWS.mkdir(parents=True, exist_ok=True)
@@ -172,10 +179,23 @@ def main() -> int:
     BATCH_SIZE = 300
     BATCH_TIMEOUT_S = 600
     rate_limited = False
+    since_cooldown = 0  # files completed since the last pull-size pause
     try:
         for batch_start in range(0, len(jobs), BATCH_SIZE):
             if rate_limited:
                 break
+            # Paced pulling: a real cooldown gap every --pull-size files,
+            # not just smaller batches — a fresh pool per 300 files (below)
+            # protects against a wedged worker, but does nothing to space
+            # out *request volume* over time, which is what Drive's quota
+            # actually tracks (see DriveRateLimited's docstring — confirmed
+            # the block persists across brand-new connections/processes, so
+            # only elapsed time with reduced volume is worth trying here).
+            if since_cooldown >= args.pull_size:
+                print(f'  paced {args.pull_size} files this pull — cooling down '
+                      f'{args.cooldown_s}s before continuing')
+                time.sleep(args.cooldown_s)
+                since_cooldown = 0
             batch = jobs[batch_start:batch_start + BATCH_SIZE]
             pool = ProcessPoolExecutor(max_workers=args.workers)
             futures = {pool.submit(do_file, j): j for j in batch}
@@ -183,6 +203,7 @@ def main() -> int:
                 completed_iter = as_completed(futures, timeout=BATCH_TIMEOUT_S)
                 for fut in completed_iter:
                     n += 1
+                    since_cooldown += 1
                     res = fut.result()
 
                     if res.get('rateLimited'):
