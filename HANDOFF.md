@@ -2172,3 +2172,91 @@ Do not run both at once, per the above. Once notices extraction finishes,
 run `node scripts/19-build-notices-data.mjs` to actually publish it to
 `docs/data-notices` — the UI code is already live, it just has no data
 behind it yet.
+
+### Update, same day — moved to GitHub Actions, statewide data now live
+
+User's own prior project, `karnataka-asddo-dashboard`, had already solved
+this exact problem (per-district Google Drive PDFs, Drive's own
+throttling) — pointed to it as a reference rather than reinventing.
+Confirmed empirically first, not assumed: a one-off diagnostic workflow
+(`test-drive-access.yml`, deleted after use) showed 5/5 files that were
+blocked on the local machine succeeded immediately from a fresh Actions
+runner IP. Built `.github/workflows/notices-import.yml` as a discover ->
+extract-matrix -> build pipeline modelled directly on that reference
+project's `import.yml`, at `max-parallel: 6` (the same number they settled
+on after finding higher values "trade throughput for throttling and
+403s") — ported `plan-matrix.mjs` and `guard-district-coverage.mjs` from
+there too (`scripts/plan-notices-matrix.mjs`,
+`scripts/guard-notices-coverage.mjs`).
+
+**Three real bugs found by actually running it, none of them visible from
+reading the code beforehand:**
+
+1. **`19-build-notices-data.mjs` needed `cache/manifest.json`**, which is
+   gitignored and does not exist on a fresh runner. Re-running the roll's
+   own `1-discover.mjs` there to regenerate it was considered and
+   rejected — it hits ECI's CDN with ~2,700 HEAD requests for data that
+   never changes, and risks the exact "runner kept returning 406" block
+   this file's own section 4b documents for a different pipeline.
+   Fixed with a small committed static seed, `seed/ac-metadata.json`
+   (35 KB — just acNumber/name/nameKn/district/partCount, regenerate from
+   `cache/manifest.json` if it ever goes stale), mirroring the reference
+   project's own `seed/manifest.json.gz` fallback pattern. Also needed a
+   `!docs/data-notices/` gitignore exception — the `data-*/` glob was
+   silently swallowing the very thing the build job commits.
+2. **An artifact-path bug silently discarded every extracted row.**
+   `upload-artifact` computes its archive root as the common ancestor of
+   every path it is given; bundling `cache/notices-rows/*.jsonl` with the
+   separate `cache/notices-unresolved.jsonl` in one upload made that
+   ancestor `cache/`, so on download the real row files landed at
+   `cache/notices-rows/notices-rows/*.jsonl` — one level deeper than the
+   build job's flat glob expects. A run that logged "58884 rows written"
+   for Kodagu alone still published "0 rows across 0 constituencies."
+   Fixed by giving the rows and the unresolved log separate, single-root
+   uploads.
+3. **A silent-narrowing bug in discovery itself.** Belgaum, Bellary and
+   Tumkur all came back with 0 PDFs found in the first full statewide run,
+   with no error logged at all — but all three had real files (1,456,
+   703, 866 respectively) confirmed in an earlier, uncontended local run.
+   `embeddedfolderview` returning HTTP 200 with a genuinely empty parse
+   under load is indistinguishable, to the old code, from a real empty
+   folder like Davanagere's. This is exactly the kind of failure
+   `karnataka-asddo-dashboard`'s own history warns about (a district
+   present at the source but missing from the import, with nothing
+   flagging it) — fixed by having `crawlDistrict` re-check up to twice,
+   with a delay, before accepting a 0-file result as final.
+
+**A fourth, different thing was found, not a bug — a real per-runner
+download quota.** One Actions job (Tumkur, on its second attempt) hit the
+exact same Drive sign-in wall the local machine hit after ~10,000
+downloads — proof that spreading the pull across many runner IPs raises
+the ceiling a lot, but does not make it infinite. Handled gracefully
+already (the `DriveRateLimited` fast-stop from earlier the same day) —
+that job's files just stay outstanding for a future run.
+
+**Two districts are not a throttling problem at all.** Hassan and
+Chitradurga's Drive folders returned HTTP 401 across three consecutive
+full statewide re-runs, on `embeddedfolderview` from many different
+Actions runner IPs — and, confirmed directly, from the local machine too
+(a completely fresh IP with zero download history that day). A stable 401
+from every source tested is a genuine access/permissions problem with
+those two specific folders, not rate-limiting, and no amount of retrying
+or IP diversity will fix it. Alongside Davanagere (folder genuinely empty)
+and Koppal (publishes `.zip`/`.rar` instead of PDFs), this is now a
+4-district standing gap — flagged, not silently missing, and worth an
+occasional manual re-check in case the source office fixes the sharing
+setting, but not worth further automated retries.
+
+**State as of this write-up: 154 constituencies, 3,814,935 rows, live in
+`docs/data-notices` on `main`.** Three full statewide re-runs
+(`gh workflow run notices-import.yml`) grew this from 144 -> 149 -> 154
+constituencies with zero regressions each time — the collapse guard
+(`guard-notices-coverage.mjs`) never needed to actually block a publish in
+practice, but the mechanism was exercised for real (a run's build job
+compares against the live-checked-out `docs/data-notices/manifest.json`
+before every rebuild). Re-running the workflow again may recover a little
+more (whichever districts get an unlucky IP this time might not next
+time) but Hassan/Chitradurga will not resolve without the source fixing
+their sharing settings, and Davanagere/Koppal need a different format
+handled entirely (zip/rar extraction, or accepting Davanagere has nothing
+to offer).
