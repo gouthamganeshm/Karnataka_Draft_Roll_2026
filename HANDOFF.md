@@ -2295,3 +2295,77 @@ fail, unlike a Jekyll site). `config.js`'s own comment and
 R2 migration path, built and sitting unused "until the scope grows"
 (section 4b). It has now grown past 1 GB. **User's explicit call: leave
 it as-is for now**, not a decision to revisit without being asked again.
+
+### Source PDF links + two more real bugs found the same way — 2026-09-07
+
+User asked for a source-PDF link on notices results (matching the
+roll/ASD pattern) and reported not seeing it live. Investigating that
+report — not just the missing link, but the actual live data behind
+it — surfaced two unrelated, real bugs, exactly the way this project's
+best findings have kept coming from actually checking rather than
+inspecting code:
+
+1. **Header text bleeding into reason/name fields at page breaks.**
+   `notices_parser.py`'s Template A/B row parsers anchor on the next
+   `(int, int, EPIC)` triple to know where a row ends — but the PDF table
+   header repeats on every new page mid-document, and header tokens don't
+   match that anchor shape, so they were silently swallowed into whichever
+   field was being consumed when the page turned. Confirmed directly:
+   AC121/part4/serial188's `reason` was
+   `"Parent Age Difference <15,Parent Name Mismatch S.No Part Serial
+   Number EPIC Number Elector Name Age Gender Reason for discrepancy"` —
+   the real reason with the next page's entire header appended. Fixed by
+   treating each template's own exact header-start token ("S.No" /
+   "S.No.") as a hard stop. Affected roughly 1 in every 12-15 rows
+   statewide (however many land last on a page) — this is why the fix
+   mattered at the dataset level, not just for one row.
+2. **The build script had no merge capability, so one flaky district
+   blocked every other district's improvement too.** Three Actions runs
+   in a row correctly got refused by `guard-notices-coverage.mjs` because
+   one unrelated district (Bangalore Rural twice, then a single AC within
+   it) came back short — but the *reason* that mattered was that
+   `19-build-notices-data.mjs` did a full rebuild from only that run's
+   fresh rows every time, with no way to carry forward ACs it did not
+   touch. One failure meant "publish nothing," discarding real, safe
+   improvements (the source-link field, the header-bleed fix, newly-
+   recovered districts) to everything else along with it. Fixed with a
+   proper merge build, modelled on `karnataka-asddo-dashboard`'s own
+   `3b-merge-build.mjs`: rebuild fresh only for ACs this run produced rows
+   for, and read every other AC's already-published records straight out
+   of the currently-checked-out `docs/data-notices` to carry forward
+   unchanged — falling back to the old fresh-only behavior (with a loud
+   warning) only in the rare case the shard depth would change between
+   builds, since a bucket record stores a hash suffix, not the EPIC, so it
+   cannot be rehashed into a different-depth prefix without the original.
+   Verified locally end-to-end before trusting it in production: took the
+   real published data, built with a deliberately tiny fresh sample for
+   one AC, and confirmed the touched AC changed, every untouched AC
+   matched byte-for-byte, and the collapse guard still correctly fires on
+   a *touched* AC that comes back smaller.
+
+**Immediate result**: the very next run after the merge fix landed
+published cleanly — **189 constituencies, 4,032,576 rows** (up from 154),
+31 of 34 districts covered (up from a prior best of 29). Both Davanagere
+and Koppal — previously always empty/zip-rar, a standing gap noted
+earlier the same day — now have real content: the source offices
+apparently added PDFs there sometime today. Verified live, not assumed:
+`YNX3762564` (AC121/part4/serial188, the case that surfaced bug #1) now
+resolves with a clean `reason` field and a `fileId` that links to a
+Drive URL confirmed to return 200.
+
+**Correction to the earlier same-day section**: Hassan actually recovered
+and is now published (confirmed by checking the live manifest's district
+list directly, not assumed from an old log) — the "Hassan and
+Chitradurga" pairing noted earlier is now just **Chitradurga and
+Vijayapura**, verified as the only 2 of 34 districts absent from the
+32-district published set (34 minus 32 = 2, checked by exact normalized
+name match, not eyeballed — several published names use slightly
+different spelling than the source list, e.g. "CHIKKMAGALUR" vs
+"Chikkamagalur", which a sloppier comparison miscounted as missing
+too). Both Chitradurga and Vijayapura returned 401 on Drive's folder
+listing across multiple checks earlier the same day — worth re-checking
+whether Vijayapura clears the same way Hassan just did on a future
+re-run, since it was never confirmed as a persistent (any-IP) 401 the way
+Chitradurga specifically was. Everything else should keep recovering
+incrementally on future re-runs now that the merge build means a re-run
+costs nothing even for districts that already succeeded.
