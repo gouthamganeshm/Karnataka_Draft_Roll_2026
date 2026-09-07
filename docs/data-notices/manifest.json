@@ -1,11 +1,18 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T06:46:03.843Z",
+  "builtAt": "2026-09-07T13:57:47.453Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 3814935,
-  "constituencies": 154,
+  "rows": 4032576,
+  "constituencies": 189,
   "acs": {
+    "1": {
+      "name": "Nippani",
+      "nameKn": "ನಿಪ್ಪಾಣಿ",
+      "district": "BELGAUM",
+      "parts": 259,
+      "partsWithData": 196
+    },
     "2": {
       "name": "Chikkodi-Sadalga",
       "nameKn": "ಚಿಕ್ಕೋಡಿ-ಸದಲಗಾ",
@@ -13,12 +20,40 @@
       "parts": 255,
       "partsWithData": 204
     },
+    "3": {
+      "name": "Athani",
+      "nameKn": "ಅಥಣಿ",
+      "district": "BELGAUM",
+      "parts": 270,
+      "partsWithData": 195
+    },
+    "5": {
+      "name": "Kudachi",
+      "nameKn": "ಕುಡಚಿ",
+      "district": "BELGAUM",
+      "parts": 227,
+      "partsWithData": 108
+    },
     "7": {
       "name": "Hukkeri",
       "nameKn": "ಹುಕ್ಕೇರಿ",
       "district": "BELGAUM",
       "parts": 234,
       "partsWithData": 204
+    },
+    "8": {
+      "name": "Arabhavi",
+      "nameKn": "ಅರಭಾವಿ",
+      "district": "BELGAUM",
+      "parts": 290,
+      "partsWithData": 217
+    },
+    "9": {
+      "name": "Gokak",
+      "nameKn": "ಗೋಕಾಕ",
+      "district": "BELGAUM",
+      "parts": 297,
+      "partsWithData": 246
     },
     "10": {
       "name": "Yemkanamardi",
@@ -165,7 +200,7 @@
       "nameKn": "ಚಿತ್ತಾಪೂರ",
       "district": "GULBARGA",
       "parts": 263,
-      "partsWithData": 29
+      "partsWithData": 130
     },
     "41": {
       "name": "Sedam",
@@ -278,6 +313,41 @@
       "district": "RAICHUR",
       "parts": 239,
       "partsWithData": 190
+    },
+    "60": {
+      "name": "Kushtagi",
+      "nameKn": "ಕುಷ್ಟಗಿ",
+      "district": "KOPPAL",
+      "parts": 282,
+      "partsWithData": 169
+    },
+    "61": {
+      "name": "Kanakagiri",
+      "nameKn": "ಕನಕಗಿರಿ",
+      "district": "KOPPAL",
+      "parts": 277,
+      "partsWithData": 174
+    },
+    "62": {
+      "name": "Gangavathi",
+      "nameKn": "ಗಂಗಾವತಿ",
+      "district": "KOPPAL",
+      "parts": 240,
+      "partsWithData": 173
+    },
+    "63": {
+      "name": "Yelburga",
+      "nameKn": "ಯಲಬುರ್ಗಾ",
+      "district": "KOPPAL",
+      "parts": 259,
+      "partsWithData": 235
+    },
+    "64": {
+      "name": "Koppal",
+      "nameKn": "ಕೊಪ್ಪಳ",
+      "district": "KOPPAL",
+      "parts": 294,
+      "partsWithData": 110
     },
     "65": {
       "name": "Shirahatti",
@@ -440,12 +510,68 @@
       "parts": 269,
       "partsWithData": 250
     },
+    "91": {
+      "name": "Kampli",
+      "nameKn": "ಕಂಪ್ಲಿ",
+      "district": "BELLARY",
+      "parts": 253,
+      "partsWithData": 139
+    },
+    "92": {
+      "name": "Siraguppa",
+      "nameKn": "ಸಿರುಗುಪ್ಪ",
+      "district": "BELLARY",
+      "parts": 244,
+      "partsWithData": 173
+    },
     "96": {
       "name": "Kudligi",
       "nameKn": "ಕೂಡ್ಲಿಗಿ",
       "district": "VIJAYANAGARA",
       "parts": 264,
       "partsWithData": 130
+    },
+    "103": {
+      "name": "Jagalur",
+      "nameKn": "ಜಗಳೂರು",
+      "district": "DAVANGERE",
+      "parts": 269,
+      "partsWithData": 119
+    },
+    "105": {
+      "name": "Harihar",
+      "nameKn": "ಹರಿಹರ",
+      "district": "DAVANGERE",
+      "parts": 236,
+      "partsWithData": 153
+    },
+    "106": {
+      "name": "Davanagere North",
+      "nameKn": "ದಾವಣಗೆರೆ ಉತ್ತರ",
+      "district": "DAVANGERE",
+      "parts": 258,
+      "partsWithData": 93
+    },
+    "107": {
+      "name": "Davanagere South",
+      "nameKn": "ದಾವಣಗೆರೆ ದಕ್ಷಿಣ",
+      "district": "DAVANGERE",
+      "parts": 284,
+      "partsWithData": 115
+    },
+    "108": {
+      "name": "Mayakonda",
+      "nameKn": "ಮಾಯಕೊಂಡ",
+      "district": "DAVANGERE",
+      "parts": 248,
+      "partsWithData": 25
+    },
+    "109": {
+      "name": "Channagiri",
+      "nameKn": "ಚನ್ನಗಿರಿ",
+      "district": "DAVANGERE",
+      "parts": 265,
+      "partsWithData": 98
     },
     "111": {
       "name": "Shimoga Rural",
@@ -460,6 +586,13 @@
       "district": "SHIMOGA",
       "parts": 257,
       "partsWithData": 162
+    },
+    "113": {
+      "name": "Shimoga",
+      "nameKn": "ಶಿವಮೊಗ್ಗ",
+      "district": "SHIMOGA",
+      "parts": 297,
+      "partsWithData": 177
     },
     "114": {
       "name": "Tirthahalli",
@@ -551,6 +684,69 @@
       "district": "CHIKKMAGALUR",
       "parts": 254,
       "partsWithData": 241
+    },
+    "129": {
+      "name": "Tiptur",
+      "nameKn": "ತಿಪಟೂರು",
+      "district": "TUMKUR",
+      "parts": 232,
+      "partsWithData": 221
+    },
+    "130": {
+      "name": "Turuvekere",
+      "nameKn": "ತುರುವೇಕೆರೆ",
+      "district": "TUMKUR",
+      "parts": 229,
+      "partsWithData": 200
+    },
+    "132": {
+      "name": "Tumkur City",
+      "nameKn": "ತುಮಕೂರು ನಗರ",
+      "district": "TUMKUR",
+      "parts": 247,
+      "partsWithData": 236
+    },
+    "133": {
+      "name": "Tumkur Rural",
+      "nameKn": "ತುಮಕೂರು ಗ್ರಾಮಾಂತರ",
+      "district": "TUMKUR",
+      "parts": 238,
+      "partsWithData": 221
+    },
+    "134": {
+      "name": "Koratagere",
+      "nameKn": "ಕೊರಟಗೆರೆ",
+      "district": "TUMKUR",
+      "parts": 256,
+      "partsWithData": 59
+    },
+    "135": {
+      "name": "Gubbi",
+      "nameKn": "ಗುಬ್ಬಿ",
+      "district": "TUMKUR",
+      "parts": 222,
+      "partsWithData": 175
+    },
+    "136": {
+      "name": "Sira",
+      "nameKn": "ಶಿರಾ",
+      "district": "TUMKUR",
+      "parts": 282,
+      "partsWithData": 265
+    },
+    "137": {
+      "name": "Pavagada",
+      "nameKn": "ಪಾವಗಡ",
+      "district": "TUMKUR",
+      "parts": 251,
+      "partsWithData": 177
+    },
+    "138": {
+      "name": "Madhugiri",
+      "nameKn": "ಮಧುಗಿರಿ",
+      "district": "TUMKUR",
+      "parts": 248,
+      "partsWithData": 238
     },
     "139": {
       "name": "Gauribidanur",
@@ -908,6 +1104,55 @@
       "district": "MANDYA",
       "parts": 276,
       "partsWithData": 253
+    },
+    "193": {
+      "name": "Shravanabelagola",
+      "nameKn": "ಶ್ರವಣಬೆಳಗೊಳ",
+      "district": "HASSAN",
+      "parts": 272,
+      "partsWithData": 238
+    },
+    "194": {
+      "name": "Arsikere",
+      "nameKn": "ಅರಸೀಕೆರೆ",
+      "district": "HASSAN",
+      "parts": 281,
+      "partsWithData": 68
+    },
+    "195": {
+      "name": "Belur",
+      "nameKn": "ಬೇಲೂರು",
+      "district": "HASSAN",
+      "parts": 276,
+      "partsWithData": 232
+    },
+    "196": {
+      "name": "Hassan",
+      "nameKn": "ಹಾಸನ",
+      "district": "HASSAN",
+      "parts": 282,
+      "partsWithData": 280
+    },
+    "197": {
+      "name": "Holenarasipur",
+      "nameKn": "ಹೊಳೇನರಸೀಪುರ",
+      "district": "HASSAN",
+      "parts": 330,
+      "partsWithData": 316
+    },
+    "198": {
+      "name": "Arakalgud",
+      "nameKn": "ಅರಕಲಗೂಡು",
+      "district": "HASSAN",
+      "parts": 292,
+      "partsWithData": 281
+    },
+    "199": {
+      "name": "Sakaleshpur",
+      "nameKn": "ಸಕಲೇಶಪುರ",
+      "district": "HASSAN",
+      "parts": 295,
+      "partsWithData": 247
     },
     "200": {
       "name": "Belthangady",
