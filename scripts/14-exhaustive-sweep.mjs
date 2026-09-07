@@ -203,9 +203,22 @@ for e in wanted:
     })
 print(json.dumps(out))
 `;
-  const r = await spawnAsync('python', ['-c', script], buf);
+  // Retried, unlike the single-shot call this used to be: a burst of 8
+  // unrelated booths all failed with "tesseract.exe returned non-zero exit
+  // status 1" at the exact same instant during a real sweep at concurrency
+  // 16 — a transient subprocess-spawn contention under load, not a real
+  // parse failure (3 of the 8 spot-checked individually afterward, outside
+  // that contention, all read correctly on the first try; not all 8 were
+  // checked). The PDF fetch a few lines above already retries for exactly
+  // this class of reason; this call never did.
+  let r;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    r = await spawnAsync('python', ['-c', script], buf);
+    if (r.status === 0) break;
+    if (attempt < 3) await new Promise((res) => setTimeout(res, 1000 * attempt));
+  }
   if (r.status !== 0) {
-    const reason = `python exit ${r.status}: ${r.stderr?.toString().slice(-300)}`;
+    const reason = `python exit ${r.status} after 3 tries: ${r.stderr?.toString().slice(-300)}`;
     return rows.map((row) => ({ row, ok: false, reason }));
   }
   let parsed;
