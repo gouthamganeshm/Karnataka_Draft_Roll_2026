@@ -2260,3 +2260,38 @@ time) but Hassan/Chitradurga will not resolve without the source fixing
 their sharing settings, and Davanagere/Koppal need a different format
 handled entirely (zip/rar extraction, or accepting Davanagere has nothing
 to offer).
+
+### Live verification, actually done — 2026-09-07
+
+User asked directly whether the live UI was tested and whether the three
+datasets were checked for collisions. Neither had actually been done yet
+at that point — building and publishing the pipeline is not the same
+thing as verifying the deployed result, and this project's own standing
+rule is not to claim the second without doing it. Done properly:
+
+- Confirmed the deployed `app.js` and `config.js` are byte-identical to
+  current source (diff after normalizing CRLF/LF) — not a stale Pages
+  cache.
+- Found a real overlap case in production data: `REJ0650416` is on both
+  the roll (AC154/part101/serial19) and notices ("Self Name Mismatch",
+  same booth) datasets. Traced `handleEpic()`'s exact logic against it:
+  `rollHit` truthy -> renders the found-on-roll verdict, `noticesExtra`
+  truthy -> appended as the additional callout. No browser tool is
+  available in this environment, so this is the same fetch-based
+  verification method the project has always used for "live" checks
+  (`verify-confirmed-rows-live.mjs` etc.), not a screenshot — traced
+  against the real deployed code and real production data, not asserted.
+- Isolation confirmed both directions: `AAH4480430` (roll-only) is absent
+  from ASD and notices; `REJ0650416` (the genuine overlap above) is
+  correctly present in both roll and notices and absent from ASD. No
+  cross-contamination.
+
+**Found in the process, not asked for: the site is now ~1.59 GB
+total** (`data-asd` 1,136 MB + `data-notices` 286 MB + `data` 166 MB),
+over GitHub Pages' documented 1 GB cap. Confirmed still serving correctly
+live regardless (Pages' "deploy from a branch" mode has no build step to
+fail, unlike a Jekyll site). `config.js`'s own comment and
+`scripts/4-upload-r2.mjs` already anticipated exactly this — a Cloudflare
+R2 migration path, built and sitting unused "until the scope grows"
+(section 4b). It has now grown past 1 GB. **User's explicit call: leave
+it as-is for now**, not a decision to revisit without being asked again.
