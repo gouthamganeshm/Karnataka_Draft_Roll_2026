@@ -1,11 +1,46 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T05:16:38.336Z",
+  "builtAt": "2026-09-07T06:00:55.775Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 3767493,
-  "constituencies": 144,
+  "rows": 3804605,
+  "constituencies": 149,
   "acs": {
+    "2": {
+      "name": "Chikkodi-Sadalga",
+      "nameKn": "ಚಿಕ್ಕೋಡಿ-ಸದಲಗಾ",
+      "district": "BELGAUM",
+      "parts": 255,
+      "partsWithData": 204
+    },
+    "11": {
+      "name": "Belgaum Uttar",
+      "nameKn": "ಬೆಳಗಾವಿ ಉತ್ತರ",
+      "district": "BELGAUM",
+      "parts": 260,
+      "partsWithData": 257
+    },
+    "15": {
+      "name": "Kittur",
+      "nameKn": "ಕಿತ್ತೂರು",
+      "district": "BELGAUM",
+      "parts": 232,
+      "partsWithData": 163
+    },
+    "17": {
+      "name": "Saundatti Yellamma",
+      "nameKn": "ಸವದತ್ತಿ ಯಲ್ಲಮ್ಮ",
+      "district": "BELGAUM",
+      "parts": 238,
+      "partsWithData": 64
+    },
+    "18": {
+      "name": "Ramdurg",
+      "nameKn": "ರಾಮದುರ್ಗ",
+      "district": "BELGAUM",
+      "parts": 252,
+      "partsWithData": 148
+    },
     "19": {
       "name": "Mudhol",
       "nameKn": "ಮುಧೋಳ",
