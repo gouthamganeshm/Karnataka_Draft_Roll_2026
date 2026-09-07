@@ -17,3 +17,7 @@ __pycache__/
 # for why), and its name happens to match the `data-*/` glob above, so it
 # needs its own explicit negation or it would be silently untracked.
 !docs/data-asd/
+
+# Third sibling tree, notices dataset (see scripts/19-build-notices-data.mjs).
+# Same reasoning, same need for an explicit negation.
+!docs/data-notices/

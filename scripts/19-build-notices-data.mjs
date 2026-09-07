@@ -50,9 +50,19 @@ const bucketPath = (prefix) => (prefix.length > 2
 
 const sortBySuffix = (a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
 
-const manifestIn = await readJson(resolve(CACHE, 'manifest.json'));
+// A committed static seed (seed/ac-metadata.json), not cache/manifest.json.
+// This script only ever needs each AC's name/nameKn/district and its total
+// part count — static facts that do not change run to run — never the
+// per-part detail the roll's own manifest carries. cache/manifest.json is
+// gitignored and simply does not exist on a fresh GitHub Actions runner,
+// which is exactly where this script needs to run (see the notices-import
+// workflow's build job); re-running the roll's own 1-discover.mjs there to
+// get it would hit ECI's CDN with ~2,700 HEAD requests per build for data
+// that never changes, and risks the exact "runner kept returning 406" block
+// documented in HANDOFF.md section 4b for a completely unrelated pipeline.
+const manifestIn = await readJson(resolve(ROOT, 'seed', 'ac-metadata.json'));
 if (!manifestIn) {
-  log('cache/manifest.json missing. Run `npm run discover` first.');
+  log('seed/ac-metadata.json missing. Regenerate it from cache/manifest.json (see HANDOFF.md).');
   process.exit(1);
 }
 
@@ -156,7 +166,7 @@ for (const ac of manifestIn.constituencies) {
   acCount++;
   acs[ac.acNumber] = {
     name: ac.name, nameKn: ac.nameKn, district: ac.district,
-    parts: ac.parts.length, partsWithData: stat.partsWithData
+    parts: ac.parts, partsWithData: stat.partsWithData
   };
 }
 
