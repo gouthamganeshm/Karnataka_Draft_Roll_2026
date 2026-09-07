@@ -47,8 +47,13 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
 
-      - name: Crawl the 34 district Drive folders
-        run: node scripts/17-discover-notices.mjs
+      - name: Crawl the district Drive folders
+        run: |
+          if [ -n "${{ inputs.districts }}" ]; then
+            node scripts/17-discover-notices.mjs --district "${{ inputs.districts }}"
+          else
+            node scripts/17-discover-notices.mjs
+          fi
 
       - name: Plan the district matrix
         id: plan

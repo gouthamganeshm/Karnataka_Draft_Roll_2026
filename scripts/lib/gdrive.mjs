@@ -30,8 +30,17 @@ const UA =
 const ENTRY_RE =
   /href="https:\/\/drive\.google\.com\/(drive\/folders|file\/d)\/([A-Za-z0-9_-]+)[^"]*"[^>]*>[\s\S]{0,900}?flip-entry-title">([^<]+)</g;
 
-/** One folder's immediate children. `kind` is 'folder' or 'file'. */
-export async function listFolder(folderId, { tries = 4 } = {}) {
+/** One folder's immediate children. `kind` is 'folder' or 'file'.
+ *
+ * A full 34-district crawl in one job measured a handful of `401
+ * Unauthorized` responses on `embeddedfolderview` itself (not the download
+ * endpoint's sign-in wall — a softer, separate throttle on folder listing),
+ * on 3 of 34 districts in one run. Longer backoff (up to ~36s on the last of
+ * 6 tries, vs. 4 tries / ~9s before) gives that window more room to clear;
+ * a district that still fails after that is reported as a crawl failure by
+ * the caller (`17-discover-notices.mjs`), not silently dropped — see
+ * `plan-notices-matrix.mjs`'s `::warning::` for each one. */
+export async function listFolder(folderId, { tries = 6 } = {}) {
   let lastErr;
   for (let attempt = 1; attempt <= tries; attempt++) {
     try {
@@ -51,7 +60,7 @@ export async function listFolder(folderId, { tries = 4 } = {}) {
       return entries;
     } catch (err) {
       lastErr = err;
-      if (attempt < tries) await sleep(1000 * attempt * attempt);
+      if (attempt < tries) await sleep(1500 * attempt * attempt);
     }
   }
   throw new Error(`listFolder(${folderId}) failed after ${tries} tries: ${lastErr?.message}`);

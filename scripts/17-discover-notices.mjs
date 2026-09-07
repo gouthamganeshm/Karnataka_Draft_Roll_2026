@@ -124,7 +124,12 @@ async function main() {
   );
   log(`Discovering notices data for ${districts.length} district(s)...`);
 
-  const results = await pool(districts, 4, async (district) => {
+  // Kept modest on purpose: the 401s documented in gdrive.mjs's listFolder
+  // comment showed up at concurrency 4, and this is a burst-sensitive
+  // endpoint, not a total-volume one — the download quota needed ~10,000
+  // files, this needed a handful of districts' worth of simultaneous
+  // listings.
+  const results = await pool(districts, 2, async (district) => {
     const rootId = DISTRICT_FOLDERS[district];
     try {
       const { files } = await crawlDistrict(district, rootId);
