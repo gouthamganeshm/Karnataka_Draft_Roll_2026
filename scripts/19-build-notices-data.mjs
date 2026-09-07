@@ -177,6 +177,7 @@ await mkdir(resolve(NOTICES_DATA, 'roll'), { recursive: true });
 for (const file of rowFiles) {
   const acNo = +file.replace('.jsonl', '');
   const partsWithData = new Set();
+  let acRows = 0;
 
   const rl = createInterface({ input: createReadStream(resolve(NOTICES_ROWS, file)), crlfDelay: Infinity });
   for await (const line of rl) {
@@ -209,10 +210,16 @@ for (const file of rowFiles) {
     ]);
 
     partsWithData.add(partNo);
+    acRows++;
     if (++built % 100000 === 0) progress(`  ${built}/${total}`);
   }
 
-  acStats[acNo] = { rows: [...partsWithData].length ? electors : 0, partsWithData: partsWithData.size };
+  // `rows` used to reuse the running global `electors` counter here — a
+  // leftover that happened to be harmless only because nothing read it
+  // (the manifest's per-AC output never included this field until now).
+  // Fixed alongside actually exposing it, rather than shipping a field
+  // that was wrong from the moment anything started using it.
+  acStats[acNo] = { rows: acRows, partsWithData: partsWithData.size };
 }
 progress('');
 
@@ -223,9 +230,16 @@ progress('');
 // shard depth changed — see `canMerge` above.
 let preserved = 0;
 if (canMerge) {
+  const preservedRowCountByAc = new Map();
+  for (const records of oldByPrefix.values()) {
+    for (const r of records) {
+      if (!preservedAcs.includes(r[1])) continue;
+      preservedRowCountByAc.set(r[1], (preservedRowCountByAc.get(r[1]) ?? 0) + 1);
+    }
+  }
   for (const ac of preservedAcs) {
     const parts = oldAcParts.get(ac) ?? new Set();
-    acStats[ac] = { rows: 0, partsWithData: parts.size };
+    acStats[ac] = { rows: preservedRowCountByAc.get(ac) ?? 0, partsWithData: parts.size };
   }
   for (const [prefix, records] of oldByPrefix) {
     const keep = records.filter((r) => preservedAcs.includes(r[1]));
@@ -260,7 +274,7 @@ for (const ac of manifestIn.constituencies) {
   acCount++;
   acs[ac.acNumber] = {
     name: ac.name, nameKn: ac.nameKn, district: ac.district,
-    parts: ac.parts, partsWithData: stat.partsWithData
+    parts: ac.parts, partsWithData: stat.partsWithData, rows: stat.rows
   };
 }
 
