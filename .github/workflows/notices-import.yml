@@ -95,12 +95,28 @@ jobs:
       - name: Rows extracted
         run: wc -l cache/notices-rows/*.jsonl 2>/dev/null || echo "no rows for this district"
 
+      # Two separate uploads, not one with two path lines: upload-artifact
+      # computes the archive root as the common ancestor of every path given
+      # to it, so mixing cache/notices-rows/*.jsonl with cache/notices-
+      # unresolved.jsonl (common ancestor cache/) nested the actual row
+      # files one directory deeper than expected on download — the build
+      # job's flat `cache/notices-rows/*.jsonl` glob then saw only the
+      # unresolved log and silently missed every real row (confirmed the
+      # hard way: a run that reported "58884 rows written" for Kodagu alone
+      # still published "0 rows across 0 constituencies"). Each upload here
+      # has one glob root, so each downloads back to exactly where it came
+      # from.
       - uses: actions/upload-artifact@v4
         with:
           name: notices-rows-${{ matrix.slug }}
-          path: |
-            cache/notices-rows/*.jsonl
-            cache/notices-unresolved.jsonl
+          path: cache/notices-rows/*.jsonl
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notices-unresolved-${{ matrix.slug }}
+          path: cache/notices-unresolved.jsonl
           if-no-files-found: ignore
           retention-days: 3
 
