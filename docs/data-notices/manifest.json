@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-08T12:43:01.306Z",
+  "builtAt": "2026-09-08T18:34:24.048Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4141087,
-  "constituencies": 198,
+  "rows": 4209467,
+  "constituencies": 204,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -661,6 +661,54 @@
       "parts": 264,
       "partsWithData": 130,
       "rows": 1804
+    },
+    "97": {
+      "name": "Molakalmuru",
+      "nameKn": "ಮೊಳಕಾಲ್ಮೂರು",
+      "district": "CHITRADURGA",
+      "parts": 311,
+      "partsWithData": 200,
+      "rows": 4448
+    },
+    "98": {
+      "name": "Challakere",
+      "nameKn": "ಚಳ್ಳಕೆರೆ",
+      "district": "CHITRADURGA",
+      "parts": 278,
+      "partsWithData": 206,
+      "rows": 7772
+    },
+    "99": {
+      "name": "Chitradurga",
+      "nameKn": "ಚಿತ್ರದುರ್ಗ",
+      "district": "CHITRADURGA",
+      "parts": 302,
+      "partsWithData": 290,
+      "rows": 30022
+    },
+    "100": {
+      "name": "Hiriyur",
+      "nameKn": "ಹಿರಿಯೂರು",
+      "district": "CHITRADURGA",
+      "parts": 300,
+      "partsWithData": 271,
+      "rows": 9592
+    },
+    "101": {
+      "name": "Hosadurga",
+      "nameKn": "ಹೊಸದುರ್ಗ",
+      "district": "CHITRADURGA",
+      "parts": 258,
+      "partsWithData": 186,
+      "rows": 5326
+    },
+    "102": {
+      "name": "Holalkere",
+      "nameKn": "ಹೊಳಲ್ಕೆರೆ",
+      "district": "CHITRADURGA",
+      "parts": 315,
+      "partsWithData": 242,
+      "rows": 11220
     },
     "103": {
       "name": "Jagalur",
