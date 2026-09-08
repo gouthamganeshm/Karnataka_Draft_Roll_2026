@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-07T16:24:36.826Z",
+  "builtAt": "2026-09-08T07:28:22.436Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4032576,
-  "constituencies": 189,
+  "rows": 4076413,
+  "constituencies": 193,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -77,6 +77,14 @@
       "parts": 260,
       "partsWithData": 257,
       "rows": 24368
+    },
+    "12": {
+      "name": "Belgaum Dakshin",
+      "nameKn": "ಬೆಳಗಾವಿ  ದಕ್ಷಿಣ",
+      "district": "BELGAUM",
+      "parts": 260,
+      "partsWithData": 220,
+      "rows": 8668
     },
     "14": {
       "name": "Khanapur",
@@ -325,6 +333,14 @@
       "parts": 260,
       "partsWithData": 196,
       "rows": 4967
+    },
+    "54": {
+      "name": "Raichur",
+      "nameKn": "ರಾಯಚೂರು",
+      "district": "RAICHUR",
+      "parts": 254,
+      "partsWithData": 223,
+      "rows": 20682
     },
     "56": {
       "name": "Devadurga",
@@ -598,6 +614,14 @@
       "partsWithData": 173,
       "rows": 9958
     },
+    "94": {
+      "name": "Bellary City",
+      "nameKn": "ಬಳ್ಳಾರಿ ನಗರ",
+      "district": "BELLARY",
+      "parts": 261,
+      "partsWithData": 171,
+      "rows": 7762
+    },
     "96": {
       "name": "Kudligi",
       "nameKn": "ಕೂಡ್ಲಿಗಿ",
@@ -781,6 +805,14 @@
       "parts": 254,
       "partsWithData": 241,
       "rows": 21592
+    },
+    "128": {
+      "name": "Chikknayakanhalli",
+      "nameKn": "ಚಿಕ್ಕನಾಯಕನಹಳ್ಳಿ",
+      "district": "TUMKUR",
+      "parts": 270,
+      "partsWithData": 257,
+      "rows": 6725
     },
     "129": {
       "name": "Tiptur",
