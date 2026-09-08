@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-08T07:28:22.436Z",
+  "builtAt": "2026-09-08T12:43:01.306Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4076413,
-  "constituencies": 193,
+  "rows": 4141087,
+  "constituencies": 198,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -211,8 +211,8 @@
       "nameKn": "ಶಹಾಪೂರ",
       "district": "YADGIR",
       "parts": 275,
-      "partsWithData": 159,
-      "rows": 6307
+      "partsWithData": 161,
+      "rows": 6338
     },
     "38": {
       "name": "Yadgir",
@@ -334,6 +334,14 @@
       "partsWithData": 196,
       "rows": 4967
     },
+    "53": {
+      "name": "Raichur Rural",
+      "nameKn": "ರಾಯಚೂರು ಗ್ರಾಮಾಂತರ",
+      "district": "RAICHUR",
+      "parts": 278,
+      "partsWithData": 168,
+      "rows": 13176
+    },
     "54": {
       "name": "Raichur",
       "nameKn": "ರಾಯಚೂರು",
@@ -341,6 +349,14 @@
       "parts": 254,
       "partsWithData": 223,
       "rows": 20682
+    },
+    "55": {
+      "name": "Manvi",
+      "nameKn": "ಮಾನ್ವಿ",
+      "district": "RAICHUR",
+      "parts": 280,
+      "partsWithData": 203,
+      "rows": 17606
     },
     "56": {
       "name": "Devadurga",
@@ -614,6 +630,14 @@
       "partsWithData": 173,
       "rows": 9958
     },
+    "93": {
+      "name": "Bellary",
+      "nameKn": "ಬಳ್ಳಾರಿ",
+      "district": "BELLARY",
+      "parts": 238,
+      "partsWithData": 220,
+      "rows": 12490
+    },
     "94": {
       "name": "Bellary City",
       "nameKn": "ಬಳ್ಳಾರಿ ನಗರ",
@@ -621,6 +645,14 @@
       "parts": 261,
       "partsWithData": 171,
       "rows": 7762
+    },
+    "95": {
+      "name": "Sandur",
+      "nameKn": "ಸಂಡೂರು",
+      "district": "BELLARY",
+      "parts": 264,
+      "partsWithData": 148,
+      "rows": 2864
     },
     "96": {
       "name": "Kudligi",
@@ -797,6 +829,14 @@
       "parts": 270,
       "partsWithData": 267,
       "rows": 30761
+    },
+    "126": {
+      "name": "Tarikere",
+      "nameKn": "ತರೀಕೆರೆ",
+      "district": "CHIKKMAGALUR",
+      "parts": 237,
+      "partsWithData": 224,
+      "rows": 18507
     },
     "127": {
       "name": "Kadur",
