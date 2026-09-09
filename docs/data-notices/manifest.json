@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-08T18:34:24.048Z",
+  "builtAt": "2026-09-09T04:52:56.729Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4209467,
-  "constituencies": 204,
+  "rows": 4210491,
+  "constituencies": 205,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -757,6 +757,14 @@
       "parts": 265,
       "partsWithData": 98,
       "rows": 719
+    },
+    "110": {
+      "name": "Honnali",
+      "nameKn": "ಹೊನ್ನಾಳಿ",
+      "district": "DAVANGERE",
+      "parts": 248,
+      "partsWithData": 160,
+      "rows": 1024
     },
     "111": {
       "name": "Shimoga Rural",
