@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-09T06:15:47.696Z",
+  "builtAt": "2026-09-09T12:41:51.557Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4210491,
-  "constituencies": 205,
+  "rows": 4252085,
+  "constituencies": 208,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -1139,8 +1139,8 @@
       "nameKn": "ಹೆಬ್ಬಾಳ",
       "district": "B.B.M.P(NORTH)",
       "parts": 285,
-      "partsWithData": 285,
-      "rows": 76076
+      "partsWithData": 284,
+      "rows": 75782
     },
     "159": {
       "name": "Pulakeshinagar",
@@ -1294,6 +1294,14 @@
       "partsWithData": 383,
       "rows": 69990
     },
+    "178": {
+      "name": "Hosakote",
+      "nameKn": "ಹೊಸಕೋಟೆ",
+      "district": "BANGALORE RURAL",
+      "parts": 298,
+      "partsWithData": 283,
+      "rows": 13703
+    },
     "179": {
       "name": "Devanahalli",
       "nameKn": "ದೇವನಹಳ್ಳಿ",
@@ -1301,6 +1309,22 @@
       "parts": 296,
       "partsWithData": 274,
       "rows": 14055
+    },
+    "180": {
+      "name": "Doddaballapur",
+      "nameKn": "ದೊಡ್ಡಬಳ್ಳಾಪುರ",
+      "district": "BANGALORE RURAL",
+      "parts": 279,
+      "partsWithData": 263,
+      "rows": 14317
+    },
+    "181": {
+      "name": "Nelamangala",
+      "nameKn": "ನೆಲಮಂಗಲ",
+      "district": "BANGALORE RURAL",
+      "parts": 281,
+      "partsWithData": 254,
+      "rows": 13868
     },
     "182": {
       "name": "Magadi",
