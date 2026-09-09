@@ -2369,3 +2369,118 @@ re-run, since it was never confirmed as a persistent (any-IP) 401 the way
 Chitradurga specifically was. Everything else should keep recovering
 incrementally on future re-runs now that the merge build means a re-run
 costs nothing even for districts that already succeeded.
+
+### Tumkur re-extracted; Bangalore Rural's instability finally explained — 2026-09-07 evening
+
+User asked to re-run Tumkur and Bangalore Rural specifically (run
+`34141878270`, `-f districts="Tumkur,Bangalore Rural" -f
+workers_per_job=6`). Outcome:
+
+- **Tumkur**: 1,971 PDFs found and extracted cleanly, merged in. Guard
+  passed (no AC below 70%, state total above 90% of last build), 189
+  constituencies still represented, **4,032,576 rows** published (same
+  total as before — expected, since merge-build only rewrites the ACs a
+  run actually touched; commit `67c642403` changed exactly 25 bucket
+  files, consistent with Tumkur's own AC set and nothing else).
+- **Bangalore Rural**: excluded from the extract matrix entirely — the
+  discover job's retry-on-empty logic (added earlier this session) fired
+  twice and still got 0 PDFs both times:
+  ```
+  Bangalore Rural: came back empty, re-checking (attempt 2)...
+  Bangalore Rural: came back empty, re-checking (attempt 3)...
+  Bangalore Rural: 0 PDF(s) found
+  ```
+
+**Root cause chased down directly, not assumed.** Fetched Bangalore
+Rural's top-level Drive folder (`1bzoI2GxURGOtLvqVc8o0jAyoNvJ0Zhgw`) by
+hand: still the correct folder (`<title>SIR - Bangalore Rural List of
+persons whom notices have been issued</title>`), but its only child is a
+folder literally named "Untitled folder"
+(`1XkB9TmUlaxqldvD2znUT-slrpJ1l0oAN`). Fetched that subfolder's own
+listing directly and it is **genuinely, currently empty** — confirmed by
+the raw HTML: `<div class="flip-entries"></div>` with zero child
+elements, not a parse failure or a rate-limit page.
+
+This is a **different failure shape** from the four confirmed-permanent
+gaps (Belgaum, Vijayanagara, Bellary, Raichur — folders that were never
+populated at all). Bangalore Rural's own discovery history this session
+went **274 -> 561 -> 0** files across three separate checks, i.e. it had
+real content twice before going empty. Read together with today's
+"Untitled folder" name and its emptiness, the most likely explanation is
+the district office is mid-reorganization (renaming/moving the folder,
+temporarily emptying it in the process) rather than a pipeline bug on our
+side — the crawler and the retry-on-empty logic both behaved correctly
+against what Drive is actually serving right now. **Recommend**: leave
+Bangalore Rural out of the next few runs and re-check in a few days
+rather than retrying immediately, since nothing will change until the
+source folder is repopulated. Not marked as a fifth permanent gap
+alongside Belgaum/Vijayanagara/Bellary/Raichur — those are stable-empty,
+this one is actively changing.
+
+### Full statewide re-run — Belgaum/Bellary/Raichur/Vijayanagara were
+### NOT permanent gaps after all — 2026-09-08
+
+User asked for a manual AC-level spot check on Hassan first (see below),
+then a full 34-district re-run, with a live Drive presence check before
+triggering it rather than discovering failures only after a 45-minute
+run.
+
+**Pre-check (direct `listFolder` against all 34 district root folders,
+concurrency 3):** 31 reachable, 3 failed — Chitradurga (401), Shimoga
+(401), Vijayapura (404). Retried each of the 3 individually with spacing
+to rule out concurrency-induced rate-limiting: all three failed again,
+confirming genuine persistent failures, not transient throttling.
+**Shimoga is a new failure** — it was not in the previously-documented
+gap list (only Chitradurga and Vijayapura were known-bad as of the prior
+session). Vijayapura's 404 (vs. 401 for the other two) is a different
+failure mode — a 404 on `embeddedfolderview` suggests the folder ID
+itself may no longer resolve, not just a listing-endpoint throttle.
+
+**Full run result** (workflow `34195384162`, all districts,
+`workers_per_job=6`): 30 of 34 districts made it into the extract matrix
+(Chitradurga/Shimoga/Vijayapura errored at discovery, Bangalore Rural
+silently returned 0 files as already documented above). Guard passed —
+**4,076,413 rows across 193 constituencies** (up from 4,032,576 / 189),
+185 constituencies got fresh rows this run, 8 untouched ACs (61,454 rows)
+carried forward unchanged. Commit `6bb9c39ef`, pushed on attempt 1.
+
+**The 8 untouched ACs are exactly Shimoga's 7 ACs (111-117) plus
+Bangalore Rural's Devanahalli (AC179)** — confirmed by cross-referencing
+the roll manifest's district lists, not assumed. This means today's new
+Shimoga failure cost nothing: its data from an earlier successful run
+was preserved byte-for-byte by the merge build, exactly as designed.
+
+**The real finding**: computed the exact 31-AC gap in the freshly
+published manifest (224 total ACs minus 193 represented) and mapped each
+missing AC number back to its district via the roll manifest:
+
+- Chitradurga: 6/6 ACs missing (97,98,99,100,101,102) — full district,
+  consistent with the confirmed 401.
+- Vijayapura (source data still labels it "Bijapur"): 8/8 ACs missing
+  (26-33) — full district, consistent with the confirmed 404.
+- Bangalore Rural: 3/4 ACs missing (178,180,181); Devanahalli (179)
+  present from the earlier preserved run.
+- **Belgaum: only 3 ACs missing (4,6,13) out of 18.** Previously
+  documented as one of four "confirmed-permanent gap districts" — this
+  run's discovery found 2,955 PDFs there.
+- **Bellary: only 2 ACs missing (93,95) out of 6** (Bellary discovery:
+  656 PDFs).
+- **Raichur: only 2 ACs missing (53,55) out of 6** (812 PDFs).
+- **Vijayanagara: only 4 ACs missing (88,89,90,104) out of 7** (163
+  PDFs).
+- Single stray ACs elsewhere: Davanagere (110), Chikkamagalur (126),
+  Tumkur (131) — one AC each, not a district-level pattern.
+
+**Correction to the earlier "confirmed-permanent gap" framing**:
+Belgaum/Bellary/Raichur/Vijayanagara were never actually permanent — the
+prior session's characterization was based on 0-PDF results at the time,
+but this run found real, substantial PDF counts for all four (hundreds
+each). Most of each district is now published; only a handful of ACs
+per district remain outstanding, the same partial-coverage pattern as
+everywhere else rather than a special never-populated category. The only
+two districts still fully, completely dark are **Chitradurga** (401) and
+**Vijayapura** (404) — Vijayapura's 404 in particular is worth treating
+differently from a throttle-driven 401 on a future retry, since a 404
+suggests the folder ID itself needs re-verifying against
+`ceo.karnataka.gov.in/notices_issued.html` rather than just trying again
+later.
