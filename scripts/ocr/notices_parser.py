@@ -26,6 +26,23 @@ Template B — seen so far only in BBMP Central's AC 163. No header at all;
 AC/part must come from the filename (`S10_{ac}_{part}_...pdf`) or the
 Drive folder path. Table: S.No. | Serial No. | EPIC Number | Elector Name |
 Relative Details | Mapping Category | DOB/Age | Photo Uploaded.
+
+Template C — one elector per PDF, not a table. Found 2026-09-09 in
+Davanagere's AC110 (Honnali) Drive folders: 1,781 of that district's 2,384
+files (statewide, every other district had 0-6 unresolved out of the same
+run — this was an isolated, diagnosable gap, not a source-side shortage).
+Filename looks like `S10_Notice_ScheduleNotice_{ac}_SH_{ac}_{part}_SHRD_
+{epic}.pdf`, but AC/part are read off the document body, all-Kannada
+labelled fields, not the filename or an English header:
+    ನೋಟಿಸ್ ಸಂಖ್ಯೆ : EFS...        (notice number, not stored)
+    ಮತದಾರರ ಹೆಸರು / ಶಾರದಮ್ಮ         (elector name)
+    ಎಪಿಕ್ ಸಂಖ್ಯೆ / IMN1123264       (EPIC)
+    110, ಹೊನ್ನಾಳಿ                  (AC number, AC name — precedes the part label)
+    ಭಾಗ ಸಂಖ್ಯೆ / 100, <booth name>  (part number, booth name)
+    ಕ್ರಮ ಸಂಖ್ಯೆ / 115               (serial number)
+This is a personalised verification-required notice, not a categorised
+discrepancy list, so it carries no "reason for discrepancy" field the way
+Templates A/B do — `reason` is a fixed label saying so, not a guess.
 """
 
 from __future__ import annotations
@@ -50,6 +67,18 @@ FILENAME_RE_B = re.compile(r'^S10_(\d+)_(\d+)_', re.IGNORECASE)
 # belongs to, never which part.
 FOLDER_AC_RE = re.compile(r'^(\d+)\s*[-\s]')
 
+# Template C's all-Kannada labels (see module docstring). Matched with
+# `.search`, not `==`, since PDF text extraction sometimes carries the label
+# and a leading/trailing space or stray character on the same line.
+EPIC_LABEL_RE = re.compile(r'ಎಪಿಕ್\s*ಸಂಖ್ಯೆ')
+NAME_LABEL_RE = re.compile(r'ಮತದಾರರ\s*ಹೆಸರು')
+PART_LABEL_RE = re.compile(r'ಭಾಗ\s*ಸಂಖ್ಯೆ')
+SERIAL_LABEL_RE = re.compile(r'ಕ್ರಮ\s*ಸಂಖ್ಯೆ')
+# The line right before the part label reads "110, ಹೊನ್ನಾಳಿ" (AC no., AC
+# name) — no label of its own, so it is identified by position, not text.
+AC_LINE_RE = re.compile(r'^(\d+)\s*,')
+LEADING_INT_RE = re.compile(r'^(\d+)')
+
 
 @dataclass
 class NoticeRow:
@@ -72,6 +101,16 @@ def identify_ac_part(full_text: str, filename: str, folder_path: list[str]) -> t
     if ac_m and part_m:
         return int(ac_m.group(1)), int(part_m.group(1)), 'header'
 
+    tokens = _tokens(full_text)
+    for i, tok in enumerate(tokens):
+        if not PART_LABEL_RE.search(tok):
+            continue
+        ac_line = AC_LINE_RE.match(tokens[i - 1]) if i > 0 else None
+        part_line = LEADING_INT_RE.match(tokens[i + 1]) if i + 1 < len(tokens) else None
+        if ac_line and part_line:
+            return int(ac_line.group(1)), int(part_line.group(1)), 'header-kn'
+        break  # the label exists but the surrounding lines didn't parse — don't keep scanning for a second match
+
     m = FILENAME_RE_A.search(filename) or FILENAME_RE_B.search(filename)
     if m:
         return int(m.group(1)), int(m.group(2)), 'filename'
@@ -89,6 +128,8 @@ def detect_template(full_text: str) -> str | None:
         return 'A'
     if 'Mapping' in full_text and 'Category' in full_text and 'Relative Details' in full_text:
         return 'B'
+    if EPIC_LABEL_RE.search(full_text) and PART_LABEL_RE.search(full_text) and SERIAL_LABEL_RE.search(full_text):
+        return 'C'
     return None
 
 
@@ -209,6 +250,30 @@ def parse_template_b(full_text: str) -> list[NoticeRow]:
     return rows
 
 
+def parse_template_c(full_text: str) -> list[NoticeRow]:
+    """One row per document — see the module docstring's Template C section.
+    Each field is the token immediately following its Kannada label; there
+    is no table and no anchor-and-scan needed."""
+    tokens = _tokens(full_text)
+
+    def value_after(label_re: re.Pattern) -> str | None:
+        for i, tok in enumerate(tokens):
+            if label_re.search(tok) and i + 1 < len(tokens):
+                return tokens[i + 1]
+        return None
+
+    epic = value_after(EPIC_LABEL_RE)
+    name = value_after(NAME_LABEL_RE) or ''
+    serial_line = value_after(SERIAL_LABEL_RE)
+    serial_m = LEADING_INT_RE.match(serial_line) if serial_line else None
+    if not epic or not EPIC_RE.match(epic) or not serial_m:
+        return []
+    return [NoticeRow(
+        serial=int(serial_m.group(1)), epic=epic, name=name,
+        reason='Individual SIR verification notice (Schedule Notice) — no categorised reason on this template'
+    )]
+
+
 def read_notices_pdf(data: bytes, filename: str, folder_path: list[str]):
     """Returns (ac, part, method, template, rows). `template` is None and
     `rows` is empty when nothing recognisable was found — the caller records
@@ -223,5 +288,10 @@ def read_notices_pdf(data: bytes, filename: str, folder_path: list[str]):
     if template is None or ac is None or part is None:
         return ac, part, method, template, []
 
-    rows = parse_template_a(full_text) if template == 'A' else parse_template_b(full_text)
+    if template == 'A':
+        rows = parse_template_a(full_text)
+    elif template == 'B':
+        rows = parse_template_b(full_text)
+    else:
+        rows = parse_template_c(full_text)
     return ac, part, method, template, rows
