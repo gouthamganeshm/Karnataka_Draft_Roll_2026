@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-09T12:41:51.557Z",
+  "builtAt": "2026-09-10T01:19:04.057Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4252085,
-  "constituencies": 208,
+  "rows": 4307211,
+  "constituencies": 212,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -614,6 +614,30 @@
       "partsWithData": 250,
       "rows": 13867
     },
+    "88": {
+      "name": "Hadagali",
+      "nameKn": "ಹಡಗಲಿ",
+      "district": "VIJAYANAGARA",
+      "parts": 226,
+      "partsWithData": 199,
+      "rows": 8474
+    },
+    "89": {
+      "name": "Hagaribommanahalli",
+      "nameKn": "ಹಗರಿಬೊಮ್ಮನಹಳ್ಳಿ",
+      "district": "VIJAYANAGARA",
+      "parts": 275,
+      "partsWithData": 236,
+      "rows": 10201
+    },
+    "90": {
+      "name": "Vijayanagara",
+      "nameKn": "ವಿಜಯನಗರ",
+      "district": "VIJAYANAGARA",
+      "parts": 271,
+      "partsWithData": 130,
+      "rows": 2433
+    },
     "91": {
       "name": "Kampli",
       "nameKn": "ಕಂಪ್ಲಿ",
@@ -717,6 +741,14 @@
       "parts": 269,
       "partsWithData": 119,
       "rows": 931
+    },
+    "104": {
+      "name": "Harapanahalli",
+      "nameKn": "ಹರಪನಹಳ್ಳಿ",
+      "district": "VIJAYANAGARA",
+      "parts": 265,
+      "partsWithData": 231,
+      "rows": 7635
     },
     "105": {
       "name": "Harihar",
@@ -1180,7 +1212,7 @@
       "district": "B.B.M.P(CENTRAL)",
       "parts": 193,
       "partsWithData": 193,
-      "rows": 41832
+      "rows": 68215
     },
     "164": {
       "name": "Gandhinagar",
