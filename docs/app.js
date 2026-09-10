@@ -649,7 +649,19 @@ let sortDir = 1;
 function districtRows() {
   const by = new Map();
   for (const [no, a] of Object.entries(manifest.acs)) {
-    if (!by.has(a.district)) by.set(a.district, { district: a.district, acs: 0, parts: 0, done: 0, electors: 0 });
+    // `notices` defaults to 0, not undefined, whenever a notices dataset is
+    // loaded at all — Vijayapura's Drive folder has been 404ing statewide
+    // (confirmed, not just unmeasured), so its row must read as a real,
+    // known zero, not the "—" this table already reserves for genuinely
+    // unavailable data (no CEO figure to compare against, etc). Leaving it
+    // undefined made a confirmed source outage look identical to a district
+    // nobody had checked yet.
+    if (!by.has(a.district)) {
+      by.set(a.district, {
+        district: a.district, acs: 0, parts: 0, done: 0, electors: 0,
+        notices: noticesManifest ? 0 : undefined
+      });
+    }
     const row = by.get(a.district);
     row.acs++;
     row.parts += a.parts;
@@ -663,7 +675,7 @@ function districtRows() {
   if (noticesManifest) {
     for (const a of Object.values(noticesManifest.acs)) {
       const row = by.get(a.district);
-      if (row) row.notices = (row.notices ?? 0) + (a.rows ?? 0);
+      if (row) row.notices += (a.rows ?? 0);
     }
   }
   return [...by.values()].map((r) => {
