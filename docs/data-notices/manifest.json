@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-10T01:19:04.057Z",
+  "builtAt": "2026-09-10T02:47:25.220Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4307211,
-  "constituencies": 212,
+  "rows": 4330941,
+  "constituencies": 220,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -181,6 +181,70 @@
       "parts": 264,
       "partsWithData": 182,
       "rows": 7116
+    },
+    "26": {
+      "name": "Muddebihal",
+      "nameKn": "ಮುದ್ದೇಬಿಹಾಳ",
+      "district": "BIJAPUR",
+      "parts": 254,
+      "partsWithData": 114,
+      "rows": 2277
+    },
+    "27": {
+      "name": "Devara Hippargi",
+      "nameKn": "ದೇವರ ಹಿಪ್ಪರಗಿ",
+      "district": "BIJAPUR",
+      "parts": 256,
+      "partsWithData": 110,
+      "rows": 3561
+    },
+    "28": {
+      "name": "Basavana  Bagevadi",
+      "nameKn": "ಬಸವನ ಬಾಗೇವಾಡಿ",
+      "district": "BIJAPUR",
+      "parts": 244,
+      "partsWithData": 167,
+      "rows": 5067
+    },
+    "29": {
+      "name": "Babaleshwar",
+      "nameKn": "ಬಬಲೇಶ್ವರ್‌",
+      "district": "BIJAPUR",
+      "parts": 259,
+      "partsWithData": 103,
+      "rows": 2819
+    },
+    "30": {
+      "name": "Bijapur City",
+      "nameKn": "ಬಿಜಾಪುರ ನಗರ",
+      "district": "BIJAPUR",
+      "parts": 287,
+      "partsWithData": 159,
+      "rows": 1208
+    },
+    "31": {
+      "name": "Nagthan",
+      "nameKn": "ನಾಗಠಾಣ",
+      "district": "BIJAPUR",
+      "parts": 306,
+      "partsWithData": 197,
+      "rows": 6710
+    },
+    "32": {
+      "name": "Indi",
+      "nameKn": "ಇಂಡಿ",
+      "district": "BIJAPUR",
+      "parts": 277,
+      "partsWithData": 71,
+      "rows": 330
+    },
+    "33": {
+      "name": "Sindgi",
+      "nameKn": "ಸಿಂಧಗಿ",
+      "district": "BIJAPUR",
+      "parts": 276,
+      "partsWithData": 100,
+      "rows": 1758
     },
     "34": {
       "name": "Afzalpur",
