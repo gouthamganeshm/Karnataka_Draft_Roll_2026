@@ -74,7 +74,15 @@ const DISTRICT_FOLDERS = {
   Udupi: '1iJhbi3jrOxXy7igSPpuusgpZoieN_1_u',
   'Uttara Kannada': '1ygNrgoiSyPEIWv3HqhEAP37JqkarEKmO',
   Vijayanagara: '16KSoRpSRztXVnCHpjEZQtlS4xsKK_GXl',
-  Vijayapura: '1E0uH1P8FJ9z5L7OW0PO5dK4ikSczWKpX',
+  // The CEO's own page moved this link at some point before 2026-09-10 —
+  // the previous ID (1E0uH1P8FJ9z5L7OW0PO5dK4ikSczWKpX) had been 404ing for
+  // days and was wrongly treated as "district office's folder is down"
+  // rather than "the link itself changed". Re-checked directly against
+  // https://ceo.karnataka.gov.in/notices_issued.html before updating —
+  // 1,021 real PDFs across all 8 ACs sitting behind the new ID. Worth
+  // periodically re-scraping that page rather than trusting this
+  // hand-transcribed map is permanent, per its own header comment above.
+  Vijayapura: '1grogYu5gO67FeRWfH6RrNix374awLAgA',
   Yadgir: '1lDuv-b0XM3083pap3THDYvGQs_UAWAQD'
 };
 
