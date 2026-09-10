@@ -2484,3 +2484,64 @@ differently from a throttle-driven 401 on a future retry, since a 404
 suggests the folder ID itself needs re-verifying against
 `ceo.karnataka.gov.in/notices_issued.html` rather than just trying again
 later.
+
+## 12. Two more real gaps found by manual scouting — 2026-09-09/10
+
+User's instruction going forward for the notices dataset: before triggering
+an import run, manually scout suspicious/low-coverage districts first
+(fresh Drive crawl, check for hidden content) to confirm a shortfall is
+genuine, *then* trigger. Two real, different bugs were found this way —
+worth internalizing both patterns since a plain PDF-count comparison alone
+would have kept missing them.
+
+**Bug 1 — zip archives are invisible to a PDF-only file filter.**
+`17-discover-notices.mjs` only ever matched `/\.pdf$/i`, so a folder whose
+content was a single `.zip` looked completely, silently empty — exactly the
+Davanagere-style "silent narrowing" this dataset has hit before, just one
+file extension over. Found by listing a "confirmed empty" Vijayanagara AC
+folder's raw entries with no extension filter at all: 4 of its 5 ACs
+(Hadagali, Hagaribommanahalli, Vijayanagara-town, Harapanahalli) each hold
+exactly one zip of per-part PDFs (`Discrepancies.zip` etc.), not zero files.
+**Fixed**: `17-discover-notices.mjs` now also records `.zip` files (tagged
+`kind: 'zip'`) and reports (not silently drops) any `.rar`/`.7z` found —
+Ramanagara has exactly one, deliberately not extracted (no Python stdlib
+support, not worth a new system dependency for one file statewide).
+`18-extract-notices.py` unzips a zip job in memory and runs every member
+through the existing `read_notices_pdf` unchanged — the PDFs inside are
+plain Template A content, confirmed directly. Verified against all 4 real
+archives before trusting it (796/796 members resolved, 0 errors, 0
+unresolved), then again in production the same way (167 job → 959 Template-A
+members, 0 unresolved). Vijayanagara went from 1/5 ACs (49.2%) to **5/5 ACs,
+71.2%** in one run. **Any future "this folder is genuinely empty" finding
+should list raw entries with no extension filter before concluding that —
+this is the second time a filtered listing has been the actual bug, not the
+data.**
+
+**Bug 2 — a 404 on a hand-transcribed folder ID can mean the link moved, not
+that the source is down.** Vijayapura's ID
+(`1E0uH1P8FJ9z5L7OW0PO5dK4ikSczWKpX`) 404'd on every check across several
+days, including a direct hit on Google's own `drive.google.com/drive/folders/`
+URL — read as a genuine external outage nothing on our side could fix
+(consistent with this project's general experience that a 404 means "really
+gone" the way it does for the ECI CDN). **It was not an outage — the CEO's
+own page had simply pointed the link at a new folder ID**
+(`1grogYu5gO67FeRWfH6RrNix374awLAgA`), something re-scraping
+`ceo.karnataka.gov.in/notices_issued.html` directly would have caught
+immediately rather than re-testing the same stale ID over and over. The new
+ID resolves cleanly: 1,021 real PDFs across all 8 ACs, one parsed directly
+to confirm (Template A, same as everywhere else). Fixed by updating
+`DISTRICT_FOLDERS` in `17-discover-notices.mjs`. **A full re-audit of all 34
+districts' IDs against a fresh scrape of the CEO page found no other
+drift** — this was specific to Vijayapura, not a systemic problem, but the
+`DISTRICT_FOLDERS` map is a static, hand-transcribed snapshot with no
+mechanism to detect a future link move on its own. If a district ever goes
+back to a clean, repeatable 404 (not a 401 throttle) on both `embeddedfolderview`
+*and* the plain `drive/folders/` URL, re-scrape the CEO page for that
+district's current link before concluding the source is unavailable — this
+exact advice was already written in section 11 above (following the
+2026-09-08 run) and sat unactioned for two days before someone asked "is it
+really failing?" a second time. Don't wait for that prompt next time.
+
+Both fixes triggered their own import run each; state as of this write-up:
+statewide notices coverage climbing past the pre-fix 96.1%-of-CEO-total
+figure as both districts' real content lands.
