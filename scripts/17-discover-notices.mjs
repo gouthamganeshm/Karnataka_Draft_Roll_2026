@@ -95,9 +95,21 @@ const DISTRICT_FOLDERS = {
  * without ever parsing a filename). */
 
 /** Walk one district's tree, collecting every PDF found at any depth,
- * however it is named. */
+ * however it is named. Also collects `.zip` archives — found 2026-09-09 in
+ * Vijayanagara, where 4 of 5 ACs (Hadagali, Hagaribommanahalli, Vijayanagara,
+ * Harapanahalli) upload one zip of per-part PDFs instead of individual
+ * files; the earlier PDF-only filter made those folders look completely
+ * empty, with nothing to say a real file was sitting there unread.
+ * `18-extract-notices.py` unzips and parses each member exactly like a
+ * standalone PDF — no `notices_parser.py` changes needed, since the PDFs
+ * inside are the same Template A content, verified directly against one.
+ * `.rar`/`.7z` archives are deliberately NOT extracted (no Python stdlib
+ * support, and only one has ever been seen statewide — Ramanagara) but are
+ * still recorded and reported, so a real file is never silently invisible
+ * the way the zips were before this fix. */
 async function crawlOnce(rootId) {
   const files = []; // { fileId, name, path: [ancestor folder names] }
+  const unhandledArchives = []; // rar/7z — found, not extracted
   const seen = new Set();
 
   async function walk(folderId, depth, path) {
@@ -105,8 +117,13 @@ async function crawlOnce(rootId) {
     seen.add(folderId);
     const entries = await listFolder(folderId);
     for (const e of entries) {
-      if (e.kind === 'file' && /\.pdf$/i.test(e.name)) {
+      if (e.kind !== 'file') continue;
+      if (/\.pdf$/i.test(e.name)) {
         files.push({ fileId: e.id, name: e.name, path });
+      } else if (/\.zip$/i.test(e.name)) {
+        files.push({ fileId: e.id, name: e.name, path, kind: 'zip' });
+      } else if (/\.(rar|7z)$/i.test(e.name)) {
+        unhandledArchives.push({ name: e.name, path: path.join('/') });
       }
     }
     for (const sub of entries.filter((e) => e.kind === 'folder')) {
@@ -115,7 +132,7 @@ async function crawlOnce(rootId) {
   }
 
   await walk(rootId, 0, []);
-  return files;
+  return { files, unhandledArchives };
 }
 
 /* A statewide run found Belgaum, Bellary and Tumkur — all three confirmed
@@ -130,13 +147,13 @@ async function crawlOnce(rootId) {
  * import, with nothing flagging it) — so a 0-file result is now treated as
  * suspicious enough to double-check, not accepted on the first pass. */
 async function crawlDistrict(district, rootId) {
-  let files = await crawlOnce(rootId);
+  let { files, unhandledArchives } = await crawlOnce(rootId);
   for (let attempt = 1; files.length === 0 && attempt <= 2; attempt++) {
     await sleep(3000 * attempt);
     log(`  ${district}: came back empty, re-checking (attempt ${attempt + 1})...`);
-    files = await crawlOnce(rootId);
+    ({ files, unhandledArchives } = await crawlOnce(rootId));
   }
-  return { files };
+  return { files, unhandledArchives };
 }
 
 async function main() {
@@ -153,12 +170,18 @@ async function main() {
   const results = await pool(districts, 2, async (district) => {
     const rootId = DISTRICT_FOLDERS[district];
     try {
-      const { files } = await crawlDistrict(district, rootId);
-      log(`  ${district}: ${files.length} PDF(s) found`);
-      return { district, files };
+      const { files, unhandledArchives } = await crawlDistrict(district, rootId);
+      const zipCount = files.filter((f) => f.kind === 'zip').length;
+      const zipNote = zipCount ? ` (${zipCount} as .zip)` : '';
+      log(`  ${district}: ${files.length} PDF(s) found${zipNote}`);
+      if (unhandledArchives.length) {
+        log(`  ${district}: ${unhandledArchives.length} unhandled archive(s) NOT extracted — ` +
+            unhandledArchives.map((a) => `${a.path}/${a.name}`).join(', '));
+      }
+      return { district, files, unhandledArchives };
     } catch (err) {
       log(`  ${district}: FAILED — ${err.message}`);
-      return { district, files: [], error: err.message };
+      return { district, files: [], unhandledArchives: [], error: err.message };
     }
   });
 
@@ -168,15 +191,21 @@ async function main() {
   // available when a PDF has no header of its own (see AC163 above).
   const allFiles = [];
   const errors = [];
-  for (const { district, files, error } of results) {
+  const allUnhandledArchives = [];
+  for (const { district, files, unhandledArchives, error } of results) {
     if (error) errors.push({ district, error });
     for (const f of files) allFiles.push({ district, ...f });
+    for (const a of unhandledArchives) allUnhandledArchives.push({ district, ...a });
   }
 
-  await writeJson(resolve(CACHE, 'notices-manifest.json'), { files: allFiles, errors }, true);
+  await writeJson(
+    resolve(CACHE, 'notices-manifest.json'),
+    { files: allFiles, errors, unhandledArchives: allUnhandledArchives },
+    true
+  );
 
   log(`\nDone. ${allFiles.length} PDF(s) found across ${districts.length} district(s), ` +
-      `${errors.length} district-level failure(s).`);
+      `${errors.length} district-level failure(s), ${allUnhandledArchives.length} unhandled archive(s).`);
   log('Wrote cache/notices-manifest.json — extraction determines AC/part per file.');
 }
 

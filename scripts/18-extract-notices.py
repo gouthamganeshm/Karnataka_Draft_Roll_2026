@@ -19,6 +19,11 @@ A file whose AC/part/template cannot be identified is recorded in
 project's standing rule that a source the pipeline cannot read must show up
 as reduced coverage, not as a booth that looks clean because nobody looked.
 
+A job whose `kind` is `'zip'` (see `17-discover-notices.mjs`) is a whole
+archive of per-part PDFs uploaded as one file — `read_zip_members` unpacks
+and parses each member the same way, fanning one job out into many rows
+(or unresolved entries) instead of one.
+
     python scripts/18-extract-notices.py                 # everything found
     python scripts/18-extract-notices.py --limit 50       # a taste
     python scripts/18-extract-notices.py --pull-size 5000 --cooldown-s 600
@@ -33,6 +38,7 @@ import json
 import os
 import sys
 import time
+import zipfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from urllib.error import HTTPError
@@ -67,20 +73,21 @@ class DriveRateLimited(Exception):
     long), and every already-extracted file stays done via the ledger."""
 
 
-def fetch(file_id: str, tries: int = 4, timeout: int = 60) -> bytes:
+def fetch(file_id: str, kind: str = 'pdf', tries: int = 4, timeout: int = 60) -> bytes:
     url = f'https://drive.google.com/uc?export=download&id={file_id}'
+    magic = b'PK' if kind == 'zip' else b'%PDF-'
     last_exc: Exception | None = None
     for attempt in range(tries):
         try:
             req = Request(url, headers={'User-Agent': UA})
             with urlopen(req, timeout=timeout) as resp:
                 data = resp.read()
-            if data[:5] == b'%PDF-':
+            if data[:len(magic)] == magic:
                 return data
             if b'ServiceLogin' in data or b'accounts.google.com' in data:
                 raise DriveRateLimited(
                     'Drive is serving a sign-in wall instead of files — anonymous download quota hit')
-            raise ValueError(f'response is not a PDF ({len(data)} bytes)')
+            raise ValueError(f'response is not a {kind} ({len(data)} bytes)')
         except DriveRateLimited:
             raise  # not retried — see the class docstring
         except Exception as e:  # noqa: BLE001 — retry anything else, Drive's other failure modes are not well documented
@@ -90,10 +97,50 @@ def fetch(file_id: str, tries: int = 4, timeout: int = 60) -> bytes:
     raise last_exc or RuntimeError('fetch failed with no captured exception')
 
 
+def read_zip_members(data: bytes, path: list[str], file_id: str) -> list[dict]:
+    """A zip of per-part PDFs, uploaded as one archive instead of individual
+    files — found 2026-09-09 in Vijayanagara (4 of its 5 ACs). Each member is
+    parsed exactly like a standalone PDF job via the same `read_notices_pdf`;
+    no `notices_parser.py` changes needed, since the PDFs inside are the same
+    Template A content as everywhere else, just bundled. Returns a list, not
+    a single (ac, part) — nothing guarantees an archive can't span more than
+    one AC, even though every real case seen so far has not."""
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile as exc:
+        return [{'name': '(archive)', 'error': f'BadZipFile: {exc}'}]
+
+    members = []
+    for name in zf.namelist():
+        if not name.lower().endswith('.pdf'):
+            continue
+        base_name = name.rsplit('/', 1)[-1]
+        try:
+            pdf_bytes = zf.read(name)
+            ac, part, method, template, rows = read_notices_pdf(pdf_bytes, base_name, path)
+        except Exception as exc:  # noqa: BLE001
+            members.append({'name': base_name, 'error': f'{type(exc).__name__}: {exc}'})
+            continue
+        if ac is None or part is None or template is None:
+            members.append({'name': base_name, 'unresolved': True, 'ac': ac, 'part': part,
+                             'method': method, 'template': template})
+        else:
+            members.append({'name': base_name, 'ac': ac, 'part': part, 'method': method, 'template': template,
+                             'rows': [{'ac': ac, 'part': part, 'serial': r.serial, 'epic': r.epic,
+                                       'name': r.name, 'reason': r.reason, 'age': r.age, 'gender': r.gender,
+                                       'ok': True, 'method': method, 'template': template,
+                                       # Points at the archive, not the individual PDF — Drive has no
+                                       # deep-link into a zip member, so the archive is the closest
+                                       # real source link the UI can offer for this row.
+                                       'fileId': file_id} for r in rows]})
+    return members
+
+
 def do_file(job: dict) -> dict:
     """Runs in a worker process."""
+    kind = job.get('kind', 'pdf')
     try:
-        data = fetch(job['fileId'])
+        data = fetch(job['fileId'], kind=kind)
     except DriveRateLimited as exc:
         # A dict marker, not a re-raised exception: simpler than relying on
         # cross-process exception pickling, and the caller only needs to
@@ -101,6 +148,9 @@ def do_file(job: dict) -> dict:
         return {**job, 'rateLimited': True, 'error': str(exc)}
     except Exception as exc:  # noqa: BLE001
         return {**job, 'error': f'{type(exc).__name__}: {exc}'}
+
+    if kind == 'zip':
+        return {**job, 'archiveMembers': read_zip_members(data, job['path'], job['fileId'])}
 
     try:
         ac, part, method, template, rows = read_notices_pdf(data, job['name'], job['path'])
@@ -221,7 +271,35 @@ def main() -> int:
                         print(f"  [{n}/{len(jobs)}] {res['name'][:60]}: {res['error']}")
                         continue
 
-                    if res.get('unresolved'):
+                    if res.get('archiveMembers') is not None:
+                        # One zip job fans out into many part-PDFs, each resolved
+                        # (and written, or logged unresolved) independently — see
+                        # read_zip_members's own docstring for why this can't
+                        # reuse the single-AC path below.
+                        for m in res['archiveMembers']:
+                            if m.get('error'):
+                                errors += 1
+                                print(f"  [{n}/{len(jobs)}] {res['name'][:40]}::{m['name'][:40]}: {m['error']}")
+                                continue
+                            if m.get('unresolved'):
+                                unresolved += 1
+                                unresolved_fh.write(json.dumps({
+                                    'fileId': res['fileId'], 'name': f"{res['name']}::{m['name']}",
+                                    'district': res['district'], 'path': res['path'],
+                                    'ac': m.get('ac'), 'part': m.get('part'),
+                                    'method': m.get('method'), 'template': m.get('template')
+                                }, ensure_ascii=False) + '\n')
+                                unresolved_fh.flush()
+                                continue
+                            ac = m['ac']
+                            if ac not in handles:
+                                handles[ac] = (NOTICES_ROWS / f'{ac}.jsonl').open('a', encoding='utf8')
+                            for row in m['rows']:
+                                handles[ac].write(json.dumps(row, ensure_ascii=False) + '\n')
+                            handles[ac].flush()
+                            total_rows += len(m['rows'])
+                            by_template[m['template']] = by_template.get(m['template'], 0) + 1
+                    elif res.get('unresolved'):
                         unresolved += 1
                         unresolved_fh.write(json.dumps({
                             'fileId': res['fileId'], 'name': res['name'], 'district': res['district'],
