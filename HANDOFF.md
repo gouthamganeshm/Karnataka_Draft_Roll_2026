@@ -2587,3 +2587,60 @@ Vijayanagara's zip-expansion false positive. A raw file-count crawl
 cannot distinguish this from a real gap on its own — cross-check against
 the actual extraction log's `unresolved` count (already 0 for both) before
 concluding there's something to chase.
+
+## 13. Resume checklist — written 2026-09-11, ahead of a planned shutdown
+
+User is shutting the machine down for a few hours and asked for this to be
+written down first. Everything below is genuinely stopped, not just idle —
+confirmed zero Node processes running, git status clean, HEAD `14ba0a65672`
+pushed. Nothing is lost either way; both processes are resumed by re-running
+the same command, not by anything stateful in this session.
+
+**1. Resume the roll exhaustive sweep (item 13 in this file's own numbering,
+unrelated to this section's own "13" — the statewide 1-sample-per-booth
+sweep, not the notices pipeline):**
+
+    node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8
+
+Picks up from `cache/exhaustive-done-roll.txt` automatically — 30,666 booths
+done as of the pause, 3,800 of this session's 34,079-booth batch checked
+(30,879/60,923 overall), **0 site fails, 5 pdf fails**, and every one of
+those 5 is the already-understood AC161 WZU-prefix OCR noise (see this
+file's own OCR section) — not a real defect, don't re-investigate it fresh.
+
+**2. Restart the test-log auto-committer alongside it**, so the sweep's
+results keep getting pushed every 10 minutes without needing to babysit it:
+
+    node scripts/16-commit-test-log.mjs
+
+Both should run detached (`nohup ... & disown` in Git Bash), then verify with
+`Get-CimInstance Win32_Process -Filter "Name='node.exe'"` that their parent
+shell has already exited — a lesson this file's own section 4h documents at
+length, still worth re-checking every time rather than assuming.
+
+**3. Before triggering another notices-import workflow run, check for new
+source data the right way**: fetch the live manifest fresh
+(`https://gouthamganeshm.github.io/Karnataka_Draft_Roll_2026/data-notices/manifest.json?_=<cache-bust>`),
+crawl all 34 districts fresh from their roots (never a cached per-AC
+subfolder ID — a district office can delete/recreate one under a new ID at
+any time, confirmed with Shimoga's AC113), and diff against the live
+numbers, not a remembered log line. As of this pause, the last such check
+(2026-09-11) found nothing new anywhere — every remaining gap already has a
+specific, individually-verified explanation (this file's sections 11 and 12
+above have the full list: genuine sparse source uploads in most districts,
+duplicate re-uploads in Chikkaballapur/Tumkur/Bidar/Mysore/etc., Vijayapura's
+and Vijayanagara's now-fixed gaps, Davanagere's Template-C file-vs-part
+ratio). Don't re-trigger the workflow just because time has passed — only
+if that fresh crawl actually finds something different.
+
+**4. Nothing else is mid-flight.** The CEO comparison figures in `app.js`
+were refreshed to the 11.09.2026 press note this same session and are
+already live — no action needed there until the CEO's office posts a newer
+one (check `x.com/ceo_karnataka`; roughly weekly cadence observed so far).
+
+**5. One low-priority, not-urgent item worth knowing about**:
+`test-logs/test-log.jsonl` is now ~55 MB, past GitHub's 50 MB soft warning
+(hard limit is 100 MB). Not blocking anything yet, but if this keeps
+growing at the sweep's pace, a rotation or Git LFS decision will eventually
+be needed — flagged here so it isn't a surprise later, not asking for
+action now.
