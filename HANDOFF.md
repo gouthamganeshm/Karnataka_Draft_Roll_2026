@@ -2545,3 +2545,45 @@ really failing?" a second time. Don't wait for that prompt next time.
 Both fixes triggered their own import run each; state as of this write-up:
 statewide notices coverage climbing past the pre-fix 96.1%-of-CEO-total
 figure as both districts' real content lands.
+
+### CEO press note, 11.09.2026 — comparison figures refreshed; a new deadline recorded
+
+Spotted via `x.com/ceo_karnataka`, same channel as the 04.09.2026 note
+this project already tracked. PDF at
+`ceo.karnataka.gov.in/uploads/PRESS NOTE-11.09.2026.pdf`. This is the
+weekly-ish cadence this note is published on — worth re-checking that
+account periodically rather than assuming a one-time fetch stays current;
+the 04.09 figures baked into `app.js` had gone a week stale by the time
+this one surfaced.
+
+Updated `CEO_OFFICIAL_ELECTORS` and `CEO_OFFICIAL_NOTICES` (and their date
+strings, both languages, plus the footer's press-note link) to this
+note's Annexure-1 and Annexure-2. Both new maps' sums verified to match
+the note's own printed statewide totals exactly before committing —
+44,658,413 electors (up 20,289 from 04.09's 44,638,124) and 4,381,760
+total notices generated (up 615). Per-district deltas are small and
+uniform (new Form 6 registrations trickling in), nothing that suggests a
+data problem on either side.
+
+**New deadline not previously captured anywhere in this project**: item 2
+of the note states last hearing on delivered notices will be conducted
+12.10.2026, and last date for disposal of claims and objections is
+22.10.2026 — both ahead of the already-known 27.10.2026 Final Roll
+publication date. Everything this project scrapes is still the *Draft*
+Roll; these are the dates the Draft Roll's discrepancy/notice cycle
+actually closes out before the Final Roll supersedes it.
+
+Also same-session: statewide manual crawl (all 34 districts, compared
+against the live site fetched fresh, not any cached number — see the
+immediately preceding section's own lesson about not trusting a
+remembered baseline) found **no new source-side content anywhere**. Every
+apparent gap traced to already-understood causes: Chikkaballapur/Tumkur's
+known duplicate-file counts, and a new one worth naming for next time —
+**Davanagere's raw PDF count (2,384) looks like a huge gap against its
+published parts-with-data (763), but isn't**: its Template C content
+(section 12 above) is one file per *elector*, not per *part*, so many
+files legitimately collapse into few distinct parts, the same shape as
+Vijayanagara's zip-expansion false positive. A raw file-count crawl
+cannot distinguish this from a real gap on its own — cross-check against
+the actual extraction log's `unresolved` count (already 0 for both) before
+concluding there's something to chase.
