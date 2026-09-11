@@ -1,9 +1,9 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-10T08:56:39.348Z",
+  "builtAt": "2026-09-11T00:49:16.551Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4330941,
+  "rows": 4330783,
   "constituencies": 220,
   "acs": {
     "1": {
@@ -251,8 +251,8 @@
       "nameKn": "ಅಫಜಲಪೂರ",
       "district": "GULBARGA",
       "parts": 261,
-      "partsWithData": 224,
-      "rows": 6915
+      "partsWithData": 223,
+      "rows": 6907
     },
     "35": {
       "name": "Jevargi",
@@ -1363,8 +1363,8 @@
       "nameKn": "ಮಹದೇವಪುರ",
       "district": "BANGALORE URBAN",
       "parts": 533,
-      "partsWithData": 532,
-      "rows": 171601
+      "partsWithData": 531,
+      "rows": 171451
     },
     "175": {
       "name": "Bommanahalli",
