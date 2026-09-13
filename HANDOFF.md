@@ -2644,3 +2644,113 @@ one (check `x.com/ceo_karnataka`; roughly weekly cadence observed so far).
 growing at the sweep's pace, a rotation or Git LFS decision will eventually
 be needed — flagged here so it isn't a surprise later, not asking for
 action now.
+
+## 14. Resumed from shutdown + a real Kunigal (AC131) gap found — 2026-09-11
+
+Picked back up per section 13's checklist: confirmed genuinely stopped state
+(clean git status, HEAD `2d197824136`, zero `node.exe` processes) before
+restarting anything. Resumed both processes detached, verified each rooted
+at `nohup.exe` with no further ancestor (the section 4h lesson, re-checked
+rather than assumed):
+
+    node scripts/14-exhaustive-sweep.mjs --dataset roll --concurrency 8
+    node scripts/16-commit-test-log.mjs
+
+Sweep confirmed picking up exactly where it left off (30,666 already done,
+30,257 remaining); committer's first cycle pushed immediately
+(196,203 entries).
+
+**Then did checklist item 3 — a fresh statewide Drive crawl** (all 34
+districts, `node scripts/17-discover-notices.mjs`, 50,562 PDFs found, 0
+district-level failures, safe to run alongside the roll sweep since it hits
+Drive, not ECI/GitHub Pages). Compared against the live manifest fetched
+fresh (`data-notices/manifest.json`, cache-busted): 220/224 ACs published,
+4,330,783 rows. Cross-checked every discrepancy against the crawl rather
+than trusting old notes:
+
+- **Chitradurga and Bangalore Rural** (both previously dark — 401 and an
+  empty "Untitled folder" respectively, per sections 11-12) are **already
+  fully published live** — all their ACs show real row counts. Whatever
+  recovered them happened before this session; nothing to do.
+- **Belgaum's 3 missing ACs (4, 6, 13)**: confirmed genuinely absent —
+  Belgaum's own top-level Drive folder listing has no `04-`, `06-`, or
+  `13-` subfolder at all among its 15 present ACs. Real sparse source
+  upload, not a crawl or import bug.
+- **Tumkur AC131 (Kunigal) — a real, new gap.** Published data shows 0 rows
+  for AC131 (every other Tumkur AC has data). The fresh crawl found a
+  `131-Kunigal` folder holding **177 real PDFs** — previously this district's
+  total was measured at 1,971 files (2026-09-07 targeted re-run); this crawl
+  found 2,228, an increase of 257, consistent with this folder being new or
+  previously missed. **Worth flagging for whoever picks this up next**: every
+  filename inside `131-Kunigal` claims `ac137` (Pavagada, a different AC) —
+  a folder/filename mismatch. Not investigated further by hand, since this is
+  exactly the situation `18-extract-notices.py` is built for: it trusts the
+  PDF's own header text over filename or folder name. If AC131 still shows 0
+  rows after the triggered run resolves, that mismatch is the first thing to
+  check by actually opening one of these PDFs.
+
+**Triggered the statewide notices-import workflow** (`gh workflow run
+"Import notices data"`, run `34627663367`, started 17:26:11Z, user confirmed
+explicitly before triggering since it's a shared-state Actions run). `gh` is
+authenticated in this session (`gouthamganeshm`, `workflow` scope) — worth
+noting since section 5 records an *unrelated* earlier session where `gh` was
+not authenticated; that was about the roll pipeline's own (abandoned)
+Actions attempt, not this one. Run succeeded in ~56 min, commit `8efda6a88`.
+
+**Resolved, not a gap — the Kunigal folder is a misfiled duplicate.** The
+Tumkur extract job log shows all 2,228 files (including the 177 in
+`131-Kunigal`) parsed cleanly: **0 unresolved, 0 errors**. But every Tumkur
+AC's published row count came back **exactly byte-identical to the pre-run
+snapshot** (summed: 93,299 rows both before and after; AC137/Pavagada
+unchanged at 6,342; AC131 still absent). Since the files parsed successfully
+but produced zero new rows anywhere, the only explanation consistent with
+both facts is that the `131-Kunigal` folder holds duplicate copies of
+already-published electors (almost certainly Pavagada's, given the
+`ac137`-labelled filenames) — real PDFs, correctly read, correctly deduped
+by the merge-build, not new source content. This matches the
+already-documented "duplicate re-uploads" pattern this district's own
+folder has shown before (Chikkaballapur/Tumkur/Bidar/Mysore, per section
+13's own recap). **AC131 (Kunigal) itself still has zero genuine source
+PDFs anywhere in Drive** — confirmed by this run, not just the raw file
+listing. Not a bug, not an import gap; the CEO's Tumkur office has never
+uploaded Kunigal-specific notices data. Nothing further to chase here
+unless that changes on a future crawl.
+
+**Verified directly against actual file content, not just row-count math —
+2026-09-13.** User pushed back on whether this had really been checked
+against source data or just inferred. It had only been inferred; checked
+properly: downloaded `131-Kunigal`'s own `..._ac137_part10.pdf`
+(fileId `1KUw5MFAjc50w3nflLXrnZqq8uMQtss3U`) directly from Drive and read
+it with PyMuPDF — its own header text literally says `AC No and Name: 137 -
+Pavagada`. Then found `137-Pavagada`'s proper folder holds the identical
+count (177 files) including a file of the exact same name, downloaded that
+one too (fileId `154r8Bytk_3dzsFpo-J0_jPKdaJZSaL7T`) — **both files are
+byte-identical, same SHA-256 `0abfdeaa...b6444b`, same 62,704 bytes, same
+extracted text.** Not a one-off coincidence: both folders hold exactly 177
+files each. Conclusion now rests on direct evidence (two real downloaded
+files, byte-compared) rather than aggregate row-count arithmetic — the
+`131-Kunigal` folder is a full duplicate re-upload of `137-Pavagada`'s own
+folder under a wrong name, confirmed the same way this project's own
+standing practice requires for a claim like this (render/read the actual
+source, don't trust the math alone).
+
+**Live-site lookup also verified directly, same session.** Pulled 3 real
+EPICs straight out of the downloaded part10 PDF (`TPC4514097`/Swamy.D,
+`TPC4338885`/Ranganna M, `TPC4524799`/N Nethravathi) and replicated
+`docs/app.js`'s exact lookup (`sha256` → `bucketPath` → binary search)
+against the actual deployed `data-notices` tree on
+`gouthamganeshm.github.io` — real HTTP fetches, not local data. All three
+resolve correctly to AC137/part10/serial 355, 776, 782 with name, age,
+gender and reason matching the source PDF exactly, field for field.
+
+One real, minor, cosmetic detail found while doing this: the published
+record's `fileId` (the source-PDF link shown to a searcher) is
+`1KUw5MFAjc50w3nflLXrnZqq8uMQtss3U` — the **Kunigal-folder copy**, not
+`137-Pavagada`'s own file (`154r8Bytk...`). Since the two are byte-identical
+this serves correct content either way, but the link a user clicks points
+into the misnamed duplicate folder rather than the correctly-named one.
+Not worth chasing on its own (cosmetic, zero data impact), but worth
+remembering if a future duplicate-resolution pass ever needs a
+tie-breaking rule: prefer the canonically-named folder's copy when two
+files are byte-identical duplicates, not whichever the merge happened to
+keep.
