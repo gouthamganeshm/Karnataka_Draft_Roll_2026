@@ -275,23 +275,74 @@ def parse_template_c(full_text: str) -> list[NoticeRow]:
 
 
 def read_notices_pdf(data: bytes, filename: str, folder_path: list[str]):
-    """Returns (ac, part, method, template, rows). `template` is None and
-    `rows` is empty when nothing recognisable was found — the caller records
-    this file as unresolved rather than pretending it was read."""
+    """Returns a list of (ac, part, method, template, rows) groups — usually
+    exactly one, covering the whole file.
+
+    Confirmed real 2026-09-16 in Chamarajanagar/Kollegal: one 23-page file
+    where nearly every page carries its own "AC No and Name:"/"Part No and
+    Name:" header for a *different* part (a single AC-wide upload, not a
+    per-part upload like everywhere else). `identify_ac_part` on the whole
+    concatenated text only ever finds the *first* header via `.search()`, so
+    every row from every part after the first was silently mislabelled under
+    page 1's part number — confirmed live: AC222 published at
+    `partsWithData: 1` when the source file actually covers ~23 parts.
+
+    So: walk pages, and only start a *new* segment when a page carries its
+    own distinct header — a continuation page with no header of its own
+    (a part's table spilling onto a second physical page, same as the
+    existing single-part multi-page case) stays part of the segment before
+    it, exactly as before this fix. When a document turns out to carry only
+    one header (the overwhelming majority of files), this produces the same
+    single group as before — this function's return type changed to a list,
+    but its behaviour for that common case did not.
+
+    `template` is None and `rows` is empty in a lone group when nothing
+    recognisable was found at all — the caller records the file as
+    unresolved rather than pretending it was read, unchanged from before."""
     import fitz
 
     doc = fitz.open(stream=data, filetype='pdf')
-    full_text = '\n'.join(page.get_text() for page in doc)
+    page_texts = [page.get_text() for page in doc]
+    full_text = '\n'.join(page_texts)
+    template = detect_template(full_text)
+
+    segments = []  # [(ac, part, text)]
+    cur_ac = cur_part = None
+    cur_text: list[str] = []
+    for pt in page_texts:
+        ac_m = HEADER_AC_RE.search(pt)
+        part_m = HEADER_PART_RE.search(pt)
+        if ac_m and part_m:
+            if cur_text:
+                segments.append((cur_ac, cur_part, '\n'.join(cur_text)))
+            cur_ac, cur_part = int(ac_m.group(1)), int(part_m.group(1))
+            cur_text = [pt]
+        else:
+            cur_text.append(pt)
+    if cur_text:
+        segments.append((cur_ac, cur_part, '\n'.join(cur_text)))
+
+    distinct_parts = {(a, p) for a, p, _ in segments if a is not None and p is not None}
+
+    def parse(text: str) -> list[NoticeRow]:
+        if template == 'A':
+            return parse_template_a(text)
+        if template == 'B':
+            return parse_template_b(text)
+        return parse_template_c(text)
+
+    if len(distinct_parts) > 1:
+        groups = []
+        for ac, part, text in segments:
+            if ac is None or part is None or template is None:
+                continue  # a lead-in page with no header of its own to attribute rows to
+            groups.append((ac, part, 'header', template, parse(text)))
+        if groups:
+            return groups
+        # every segment failed to resolve — fall through to the single-group
+        # path below so this still reports as one unresolved file, not zero
 
     ac, part, method = identify_ac_part(full_text, filename, folder_path)
-    template = detect_template(full_text)
     if template is None or ac is None or part is None:
-        return ac, part, method, template, []
-
-    if template == 'A':
-        rows = parse_template_a(full_text)
-    elif template == 'B':
-        rows = parse_template_b(full_text)
-    else:
-        rows = parse_template_c(full_text)
-    return ac, part, method, template, rows
+        return [(ac, part, method, template, [])]
+    return [(ac, part, method, template, parse(full_text))]

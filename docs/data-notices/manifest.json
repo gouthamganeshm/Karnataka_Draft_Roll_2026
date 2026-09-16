@@ -1,6 +1,6 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-11T18:22:47.552Z",
+  "builtAt": "2026-09-16T05:09:17.031Z",
   "shardDepth": 3,
   "suffixLength": 8,
   "rows": 4330783,
@@ -1747,7 +1747,7 @@
       "nameKn": "ಕೊಳ್ಳೇಗಾಲ",
       "district": "CHAMARAJNAGAR",
       "parts": 245,
-      "partsWithData": 1,
+      "partsWithData": 22,
       "rows": 65
     },
     "223": {

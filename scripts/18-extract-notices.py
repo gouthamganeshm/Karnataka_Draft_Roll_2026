@@ -97,6 +97,30 @@ def fetch(file_id: str, kind: str = 'pdf', tries: int = 4, timeout: int = 60) ->
     raise last_exc or RuntimeError('fetch failed with no captured exception')
 
 
+def _flatten_groups(groups: list, file_id: str) -> dict:
+    """`read_notices_pdf` now returns a list of (ac, part, method, template,
+    rows) groups — more than one when a single file turns out to cover
+    multiple parts (see that function's own docstring for the Kollegal case
+    this was built for). Flattens that into the one-dict-per-file shape both
+    call sites already expect: every row keeps its own correct `ac`/`part`
+    (a multi-part file's rows are not all the same part any more), while the
+    dict's own top-level `ac`/`part`/`method`/`template` — used only for the
+    unresolved-file log and for picking which `cache/notices-rows/<ac>.jsonl`
+    to append to — come from the first resolved group."""
+    resolved = [g for g in groups if g[0] is not None and g[1] is not None and g[3] is not None]
+    if not resolved:
+        ac, part, method, template, _ = groups[0]
+        return {'unresolved': True, 'ac': ac, 'part': part, 'method': method, 'template': template}
+
+    rows = []
+    for ac, part, method, template, group_rows in resolved:
+        rows.extend({'ac': ac, 'part': part, 'serial': r.serial, 'epic': r.epic, 'name': r.name,
+                      'reason': r.reason, 'age': r.age, 'gender': r.gender, 'ok': True,
+                      'method': method, 'template': template, 'fileId': file_id} for r in group_rows)
+    ac0, part0, method0, template0, _ = resolved[0]
+    return {'ac': ac0, 'part': part0, 'method': method0, 'template': template0, 'rows': rows}
+
+
 def read_zip_members(data: bytes, path: list[str], file_id: str) -> list[dict]:
     """A zip of per-part PDFs, uploaded as one archive instead of individual
     files — found 2026-09-09 in Vijayanagara (4 of its 5 ACs). Each member is
@@ -117,22 +141,11 @@ def read_zip_members(data: bytes, path: list[str], file_id: str) -> list[dict]:
         base_name = name.rsplit('/', 1)[-1]
         try:
             pdf_bytes = zf.read(name)
-            ac, part, method, template, rows = read_notices_pdf(pdf_bytes, base_name, path)
+            groups = read_notices_pdf(pdf_bytes, base_name, path)
         except Exception as exc:  # noqa: BLE001
             members.append({'name': base_name, 'error': f'{type(exc).__name__}: {exc}'})
             continue
-        if ac is None or part is None or template is None:
-            members.append({'name': base_name, 'unresolved': True, 'ac': ac, 'part': part,
-                             'method': method, 'template': template})
-        else:
-            members.append({'name': base_name, 'ac': ac, 'part': part, 'method': method, 'template': template,
-                             'rows': [{'ac': ac, 'part': part, 'serial': r.serial, 'epic': r.epic,
-                                       'name': r.name, 'reason': r.reason, 'age': r.age, 'gender': r.gender,
-                                       'ok': True, 'method': method, 'template': template,
-                                       # Points at the archive, not the individual PDF — Drive has no
-                                       # deep-link into a zip member, so the archive is the closest
-                                       # real source link the UI can offer for this row.
-                                       'fileId': file_id} for r in rows]})
+        members.append({'name': base_name, **_flatten_groups(groups, file_id)})
     return members
 
 
@@ -153,20 +166,11 @@ def do_file(job: dict) -> dict:
         return {**job, 'archiveMembers': read_zip_members(data, job['path'], job['fileId'])}
 
     try:
-        ac, part, method, template, rows = read_notices_pdf(data, job['name'], job['path'])
+        groups = read_notices_pdf(data, job['name'], job['path'])
     except Exception as exc:  # noqa: BLE001
         return {**job, 'error': f'parse {type(exc).__name__}: {exc}'}
 
-    if ac is None or part is None or template is None:
-        return {**job, 'unresolved': True, 'ac': ac, 'part': part, 'method': method, 'template': template}
-
-    out_rows = [
-        {'ac': ac, 'part': part, 'serial': r.serial, 'epic': r.epic, 'name': r.name,
-         'reason': r.reason, 'age': r.age, 'gender': r.gender, 'ok': True,
-         'method': method, 'template': template, 'fileId': job['fileId']}
-        for r in rows
-    ]
-    return {**job, 'ac': ac, 'part': part, 'method': method, 'template': template, 'rows': out_rows}
+    return {**job, **_flatten_groups(groups, job['fileId'])}
 
 
 def main() -> int:
@@ -291,12 +295,16 @@ def main() -> int:
                                 }, ensure_ascii=False) + '\n')
                                 unresolved_fh.flush()
                                 continue
-                            ac = m['ac']
-                            if ac not in handles:
-                                handles[ac] = (NOTICES_ROWS / f'{ac}.jsonl').open('a', encoding='utf8')
+                            # Routed by each row's own `ac`, not `m['ac']` (that field is only
+                            # the first group's, for logging) — a multi-part file's rows can
+                            # legitimately carry different `ac`/`part` per row since the
+                            # 2026-09-16 fix (see notices_parser.read_notices_pdf).
                             for row in m['rows']:
-                                handles[ac].write(json.dumps(row, ensure_ascii=False) + '\n')
-                            handles[ac].flush()
+                                row_ac = row['ac']
+                                if row_ac not in handles:
+                                    handles[row_ac] = (NOTICES_ROWS / f'{row_ac}.jsonl').open('a', encoding='utf8')
+                                handles[row_ac].write(json.dumps(row, ensure_ascii=False) + '\n')
+                                handles[row_ac].flush()
                             total_rows += len(m['rows'])
                             by_template[m['template']] = by_template.get(m['template'], 0) + 1
                     elif res.get('unresolved'):
@@ -308,12 +316,14 @@ def main() -> int:
                         }, ensure_ascii=False) + '\n')
                         unresolved_fh.flush()
                     else:
-                        ac = res['ac']
-                        if ac not in handles:
-                            handles[ac] = (NOTICES_ROWS / f'{ac}.jsonl').open('a', encoding='utf8')
+                        # Same per-row routing as the archive branch above, and for the
+                        # same reason — see that branch's comment.
                         for row in res['rows']:
-                            handles[ac].write(json.dumps(row, ensure_ascii=False) + '\n')
-                        handles[ac].flush()
+                            row_ac = row['ac']
+                            if row_ac not in handles:
+                                handles[row_ac] = (NOTICES_ROWS / f'{row_ac}.jsonl').open('a', encoding='utf8')
+                            handles[row_ac].write(json.dumps(row, ensure_ascii=False) + '\n')
+                            handles[row_ac].flush()
                         total_rows += len(res['rows'])
                         by_template[res['template']] = by_template.get(res['template'], 0) + 1
 
