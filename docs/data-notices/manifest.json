@@ -1,9 +1,9 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-16T05:09:17.031Z",
+  "builtAt": "2026-09-16T06:37:43.258Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4330783,
+  "rows": 4330781,
   "constituencies": 220,
   "acs": {
     "1": {
@@ -131,8 +131,8 @@
       "nameKn": "ಮುಧೋಳ",
       "district": "BAGALKOT",
       "parts": 222,
-      "partsWithData": 90,
-      "rows": 2187
+      "partsWithData": 89,
+      "rows": 2185
     },
     "20": {
       "name": "Terdal",
