@@ -2754,3 +2754,148 @@ remembering if a future duplicate-resolution pass ever needs a
 tie-breaking rule: prefer the canonically-named folder's copy when two
 files are byte-identical duplicates, not whichever the merge happened to
 keep.
+
+## 15. CEO press note 18.09.2026 + a real Kunigal gap that finally filled — 2026-09-18
+
+Session started from a CEO tweet the user forwarded
+(`x.com/ceo_karnataka/status/2100881913506672716`). **x.com is not fetchable
+from here** — `WebFetch` returns HTTP 402 on a status URL, so a forwarded
+tweet cannot be read directly. Going to
+`ceo.karnataka.gov.in/press_releases.html` and taking the newest note is the
+working route, and it is what this project should keep doing; the tweet only
+ever signals that a new note exists.
+
+### Comparison figures refreshed (commit `992f6cd6d34`, live and verified)
+
+`PRESS NOTE- 18.09.2026.pdf` (note the space after the hyphen — the CEO's
+upload filenames are not consistently formatted; 11.09's had none). Parsed
+with PyMuPDF the same way as previous notes. Both annexures' sums were
+checked against the note's own printed statewide totals before committing:
+
+| | 11.09 | 18.09 | delta |
+|---|---|---|---|
+| Electors (Annexure-1) | 4,46,58,413 | **4,47,39,070** | +80,657 |
+| Notices generated (Annexure-2) | 43,81,760 | **43,81,945** | +185 |
+
+**A free cross-check worth reusing**: Annexure-2's *Polling Stations* column
+sums to exactly **60,923** — this project's own statewide part count, derived
+independently by binary-search probing the ECI CDN (section 4f). Per-district
+it also matches (Bangalore Urban 3,354, Belgaum 4,644, Kodagu 567). Any
+future note whose polling-station column disagrees with `cache/manifest.json`
+is worth investigating before trusting either side.
+
+Updated in `docs/app.js`: `CEO_OFFICIAL_ELECTORS`, `CEO_OFFICIAL_TOTAL`,
+`CEO_OFFICIAL_NOTICES`, the date strings in both languages; and in
+`docs/index.html` the static footer copy plus the press-note link (fetched,
+200). Deploy confirmed serving the new figures.
+
+**Deadlines unchanged by this note**: last hearing 12.10.2026, disposal of
+claims/objections 22.10.2026, Final Roll 27.10.2026 — same as 11.09's.
+`CLAIMS_CLOSE_AT` in `3-build-data.mjs` is still `2026-09-23` and this note
+gives no reason to move it (it speaks only to *disposal*, not to the filing
+window), but that banner date is now days away and should be re-confirmed
+against an ECI source before it lapses.
+
+**New in this note, not previously recorded anywhere**: the CEO acknowledges
+directly that electors are failing to find themselves in the part they were
+registered in before, because polling stations were rationalised and electors
+re-serialised, and directs them to search by EPIC instead. That is precisely
+what this site does, and the site's own copy does not currently say it.
+
+### The comparison percentage is now drifting for a reason the UI does not state
+
+The "vs. CEO official count" tile moved **99.4% → 99.2%** on this update. Our
+own count did not change and cannot: the draft roll PDFs are a frozen
+24.08.2026 snapshot. The CEO's figure, by contrast, grows every week with new
+Form-6 registrations. So a growing share of that gap is *not* what
+`offsetReasonNote` says it is (OCR-withheld unreadable entries) — it is
+electors who were never in the draft roll at all. At +80,657/week this
+divergence is roughly 0.18 points per note and will keep widening until the
+Final Roll drops on 27.10.2026. **The copy should be updated to name both
+causes**; not done here because site wording is a standing user decision
+(section 7, item 5).
+
+### Per-district UI numbers audited against the live manifests
+
+Every rendered figure was recomputed from the three live manifests and
+compared against the deployed page's own DOM text — all 34 district rows
+match, all 34 CEO keys resolve (no `—`), and the district electors sum equals
+`manifest.electors` exactly. Elector offsets sit in a tight **97.6-99.7%**
+band, consistent with section 10's history.
+
+**One thing the audit surfaced, pre-existing and not caused by this update**:
+five districts read **at or above 100%** on notices — Ramanagaram **102.4%**
+(20,175 ours vs 19,696 CEO), and Kodagu, Kolar, Udupi and Yadgir each a few
+rows over. That contradicts the site's own `offsetReasonNote`, which tells
+the reader this column is *expected* to sit under 100% because our dataset
+covers one reason-category out of several. Both readings cannot be right. The
+likely explanation is duplicate rows surviving the merge (this dataset's
+known re-upload pattern, sections 12-14) rather than the CEO under-counting,
+but that is a hypothesis — nobody has checked an over-counted district's rows
+against its source PDFs. Worth doing before someone points at Ramanagaram as
+evidence the data is wrong.
+
+### Tile numbers were breaking mid-group (fixed, `6870fc0a7a7`)
+
+`.tile-value` carries `overflow-wrap: anywhere` and the tiles' grid minimum
+was `160px`, which measured out to a 123px text box against 140-166px of
+text — so the browser broke the eight-digit values at arbitrary positions and
+the page was literally rendering "43,30,781" as `43,30,78` / `1`. Widened the
+grid minimum to `210px`; verified in the live page at 1536px and with the
+container forced to 330/300/260px that all seven tiles now take one line
+each. Worth remembering that Indian digit grouping makes these values ~11
+characters — any new tile, or a narrower breakpoint, needs re-measuring
+rather than eyeballing.
+
+### The statewide Drive crawl found exactly one new thing: Kunigal is real now
+
+Ran checklist item 3 (section 13) properly: re-scraped
+`ceo.karnataka.gov.in/notices_issued.html` first and diffed all 34 folder IDs
+against `DISTRICT_FOLDERS` — **no drift**, every ID still current (the
+Vijayapura-style link move from section 12 has not recurred). Then a full
+crawl: **50,640 PDFs across 34 districts, 0 district-level failures**, 1
+unhandled `.rar` (Ramanagara's known one).
+
+Diffed by `fileId` against the previous crawl (2026-09-16), rather than
+against a remembered number:
+
+- **Tumkur `131-Kunigal`: 177 files removed, 257 added.** The 177 that
+  vanished are exactly the misfiled `ac137`-named Pavagada duplicates
+  section 14 identified. The 257 new ones are all named `ac131`. **Verified
+  by content, not by filename** (this project's standing requirement):
+  downloaded `..._ac131_part10.pdf` (fileId
+  `1-AhaAiuBQtysmdmYRqnz_hMe1Rks9o2W`) and read it with PyMuPDF — its own
+  header says `AC No and Name: 131 - Kunigal`, `Part No and Name: 10 -
+  Government Lower Primary School`, Template A, real EPICs and reasons. The
+  district office has replaced the wrongly-uploaded folder with genuine
+  Kunigal content. **Section 14's conclusion — "AC131 has never had genuine
+  source PDFs, nothing to chase unless that changes on a future crawl" — is
+  now superseded; it changed.**
+- **Gulbarga: one file removed** (`..._ac45_part262.pdf`), nothing added in
+  that district. A single part withdrawn at source, already published; no
+  action, noted so a future crawl diff does not read it as new.
+- Statewide, **AC131 was the only AC with crawled files and zero published
+  rows**. The 8 ACs that look like the reverse (published rows, no crawled
+  files — Nargund, Hadagali, Hagaribommanahalli, Vijayanagara, Harapanahalli,
+  Harihar, Honnali, Kollegal) are the known zip and Template-C cases whose
+  filenames carry no `_acNNN_`; 2,152 files statewide are unlabelled that
+  way, so a filename-derived AC map cannot see them. Not gaps.
+
+Triggered `Import notices data` after checking with the user (run
+`35376116910`, started 17:44Z) — the shared-state-Actions confirmation habit
+from section 14. **Expected effect, written down before the result so it can
+be checked honestly**: Tumkur's notices column should rise from its current
+**83.4%** of the CEO figure (93,299 / 1,11,875), the lowest in the state, and
+AC131 should stop reading zero. If Tumkur does *not* move, the first thing to
+check is whether these new files' EPICs are already published under AC137 —
+the same duplicate-merge outcome section 14 measured, just with correct
+filenames this time.
+
+### Machine state at the start of this session
+
+No `node.exe` processes running — the exhaustive sweep
+(`14-exhaustive-sweep.mjs`) and the test-log committer
+(`16-commit-test-log.mjs`) were both stopped, last test-log commit
+2026-09-17 17:01Z, with one uncommitted line still sitting in
+`test-logs/test-log.jsonl`. Neither was restarted this session; nothing above
+depends on them.
