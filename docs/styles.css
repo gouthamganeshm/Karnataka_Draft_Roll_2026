@@ -352,7 +352,7 @@ main { padding-bottom: 56px; }
 .chart { margin-top: 18px; }
 
 .tiles {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 14px; margin-bottom: 20px;
 }
 .tile {
