@@ -1,10 +1,10 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-16T06:37:43.258Z",
+  "builtAt": "2026-09-18T18:42:00.769Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4330781,
-  "constituencies": 220,
+  "rows": 4340350,
+  "constituencies": 221,
   "acs": {
     "1": {
       "name": "Nippani",
@@ -339,8 +339,8 @@
       "nameKn": "ಗುಲಬರ್ಗಾ ಉತ್ತರ",
       "district": "GULBARGA",
       "parts": 308,
-      "partsWithData": 296,
-      "rows": 25585
+      "partsWithData": 295,
+      "rows": 25529
     },
     "46": {
       "name": "Aland",
@@ -1021,6 +1021,14 @@
       "parts": 229,
       "partsWithData": 200,
       "rows": 5373
+    },
+    "131": {
+      "name": "Kunigal",
+      "nameKn": "ಕುಣಿಗಲ್‌",
+      "district": "TUMKUR",
+      "parts": 270,
+      "partsWithData": 257,
+      "rows": 9625
     },
     "132": {
       "name": "Tumkur City",
