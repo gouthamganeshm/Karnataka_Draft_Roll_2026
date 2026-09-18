@@ -37,8 +37,8 @@ const partPdfUrl = (acNo, partNo) =>
 const NEGATIVE_VERDICT_COVERAGE = 99;
 
 /* District-wise elector totals from the Chief Electoral Officer's own press
- * note (Annexure-1, "PRESS NOTE-11.09.2026.pdf" — updated 2026-09-11 from the
- * previous 04-09-2026 note; the CEO reissues this roughly weekly, so
+ * note (Annexure-1, "PRESS NOTE- 18.09.2026.pdf" — updated 2026-09-18 from the
+ * previous 11.09.2026 note; the CEO reissues this roughly weekly, so
  * re-check @ceo_karnataka on X for a newer one before trusting this is still
  * current), fetched and transcribed by hand — the CEO does not publish this
  * as structured data. This is a fixed snapshot, not a live figure: it will
@@ -46,17 +46,17 @@ const NEGATIVE_VERDICT_COVERAGE = 99;
  * See the offset note rendered next to the district table for why the two
  * never match exactly. */
 const CEO_OFFICIAL_ELECTORS = {
-  'BELGAUM': 3593583, 'BANGALORE URBAN': 2304281, 'MYSORE': 2242381, 'TUMKUR': 2062351,
-  'GULBARGA': 1849981, 'BIJAPUR': 1685167, 'DAKSHINA KANNADA': 1646401, 'MANDYA': 1412819,
-  'RAICHUR': 1394405, 'BAGALKOT': 1393852, 'HASSAN': 1375488, 'DHARWAD': 1354276,
-  'SHIMOGA': 1331170, 'CHITRADURGA': 1298004, 'DAVANGERE': 1300375, 'B.B.M.P(NORTH)': 1280015,
-  'BIDAR': 1220946, 'HAVERI': 1221912, 'UTTARA KANNADA': 1123606, 'KOLAR': 1125111,
-  'B.B.M.P(SOUTH)': 1086732, 'KOPPAL': 1043225, 'B.B.M.P(CENTRAL)': 1029166, 'BELLARY': 1006627,
-  'UDUPI': 1000746, 'VIJAYANAGARA': 995014, 'CHIKKABALLAPUR': 945496, 'YADGIR': 864247,
-  'CHIKKMAGALUR': 863545, 'RAMANAGARAM': 828172, 'BANGALORE RURAL': 796153, 'CHAMARAJNAGAR': 794309,
-  'GADAG': 782902, 'KODAGU': 405955
+  'BELGAUM': 3593978, 'BANGALORE URBAN': 2304158, 'MYSORE': 2244990, 'TUMKUR': 2065494,
+  'GULBARGA': 1851269, 'BIJAPUR': 1687395, 'DAKSHINA KANNADA': 1647842, 'MANDYA': 1417340,
+  'RAICHUR': 1402182, 'BAGALKOT': 1400551, 'HASSAN': 1379924, 'DHARWAD': 1355614,
+  'SHIMOGA': 1335817, 'DAVANGERE': 1303924, 'CHITRADURGA': 1301481, 'B.B.M.P(NORTH)': 1280466,
+  'HAVERI': 1224155, 'BIDAR': 1222382, 'KOLAR': 1129312, 'UTTARA KANNADA': 1124369,
+  'B.B.M.P(SOUTH)': 1086827, 'KOPPAL': 1045395, 'B.B.M.P(CENTRAL)': 1029476, 'BELLARY': 1010361,
+  'UDUPI': 1001555, 'VIJAYANAGARA': 998634, 'CHIKKABALLAPUR': 948975, 'YADGIR': 864356,
+  'CHIKKMAGALUR': 864355, 'RAMANAGARAM': 831326, 'CHAMARAJNAGAR': 797305, 'BANGALORE RURAL': 796425,
+  'GADAG': 784945, 'KODAGU': 406492
 };
-const CEO_OFFICIAL_TOTAL = 44658413;
+const CEO_OFFICIAL_TOTAL = 44739070;
 
 /* District-wise "notices to be generated" counts, same press note as above
  * (Annexure-2) — a different table than CEO_OFFICIAL_ELECTORS, and a
@@ -67,15 +67,18 @@ const CEO_OFFICIAL_TOTAL = 44658413;
  * their own first page — so this site reading somewhat under the CEO
  * total is expected even at full coverage, not just a gap to close. */
 const CEO_OFFICIAL_NOTICES = {
-  'UTTARA KANNADA': 65248, 'B.B.M.P(CENTRAL)': 429316, 'BANGALORE URBAN': 945732,
-  'B.B.M.P(NORTH)': 613454, 'B.B.M.P(SOUTH)': 418101, 'MANDYA': 150258,
-  'DAKSHINA KANNADA': 150125, 'KOLAR': 142181, 'MYSORE': 128216, 'TUMKUR': 111875,
-  'GULBARGA': 105500, 'UDUPI': 97673, 'CHIKKMAGALUR': 91609, 'BELGAUM': 84402,
-  'HASSAN': 79774, 'CHITRADURGA': 68750, 'RAICHUR': 69070, 'HAVERI': 60011,
-  'KODAGU': 58883, 'BANGALORE RURAL': 56349, 'CHIKKABALLAPUR': 55798, 'YADGIR': 55081,
-  'SHIMOGA': 48660, 'DHARWAD': 47939, 'BAGALKOT': 47433, 'BELLARY': 37868,
-  'BIDAR': 32667, 'VIJAYANAGARA': 30622, 'GADAG': 25973, 'BIJAPUR': 24529,
-  'RAMANAGARAM': 19696, 'KOPPAL': 14401, 'CHAMARAJNAGAR': 7480, 'DAVANGERE': 7086
+  'BANGALORE URBAN': 945748, 'B.B.M.P(NORTH)': 613516, 'B.B.M.P(CENTRAL)': 429354,
+  'B.B.M.P(SOUTH)': 418110, 'MANDYA': 150259, 'DAKSHINA KANNADA': 150128,
+  'KOLAR': 142182, 'MYSORE': 128216, 'TUMKUR': 111875,
+  'GULBARGA': 105503, 'UDUPI': 97674, 'CHIKKMAGALUR': 91610,
+  'BELGAUM': 84412, 'HASSAN': 79774, 'RAICHUR': 69097,
+  'CHITRADURGA': 68750, 'UTTARA KANNADA': 65248, 'HAVERI': 60011,
+  'KODAGU': 58883, 'BANGALORE RURAL': 56349, 'CHIKKABALLAPUR': 55798,
+  'YADGIR': 55081, 'SHIMOGA': 48660, 'DHARWAD': 47944,
+  'BAGALKOT': 47433, 'BELLARY': 37868, 'BIDAR': 32672,
+  'VIJAYANAGARA': 30622, 'GADAG': 25973, 'BIJAPUR': 24532,
+  'RAMANAGARAM': 19696, 'KOPPAL': 14401, 'CHAMARAJNAGAR': 7480,
+  'DAVANGERE': 7086
 };
 const CEO_OFFICIAL_NOTICES_TOTAL = Object.values(CEO_OFFICIAL_NOTICES).reduce((a, b) => a + b, 0);
 
@@ -100,11 +103,11 @@ const STRINGS = {
     districtSub: 'A constituency is only searchable once every one of its booths has been read. Click a column heading to sort.',
     colOfficial: 'CEO official', colOffset: 'vs. official',
     colNotices: 'Notices (ours)', colOfficialNotices: 'Notices (CEO)', colNoticesOffset: 'vs. CEO notices',
-    offsetReasonNote: 'The "CEO official" column is the district-wise elector count from the Chief Electoral Officer\'s press note of 11 September 2026 — a fixed snapshot, shown for comparison only. This site\'s own count runs slightly behind it in every district, for one deliberate reason: where the source page image is too smudged, folded or low-contrast for the OCR reader to form a valid EPIC with confidence, that entry is withheld from search rather than published as a guess. The CEO\'s figure comes from their own source records, not OCR, so it is not subject to the same gap. The "Notices" columns compare separately, against the same press note\'s count of every notice the SIR process generated statewide — but this site\'s notices dataset only ever covers the "discrepancy and no-mapping" reason, one category among several the CEO\'s total includes, so running noticeably under 100% there is expected even once every district is fully covered, not just a gap still to close.',
+    offsetReasonNote: 'The "CEO official" column is the district-wise elector count from the Chief Electoral Officer\'s press note of 18 September 2026 — a fixed snapshot, shown for comparison only. This site\'s own count runs slightly behind it in every district, for one deliberate reason: where the source page image is too smudged, folded or low-contrast for the OCR reader to form a valid EPIC with confidence, that entry is withheld from search rather than published as a guess. The CEO\'s figure comes from their own source records, not OCR, so it is not subject to the same gap. The "Notices" columns compare separately, against the same press note\'s count of every notice the SIR process generated statewide — but this site\'s notices dataset only ever covers the "discrepancy and no-mapping" reason, one category among several the CEO\'s total includes, so running noticeably under 100% there is expected even once every district is fully covered, not just a gap still to close.',
     footerSource: 'Source: the draft electoral roll published by the Chief Electoral Officer, Karnataka for the Special Intensive Revision 2026. This site is an independent, unofficial reformatting of those documents. Always confirm with your BLO or voters.eci.gov.in before acting.',
     footerLink: 'Official draft roll download on voters.eci.gov.in',
     footerCeo: 'Chief Electoral Officer, Karnataka',
-    footerOfficialStats: 'Official count as of 11 September 2026: 4,46,58,413 electors statewide (Chief Electoral Officer, Karnataka). The Final Electoral Roll is due to be published on 27 October 2026.',
+    footerOfficialStats: 'Official count as of 18 September 2026: 4,47,39,070 electors statewide (Chief Electoral Officer, Karnataka). The Final Electoral Roll is due to be published on 27 October 2026.',
     footerOfficialStatsLink: 'Read the official press note (PDF) ↗',
     footerOffsetCompare: 'This site currently indexes {ours} electors — {pct}% of that official figure. See "Import coverage by district" above for why.',
 
@@ -178,11 +181,11 @@ const STRINGS = {
     districtSub: 'ಎಲ್ಲಾ ಮತಗಟ್ಟೆಗಳನ್ನು ಓದಿದ ನಂತರವೇ ಕ್ಷೇತ್ರವನ್ನು ಹುಡುಕಬಹುದು.',
     colOfficial: 'ಸಿಇಒ ಅಧಿಕೃತ', colOffset: 'ಅಧಿಕೃತಕ್ಕೆ ಹೋಲಿಸಿ',
     colNotices: 'ನೋಟಿಸ್ (ನಮ್ಮದು)', colOfficialNotices: 'ನೋಟಿಸ್ (ಸಿಇಒ)', colNoticesOffset: 'ಸಿಇಒ ನೋಟಿಸ್‌ಗೆ ಹೋಲಿಸಿ',
-    offsetReasonNote: '"ಸಿಇಒ ಅಧಿಕೃತ" ಅಂಕಣವು ೧೧ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರ ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ಜಿಲ್ಲಾವಾರು ಎಣಿಕೆ — ಹೋಲಿಕೆಗಾಗಿ ಮಾತ್ರ ತೋರಿಸಲಾಗಿದೆ, ಇದು ಬದಲಾಗುವುದಿಲ್ಲ. ಈ ತಾಣದ ಸ್ವಂತ ಎಣಿಕೆ ಪ್ರತಿ ಜಿಲ್ಲೆಯಲ್ಲಿ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರುತ್ತದೆ, ಏಕೆಂದರೆ ಮೂಲ ಪುಟದ ಚಿತ್ರ ಅಸ್ಪಷ್ಟ ಅಥವಾ ಮಸುಕಾಗಿದ್ದಲ್ಲಿ, ಒಸಿಆರ್ ಊಹಿಸಿ ಪ್ರಕಟಿಸುವ ಬದಲು ಆ ನಮೂದನ್ನು ತಡೆಹಿಡಿಯುತ್ತದೆ. ಸಿಇಒ ಅಂಕಿ ಅವರ ಸ್ವಂತ ಮೂಲ ದಾಖಲೆಗಳಿಂದ ಬಂದಿದೆ, ಒಸಿಆರ್‌ನಿಂದಲ್ಲ. "ನೋಟಿಸ್" ಅಂಕಣಗಳು ಪ್ರತ್ಯೇಕವಾಗಿ, ಅದೇ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ರಾಜ್ಯಾದ್ಯಂತ ಎಸ್‌ಐಆರ್ ಪ್ರಕ್ರಿಯೆ ಸೃಷ್ಟಿಸಿದ ಎಲ್ಲಾ ನೋಟಿಸ್‌ಗಳ ಎಣಿಕೆಗೆ ಹೋಲಿಸುತ್ತವೆ — ಆದರೆ ಈ ತಾಣದ ನೋಟಿಸ್ ದತ್ತಾಂಶ "ಅಸಂಗತತೆ ಮತ್ತು ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ" ಕಾರಣವನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿದೆ, ಸಿಇಒ ಎಣಿಕೆ ಒಳಗೊಂಡ ಹಲವು ವರ್ಗಗಳಲ್ಲಿ ಒಂದು — ಆದ್ದರಿಂದ ಪ್ರತಿ ಜಿಲ್ಲೆ ಪೂರ್ಣವಾಗಿ ಒಳಗೊಂಡ ನಂತರವೂ ೧೦೦%ಗಿಂತ ಗಮನಾರ್ಹವಾಗಿ ಕಡಿಮೆ ಇರುವುದು ನಿರೀಕ್ಷಿತ, ಇನ್ನೂ ಮುಚ್ಚಬೇಕಾದ ಕೊರತೆಯಲ್ಲ.',
+    offsetReasonNote: '"ಸಿಇಒ ಅಧಿಕೃತ" ಅಂಕಣವು ೧೮ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರ ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿಯ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ಜಿಲ್ಲಾವಾರು ಎಣಿಕೆ — ಹೋಲಿಕೆಗಾಗಿ ಮಾತ್ರ ತೋರಿಸಲಾಗಿದೆ, ಇದು ಬದಲಾಗುವುದಿಲ್ಲ. ಈ ತಾಣದ ಸ್ವಂತ ಎಣಿಕೆ ಪ್ರತಿ ಜಿಲ್ಲೆಯಲ್ಲಿ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರುತ್ತದೆ, ಏಕೆಂದರೆ ಮೂಲ ಪುಟದ ಚಿತ್ರ ಅಸ್ಪಷ್ಟ ಅಥವಾ ಮಸುಕಾಗಿದ್ದಲ್ಲಿ, ಒಸಿಆರ್ ಊಹಿಸಿ ಪ್ರಕಟಿಸುವ ಬದಲು ಆ ನಮೂದನ್ನು ತಡೆಹಿಡಿಯುತ್ತದೆ. ಸಿಇಒ ಅಂಕಿ ಅವರ ಸ್ವಂತ ಮೂಲ ದಾಖಲೆಗಳಿಂದ ಬಂದಿದೆ, ಒಸಿಆರ್‌ನಿಂದಲ್ಲ. "ನೋಟಿಸ್" ಅಂಕಣಗಳು ಪ್ರತ್ಯೇಕವಾಗಿ, ಅದೇ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯ ರಾಜ್ಯಾದ್ಯಂತ ಎಸ್‌ಐಆರ್ ಪ್ರಕ್ರಿಯೆ ಸೃಷ್ಟಿಸಿದ ಎಲ್ಲಾ ನೋಟಿಸ್‌ಗಳ ಎಣಿಕೆಗೆ ಹೋಲಿಸುತ್ತವೆ — ಆದರೆ ಈ ತಾಣದ ನೋಟಿಸ್ ದತ್ತಾಂಶ "ಅಸಂಗತತೆ ಮತ್ತು ಮ್ಯಾಪಿಂಗ್ ಇಲ್ಲದಿರುವ" ಕಾರಣವನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿದೆ, ಸಿಇಒ ಎಣಿಕೆ ಒಳಗೊಂಡ ಹಲವು ವರ್ಗಗಳಲ್ಲಿ ಒಂದು — ಆದ್ದರಿಂದ ಪ್ರತಿ ಜಿಲ್ಲೆ ಪೂರ್ಣವಾಗಿ ಒಳಗೊಂಡ ನಂತರವೂ ೧೦೦%ಗಿಂತ ಗಮನಾರ್ಹವಾಗಿ ಕಡಿಮೆ ಇರುವುದು ನಿರೀಕ್ಷಿತ, ಇನ್ನೂ ಮುಚ್ಚಬೇಕಾದ ಕೊರತೆಯಲ್ಲ.',
     footerSource: 'ಮೂಲ: ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ ಪ್ರಕಟಿಸಿದ ಎಸ್‌ಐಆರ್ ೨೦೨೬ ಕರಡು ಮತದಾರರ ಪಟ್ಟಿ. ಇದು ಅನಧಿಕೃತ ಮರುರಚನೆ. ಕ್ರಮ ಕೈಗೊಳ್ಳುವ ಮೊದಲು ನಿಮ್ಮ ಬಿಎಲ್‌ಒ ಅಥವಾ voters.eci.gov.in ನಲ್ಲಿ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
     footerLink: 'voters.eci.gov.in ನಲ್ಲಿ ಅಧಿಕೃತ ಕರಡು ಪಟ್ಟಿ',
     footerCeo: 'ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ',
-    footerOfficialStats: '೧೧ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರಂತೆ ಅಧಿಕೃತ ಎಣಿಕೆ: ರಾಜ್ಯಾದ್ಯಂತ ೪,೪೬,೫೮,೪೧೩ ಮತದಾರರು (ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ). ಅಂತಿಮ ಮತದಾರರ ಪಟ್ಟಿ ೨೭ ಅಕ್ಟೋಬರ್ ೨೦೨೬ ರಂದು ಪ್ರಕಟವಾಗಲಿದೆ.',
+    footerOfficialStats: '೧೮ ಸೆಪ್ಟೆಂಬರ್ ೨೦೨೬ರಂತೆ ಅಧಿಕೃತ ಎಣಿಕೆ: ರಾಜ್ಯಾದ್ಯಂತ ೪,೪೭,೩೯,೦೭೦ ಮತದಾರರು (ಮುಖ್ಯ ಚುನಾವಣಾಧಿಕಾರಿ, ಕರ್ನಾಟಕ). ಅಂತಿಮ ಮತದಾರರ ಪಟ್ಟಿ ೨೭ ಅಕ್ಟೋಬರ್ ೨೦೨೬ ರಂದು ಪ್ರಕಟವಾಗಲಿದೆ.',
     footerOfficialStatsLink: 'ಅಧಿಕೃತ ಪತ್ರಿಕಾ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಿ (ಪಿಡಿಎಫ್) ↗',
     footerOffsetCompare: 'ಈ ತಾಣ ಪ್ರಸ್ತುತ {ours} ಮತದಾರರನ್ನು ಸೂಚಿಸುತ್ತದೆ — ಅಧಿಕೃತ ಅಂಕಿಯ {pct}%. ಕಾರಣಕ್ಕಾಗಿ ಮೇಲಿನ "ಜಿಲ್ಲಾವಾರು ಆಮದು ವ್ಯಾಪ್ತಿ" ನೋಡಿ.',
 
