@@ -2899,3 +2899,49 @@ No `node.exe` processes running — the exhaustive sweep
 2026-09-17 17:01Z, with one uncommitted line still sitting in
 `test-logs/test-log.jsonl`. Neither was restarted this session; nothing above
 depends on them.
+
+### Import result — the prediction held, and Kunigal is genuinely new data
+
+Run `35376116910` finished **success in 58m39s**, published build
+`2026-09-18T18:42:00.769Z`. Checked against the live manifest fetched fresh
+(cache-busted), not against the workflow's own log:
+
+**Exactly two ACs changed statewide**, and both were predicted by the crawl
+diff before the run started:
+
+| AC | | rows | partsWithData |
+|---|---|---|---|
+| 131 Kunigal (Tumkur) | **new** | 0 → **9,625** | 0 → **257** |
+| 45 Gulbarga Uttar | withdrawn file | 25,585 → 25,529 (−56) | 296 → 295 |
+
+AC45's −56 is precisely the single source file the crawl diff found deleted
+(`..._ac45_part262.pdf`) — a satisfying closed loop: the diff predicted both
+changes and the import produced exactly those two, nothing else moved.
+
+**AC137 Pavagada is unchanged at 6,342 rows**, which is the important
+negative result. Section 14's worry was that the Kunigal folder would turn
+out to be Pavagada's rows again under better filenames, in which case the
+merge would have deduplicated them into nothing. It did not: 9,625 genuinely
+new electors landed, and Pavagada did not move a single row.
+
+Statewide notices **4,330,781 → 4,340,350** (+9,569 = 9,625 − 56), ACs with
+data **220 → 221**.
+
+**UI effect**: the "Notice records" tile reads 43,40,350 and "vs. CEO notices
+count" **98.8% → 99.1%**. Tumkur's district row moves **83.4% → 92.0%**
+(1,02,924 of 1,11,875) and is no longer the state's outlier — Hassan (88.6%)
+now is.
+
+**Verified end-to-end against the deployed tree, not just the manifest.**
+Four EPICs read by eye out of the downloaded source PDF
+(`..._ac131_part10.pdf`) were run through `docs/app.js`'s own lookup path
+(SHA-256 → `bucketPath` → suffix match) over real HTTP against
+`data-notices`: `RVP4772265`, `RVP4771838`, `RVP4971479` and `GFC2120020`
+all resolve to AC131 part 10 at serials 6, 19, 52 and 98, with reason, age,
+gender and name matching the PDF field for field. The published `fileId`
+also points at the correct `131-Kunigal` file, so the cosmetic
+wrong-folder-link issue section 14 recorded does not apply to these rows.
+
+**Still true after this run**: AC131 now has 257 of its 270 parts, so 13
+Kunigal booths remain without source PDFs — ordinary sparse upload, the same
+shape as most districts, not a gap to chase.
