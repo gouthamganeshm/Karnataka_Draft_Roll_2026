@@ -1,9 +1,9 @@
 {
   "state": "S10",
-  "builtAt": "2026-09-18T18:42:00.769Z",
+  "builtAt": "2026-09-22T18:33:22.013Z",
   "shardDepth": 3,
   "suffixLength": 8,
-  "rows": 4340350,
+  "rows": 4340895,
   "constituencies": 221,
   "acs": {
     "1": {
@@ -1515,8 +1515,8 @@
       "nameKn": "ಕೆ.ಆರ್‌ .ಪೇಟೆ",
       "district": "MANDYA",
       "parts": 276,
-      "partsWithData": 253,
-      "rows": 12328
+      "partsWithData": 265,
+      "rows": 12873
     },
     "193": {
       "name": "Shravanabelagola",
