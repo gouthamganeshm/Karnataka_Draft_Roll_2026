@@ -2994,3 +2994,13 @@ Arsikere 68/281, Koratagere 59/256, Pavagada 177/251, Vijayanagar(167)
 263/284. Drive file counts match our parts-with-data one-for-one there, and
 ECI's CDN does not host these reports (probed; the ASD control URL 200s).
 Nothing further to fetch unless a district uploads more.
+
+**Import result, verified against the deployed site.** Run `35761838538`
+succeeded; build `2026-09-22T18:33:22.013Z`, commit `d9b7a1e4f`. Statewide
+4,340,350 → **4,340,895** (+545 exactly); Mandya job read `{'A': 1804,
+'xlsx': 3}`. Live AC192: **12,873 rows, 265 parts with data**. Live lookups
+via the app's own SHA-256 bucket path: sheet-only `YTE2798502` and
+`YTE4155503` resolve to AC192 part 73 (serials 305, 484, reason `PROGENY`,
+no age/gender), and `YTE2074110`, which is in both sources, still carries its
+PDF row (`Parent Age Difference <15`, 67, M). That confirms the PDF-first
+ordering held.
