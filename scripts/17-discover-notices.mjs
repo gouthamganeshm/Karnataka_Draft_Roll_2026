@@ -130,6 +130,11 @@ async function crawlOnce(rootId) {
         files.push({ fileId: e.id, name: e.name, path });
       } else if (/\.zip$/i.test(e.name)) {
         files.push({ fileId: e.id, name: e.name, path, kind: 'zip' });
+      } else if (/\.xlsx$/i.test(e.name)) {
+        // Mandya's AC192 publishes its elector-level list as a spreadsheet,
+        // covering booths that have no PDF at all. Count-only sheets are
+        // skipped at extraction, not here.
+        files.push({ fileId: e.id, name: e.name, path, kind: 'xlsx' });
       } else if (/\.(rar|7z)$/i.test(e.name)) {
         unhandledArchives.push({ name: e.name, path: path.join('/') });
       }

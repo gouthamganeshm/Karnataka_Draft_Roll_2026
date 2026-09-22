@@ -45,7 +45,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).parent / 'ocr'))
-from notices_parser import read_notices_pdf  # noqa: E402
+from notices_parser import FOLDER_AC_RE, read_notices_pdf  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = Path(os.environ.get('ROLL_CACHE', ROOT / 'cache'))
@@ -75,7 +75,10 @@ class DriveRateLimited(Exception):
 
 def fetch(file_id: str, kind: str = 'pdf', tries: int = 4, timeout: int = 60) -> bytes:
     url = f'https://drive.google.com/uc?export=download&id={file_id}'
-    magic = b'PK' if kind == 'zip' else b'%PDF-'
+    if kind == 'xlsx':
+        # Multi-MB sheets get Drive's "can't scan for viruses" page on the uc URL.
+        url = f'https://drive.usercontent.google.com/download?id={file_id}&export=download&confirm=t'
+    magic = b'PK' if kind in ('zip', 'xlsx') else b'%PDF-'
     last_exc: Exception | None = None
     for attempt in range(tries):
         try:
@@ -121,6 +124,41 @@ def _flatten_groups(groups: list, file_id: str) -> dict:
     return {'ac': ac0, 'part': part0, 'method': method0, 'template': template0, 'rows': rows}
 
 
+def read_xlsx_rows(data: bytes, path: list[str], file_id: str) -> dict:
+    """An elector-level notices list uploaded as a spreadsheet (Mandya AC192:
+    EPIC No. | Part No. | Serial No. | Name | Mapping Category). Checked against
+    that AC's own PDFs: every overlapping EPIC agreed on part and serial. The
+    sheet has no AC column, so the AC comes from the nearest "{ac}-name"
+    folder. Sheets without an EPIC column (per-part count reports) yield no
+    rows."""
+    import openpyxl
+
+    ac = next((int(m.group(1)) for p in reversed(path) if (m := FOLDER_AC_RE.match(p))), None)
+    wb = openpyxl.load_workbook(io.BytesIO(data), read_only=True)
+    rows = []
+    for ws in wb.worksheets:
+        cols = None
+        for r in ws.iter_rows(values_only=True):
+            cells = [str(c).strip() if c is not None else '' for c in r]
+            if cols is None or 'EPIC No.' in cells:
+                if 'EPIC No.' in cells and 'Part No.' in cells:
+                    cols = {h: i for i, h in enumerate(cells)}
+                continue
+            part = r[cols['Part No.']]
+            serial = r[cols['Serial No.']] if 'Serial No.' in cols else None
+            if not isinstance(part, (int, float)):
+                continue
+            rows.append({'ac': ac, 'part': int(part), 'serial': int(serial) if isinstance(serial, (int, float)) else 0,
+                         'epic': cells[cols['EPIC No.']].upper(),
+                         'name': cells[cols['Name']] if 'Name' in cols else '',
+                         'reason': cells[cols['Mapping Category']] if 'Mapping Category' in cols else '',
+                         'age': None, 'gender': '', 'ok': True,
+                         'method': 'folder', 'template': 'xlsx', 'fileId': file_id})
+    if rows and ac is None:
+        return {'unresolved': True, 'ac': None, 'part': None, 'method': 'folder', 'template': 'xlsx'}
+    return {'ac': ac, 'part': None, 'method': 'folder', 'template': 'xlsx', 'rows': rows}
+
+
 def read_zip_members(data: bytes, path: list[str], file_id: str) -> list[dict]:
     """A zip of per-part PDFs, uploaded as one archive instead of individual
     files — found 2026-09-09 in Vijayanagara (4 of its 5 ACs). Each member is
@@ -164,6 +202,11 @@ def do_file(job: dict) -> dict:
 
     if kind == 'zip':
         return {**job, 'archiveMembers': read_zip_members(data, job['path'], job['fileId'])}
+    if kind == 'xlsx':
+        try:
+            return {**job, **read_xlsx_rows(data, job['path'], job['fileId'])}
+        except Exception as exc:  # noqa: BLE001
+            return {**job, 'error': f'xlsx {type(exc).__name__}: {exc}'}
 
     try:
         groups = read_notices_pdf(data, job['name'], job['path'])
@@ -234,8 +277,15 @@ def main() -> int:
     BATCH_TIMEOUT_S = 600
     rate_limited = False
     since_cooldown = 0  # files completed since the last pull-size pause
+    # Spreadsheet jobs go in batches of their own after every PDF batch: the
+    # build keeps the first row it sees per EPIC, and a PDF row carries age,
+    # gender and the specific reason where a sheet row has only a category.
+    pdf_jobs = [j for j in jobs if j.get('kind') != 'xlsx']
+    xlsx_jobs = [j for j in jobs if j.get('kind') == 'xlsx']
+    batches = [(i, pdf_jobs[i:i + BATCH_SIZE]) for i in range(0, len(pdf_jobs), BATCH_SIZE)]
+    batches += [(len(pdf_jobs) + i, xlsx_jobs[i:i + BATCH_SIZE]) for i in range(0, len(xlsx_jobs), BATCH_SIZE)]
     try:
-        for batch_start in range(0, len(jobs), BATCH_SIZE):
+        for batch_start, batch in batches:
             if rate_limited:
                 break
             # Paced pulling: a real cooldown gap every --pull-size files,
@@ -250,8 +300,7 @@ def main() -> int:
                       f'{args.cooldown_s}s before continuing')
                 time.sleep(args.cooldown_s)
                 since_cooldown = 0
-            batch = jobs[batch_start:batch_start + BATCH_SIZE]
-            pool = ProcessPoolExecutor(max_workers=args.workers)
+            pool =ProcessPoolExecutor(max_workers=args.workers)
             futures = {pool.submit(do_file, j): j for j in batch}
             try:
                 completed_iter = as_completed(futures, timeout=BATCH_TIMEOUT_S)

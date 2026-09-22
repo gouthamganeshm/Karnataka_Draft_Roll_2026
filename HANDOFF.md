@@ -2945,3 +2945,52 @@ wrong-folder-link issue section 14 recorded does not apply to these rows.
 **Still true after this run**: AC131 now has 257 of its 270 parts, so 13
 Kunigal booths remain without source PDFs — ordinary sparse upload, the same
 shape as most districts, not a gap to chase.
+
+## 16. Pre-retirement completeness sweep — 2026-09-22
+
+User plans to retire the site within days and asked for a final sweep so no
+source data is left unread. Started from CEO tweet
+`x.com/ceo_karnataka/status/2101684613467033902` (read via Claude in Chrome;
+WebFetch still 402s on x.com): a 20.09.2026 note on Special Campaign
+Form 6/7/8 receipts (79,897 over 19-20 Sep). **Not** an Annexure-1/2 note, so
+the CEO comparison figures in `app.js` stay on 18.09.2026, which is still the
+newest statewide note on `press_releases.html`.
+
+**Roll: unchanged, verified.** 8 ACs sampled: Revision1 still
+`Last-Modified: 24 Aug 2026`, Revision2/3 404. All 224 ACs probed at
+maxPart+1 and +2: all 404. Parts are contiguous 1..N everywhere (60,923).
+
+**ASD: unchanged, verified.** The 187 booths with zero ASD rows were all
+re-probed: still 404 (no report). 15 sampled existing reports still dated
+21 Aug 2026.
+
+**Notices: source unchanged since 18 Sep.** Fresh crawl of all 34
+districts: 50,640 files, a fileId diff against the 18 Sep crawl shows
+0 added / 0 removed, and all 34 folder IDs still match `notices_issued.html`.
+A scratch sweep (`cache/scratch/sweep-all.mjs`) listed *every* entry of any
+type: only 22 non-PDF items statewide. 18 WhatsApp photos (Mandya 188), a
+`winrar.exe` (Shimoga 111, not touched), a Word letter about two individual
+cases (BBMP Central 164), two per-part **count** sheets (Mandya 186, 192),
+and one real gap:
+
+- **Mandya AC192 K.R.Pete `...No Mapping XL Data.xlsx`: an elector-level
+  list (EPIC, part, serial, name, mapping category), 12,510 EPICs.**
+  Cross-checked against the AC's own PDFs: 11,965 overlap and all agree on
+  part+serial. It adds **545 electors**, 544 of them in 12 booths that have
+  no PDF. Pipeline now reads `.xlsx` (`17-discover-notices.mjs` collects
+  them; `18-extract-notices.py` `read_xlsx_rows`, run in batches after every
+  PDF batch so first-seen dedupe keeps the richer PDF row; the workflow
+  installs `openpyxl`). Count-only sheets yield 0 rows by design. Local
+  test: AC192 12,328 → 12,873 rows, 253 → 265 parts with data.
+- Ramanagara's `183-Ramanagara Discrepency.rar` is byte-for-name identical
+  to the extracted folder beside it (255 = 255 filenames). Not a gap.
+- The only folder that could hint at a listing cap (Davanagere
+  `110-HONNALI`, exactly 1,024 entries) belongs to a district already within
+  12 notices of the CEO count.
+
+**Why notices will still read ~99%, not 100%** (41.6K short of 43,81,945
+before this fix): booths never uploaded. Belgaum ACs 4/6/13 have no folder;
+Arsikere 68/281, Koratagere 59/256, Pavagada 177/251, Vijayanagar(167)
+263/284. Drive file counts match our parts-with-data one-for-one there, and
+ECI's CDN does not host these reports (probed; the ASD control URL 200s).
+Nothing further to fetch unless a district uploads more.
