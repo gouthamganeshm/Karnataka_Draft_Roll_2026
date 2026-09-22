@@ -1,8 +1,16 @@
 # Handoff — Karnataka SIR 2026 draft roll
 
-State of the work as of **2026-08-24**, written so a cold session can pick it up
-without re-deriving anything. Everything marked *verified* was actually run and
-its output inspected; everything else says what it is.
+> **Archived 2026-09-23. Read section 17 first.** The author deleted the
+> local working copy after this commit and plans to retire the site. The
+> site itself runs entirely from this repo (GitHub Pages serves all three
+> datasets from `docs/`), but the 9.4 GB local `cache/` is gone. Section 17
+> lists exactly what that means, how to rebuild any part of it, and every
+> issue still open.
+
+Started **2026-08-24** and appended session by session, so a cold session
+can pick it up without re-deriving anything. Everything marked *verified* was
+actually run and its output inspected; everything else says what it is.
+Later sections supersede earlier ones where they disagree.
 
 ---
 
@@ -2967,7 +2975,7 @@ re-probed: still 404 (no report). 15 sampled existing reports still dated
 **Notices: source unchanged since 18 Sep.** Fresh crawl of all 34
 districts: 50,640 files, a fileId diff against the 18 Sep crawl shows
 0 added / 0 removed, and all 34 folder IDs still match `notices_issued.html`.
-A scratch sweep (`cache/scratch/sweep-all.mjs`) listed *every* entry of any
+A full sweep (`scripts/audit-notices-drive.mjs`) listed *every* entry of any
 type: only 22 non-PDF items statewide. 18 WhatsApp photos (Mandya 188), a
 `winrar.exe` (Shimoga 111, not touched), a Word letter about two individual
 cases (BBMP Central 164), two per-part **count** sheets (Mandya 186, 192),
@@ -3004,3 +3012,129 @@ via the app's own SHA-256 bucket path: sheet-only `YTE2798502` and
 no age/gender), and `YTE2074110`, which is in both sources, still carries its
 PDF row (`Parent Age Difference <15`, 67, M). That confirms the PDF-first
 ordering held.
+
+## 17. Archival — final state, what was lost, how to rebuild — 2026-09-23
+
+The author deleted the local working copy after this commit and plans to
+retire the site within days. This section is the complete picture for anyone
+(or any session) who picks the repo up from a fresh clone.
+
+### Final published state (verified live 2026-09-22/23)
+
+| Dataset | Live figures | Source status at archival |
+|---|---|---|
+| Draft roll (`docs/data`, built 2026-08-30) | 224/224 ACs, 60,923/60,923 parts, 4,43,85,225 electors (99.2% of the CEO's 18.09 figure, see section 15 on why that drifts) | ECI still serves only `Revision1`, all dated 24 Aug 2026; no new parts in any AC (section 16) |
+| ASD (`docs/data-asd`, built 2026-08-30) | 224/224 ACs, 100% of parts, 10,766,778 rows | Unchanged; the 187 booths with no report are still 404 at ECI |
+| Notices (`docs/data-notices`, built 2026-09-22T18:33Z) | 221/224 ACs, 4,340,895 rows = 99.06% of CEO Annexure-2 (43,81,945) | Nothing added to any of the 34 Drive folders since 18 Sep; the remaining gap is booths never uploaded (section 16) |
+
+CEO comparison figures in `docs/app.js` are from the 18.09.2026 press note,
+which was still the newest statewide note at archival (the 20.09 note is
+Form 6/7/8 campaign counts only). Claims/objections closed 23.09.2026; the
+Final Roll is due 27.10.2026 and will supersede everything this site shows.
+
+### What lives in the repo (survives) vs what was lost
+
+**In git, enough to keep the site running indefinitely:** all code, the
+three published trees under `docs/` (~3 GB, served by GitHub Pages straight
+from `main` — `docs/config.js` points at `./data*`, R2 was never used),
+`seed/ac-metadata.json` (AC names, districts, part counts), `test-logs/`,
+`reports/`, and this file.
+
+**Lost with the local `cache/` (9.4 GB, gitignored):**
+- `cache/rows/*.jsonl` — raw roll OCR rows *with plaintext EPICs*, including
+  the ~5.9% withheld (`ok:false`) rows that never reached the site.
+- `cache/asd-rows/*.jsonl` (3.0 GB) — raw ASD rows.
+- `cache/manifest.json` (regenerable: `scripts/1-discover.mjs`),
+  `cache/build-state.json`, the exhaustive-sweep ledgers, the
+  confirmed-corrections JSONs and OCR review crops, `notices-manifest.json`.
+- `cache-bihar/`, `data-bihar/` — an early calibration run on Bihar
+  (S04, AC170 Barbigha, 45/275 parts). Unrelated to Karnataka, not needed.
+
+**The consequence that matters most:** published buckets store only a
+SHA-256 suffix per record, never the EPIC. **Nothing in this repo can
+list or recover the EPICs.** Any roll or ASD correction needs the affected
+source PDFs re-read from the ECI CDN (still public, section 2).
+
+### Rebuilding from a fresh clone — and the one command not to run
+
+**Do NOT run `scripts/3-build-data.mjs` or `scripts/10-build-asd-data.mjs`
+from a fresh clone.** With no `cache/build-state.json`, the roll build falls
+back to a full rebuild, and both builds start with `rm` of their published
+tree (`docs/data`, `docs/data-asd`). Unless all 224 ACs were re-extracted
+first (roll OCR ≈ 9-10 parts/min, i.e. ~4-5 days statewide; ASD ≈ 2.4 h), that
+would wipe the live dataset down to whatever was re-extracted.
+
+- **Correct specific roll records** (e.g. the AC112 and duplicate-EPIC items
+  below): follow `scripts/fix-ac161-wzu-wzz.mjs`. It edits only the bucket
+  files involved, removing the record from the wrong EPIC's bucket (matched on
+  suffix + ac/part/serial, not suffix alone) and inserting it into the right
+  one. Works without `cache/`. Verify afterwards with the live lookup path.
+- **Re-extract one roll AC** for inspection: `node scripts/1-discover.mjs`
+  then `python scripts/2-extract.py` for that AC (~30 min per AC), then patch
+  buckets as above. Do not publish via the build.
+- **Notices** are safe to re-import from anywhere: `gh workflow run
+  "Import notices data"`. It crawls and extracts fresh on Actions runners
+  and merges into the committed `docs/data-notices`, with a coverage guard.
+  Check for new source files first (`node scripts/17-discover-notices.mjs`,
+  then diff by `fileId`), per section 13.
+- **Audit tools that need no cache:** `node scripts/notices-gap-report.mjs`
+  (per-district shortfall vs the CEO, live), `node
+  scripts/audit-notices-drive.mjs` (every file of any type in all 34 Drive
+  trees), `node scripts/recheck-roll-site-fails.mjs` (re-tests every logged
+  roll site failure against the live site).
+
+### Open issues at archival — none fixed
+
+1. **AC112 part 202 serial 476: `INA8000960` should be `INA1800960`**
+   (section 1). Unfixed; fixable with the bucket-patch pattern above.
+2. **Two roll EPICs resolve to the wrong booth live**, found 2026-09-23 by
+   re-checking all 265 roll site failures in the test log: 263 now pass
+   (transient load/Pages failures during the sweep, the section 11
+   contention pattern), 2 do not:
+   - `YER9475500`: source PDF says AC176 part 558 serial 100; live says
+     AC176 part 13 serial 120.
+   - `YII3181922`: source PDF says AC130 part 60 serial 310; live says
+     AC218 part 55 serial 147.
+   Most likely the same EPIC printed on two booths (or an OCR misread on one),
+   where the build keeps the first row it sees. Not investigated further.
+3. **Roll exhaustive sweep stopped at 49,853/60,923 booths** (2026-09-17)
+   and was not resumed. Its ledger lived in `cache/`, so it cannot resume.
+   The test log holds every result so far: roll site 49,703 pass / 265 fail
+   (see item 2), roll pdf 49,467 pass / 346 fail (pdf-layer failures, i.e.
+   the sweep's own fresh OCR disagreeing with the published row; only the
+   AC161 WZU/WZZ subset was ever analysed). ASD sweep completed: 60,732 site
+   pass / 8 fail.
+4. **Notices over 100% in five districts** (Ramanagaram 102.4%, Udupi,
+   Kodagu, Kolar, Yadgir marginally), which contradicts `offsetReasonNote`'s
+   claim that the column should sit under 100% (section 15). Unexplained.
+   Separately, most districts match the CEO count to within 0.5%, which
+   suggests the CEO's Annexure-2 counts the same notices these PDFs list, and
+   that note's "one category among several" wording is probably wrong.
+5. **The elector comparison drifts** as the CEO's figure grows with new
+   Form-6 registrations while the draft roll is frozen; the UI copy still
+   attributes the whole gap to OCR-withheld rows (section 15).
+6. **Section 7's open decisions** (withheld rows, booth names, wording)
+   were never taken. Item 3 there (BBMP scope) is obsolete: all 224 ACs,
+   including BBMP, are covered.
+7. `test-logs/test-log.jsonl` is ~65 MB, above GitHub's 50 MB warning
+   (hard limit 100 MB). Committed as-is at archival; nothing appends to it
+   any more.
+
+### Retiring the site
+
+Disabling Pages (repo Settings → Pages) takes the site down and keeps
+everything else. Archiving the repo does **not** stop Pages serving.
+Deleting the `docs/data*` trees from `main` would also take the searches
+down but leaves them in history.
+
+### Operational lessons worth keeping
+
+- `x.com` status links cannot be fetched by WebFetch (HTTP 402); open them
+  in a real browser, or go straight to `ceo.karnataka.gov.in/press_releases.html`.
+- Drive's `uc?export=download` serves a virus-scan interstitial for
+  multi-MB files; use `drive.usercontent.google.com/download?id=…&confirm=t`
+  (now done for `.xlsx` in `18-extract-notices.py`).
+- Never delete a log file a running process still has open for writing;
+  truncate it instead.
+- Don't run the roll sweep and a notices extraction at full worker counts on
+  one machine at once (section 11).

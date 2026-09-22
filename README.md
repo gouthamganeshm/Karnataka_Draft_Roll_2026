@@ -14,6 +14,13 @@ number and gets their entry back. It reformats official data; it is not
 official. As of 30-08-2026 the draft roll is fully imported: **224/224
 constituencies, 100% of booths, ~44.4M electors**.
 
+> **Archived 2026-09-23.** The project is complete and no longer maintained;
+> the author has deleted their local working copy and plans to retire the
+> site. Everything the site needs is in this repo. Final numbers, known open
+> issues, and how to rebuild safely from a fresh clone are in
+> [`HANDOFF.md` section 17](HANDOFF.md). Read its warning before running
+> any build script.
+
 It also indexes two more, separate datasets — see
 [**The ASD list**](#the-asd-list--a-second-separate-search) and
 [**The notices list**](#the-notices-list--a-third-separate-search)
@@ -352,12 +359,17 @@ confirmed to vary in every dimension:
   at all and a different column set (`Mapping Category`, `Relative
   Details`, `DOB/Age`, `Photo Uploaded`) — AC/part has to come from the
   filename or the enclosing folder name instead, there.
-- **One district's files are `.zip`/`.rar` archives, not PDFs at all**
-  (not yet handled); **one district's linked folder is genuinely empty.**
+- **Not everything is a PDF.** Some ACs upload `.zip` archives of per-part
+  PDFs (unpacked and parsed like any other PDF). Mandya's K.R.Pete (AC192)
+  publishes part of its list only as an `.xlsx` spreadsheet, which is read
+  too; its sheet rows carry a mapping category but no age or gender. The
+  one `.rar` statewide (Ramanagara AC183) duplicates a folder that is
+  already imported, so it is reported but not unpacked.
 
 `scripts/17-discover-notices.mjs` therefore never assumes a folder depth
 or a filename shape — it crawls every folder it finds recursively and
-collects every `.pdf`, however it is named, however deep it sits.
+collects every `.pdf`, `.zip` and `.xlsx`, however it is named, however
+deep it sits.
 Identifying which AC/part a given file belongs to is deferred entirely to
 extraction, which reads each PDF's own header text as the authoritative
 source when one exists.
@@ -407,18 +419,22 @@ from — carried through the pipeline as data (a Drive file ID), since
 Drive has no predictable per-file URL the way ECI's own CDN does for the
 roll and ASD links above.
 
-The CEO's own 04-09-2026 press note gives a district-wise count of every
-notice the SIR process has generated (Annexure-2) — a different, broader
-number than this dataset, since it counts every notice reason together
-where this dataset only ever covers the discrepancy/no-mapping category.
-The site's district table compares against it anyway, with that caveat
-shown in place, because most districts land close enough to be a useful
-sanity check regardless: **Bangalore Urban, Gulbarga and Mysore all land
-at 99–101%** of the CEO's per-district figure (Mysore slightly over —
-plausibly more notices were generated after the press note's 04-09
-snapshot than before this dataset was last crawled), which is strong
-evidence the extraction itself is sound even though the two totals were
-never going to match exactly by design.
+The CEO's weekly press notes give a district-wise count of notices
+generated (Annexure-2); the site's district table compares against the
+18-09-2026 note. At archival the site holds **4,340,895 notices, 99.06% of
+the CEO's 43,81,945**, and most districts match to within 0.5%. That is
+strong evidence the extraction is sound. The site's own caption says this
+column is expected to sit well under 100% because the CEO counts other
+notice types too; the near-exact matches suggest that caption is wrong
+(see `HANDOFF.md` section 17).
+
+The remaining ~41,000 are booths whose PDFs were never uploaded: Belgaum
+ACs 4, 6 and 13 have no folder at all, and Arsikere, Koratagere, Pavagada
+and BBMP South's Vijayanagar are missing large blocks of booths. For every
+AC checked, the Drive file counts match the booths imported, and ECI's CDN
+does not host these reports, so there was nothing further to fetch.
+`node scripts/notices-gap-report.mjs` prints the live per-district
+breakdown.
 
 ---
 
@@ -445,7 +461,7 @@ exactly that switch.
 |---|---|---|
 | 1 | `1-discover.mjs` | District → AC → part tree into `cache/manifest.json`. |
 | 2 | `2-extract.py` (`2-extract-forever.mjs` supervisor) | Streams each part PDF and OCRs it **in memory**, keeping only rows. Resumable. |
-| 3 | `3-build-data.mjs` | Rows → hash buckets, per-AC search index, `manifest.json`. Incremental after the first run. |
+| 3 | `3-build-data.mjs` | Rows → hash buckets, per-AC search index, `manifest.json`. Incremental after the first run. **From a fresh clone it does a full rebuild that first deletes `docs/data`** (as does `10-build-asd-data.mjs` for `docs/data-asd`) — read `HANDOFF.md` section 17 before running either. |
 | 4 | `4-upload-r2.mjs` | Syncs `docs/data/` to Cloudflare R2 — written and ready, **not currently used**; the site serves straight from GitHub Pages instead (see *Hosting*). |
 | 5–6 | `5-publish.mjs` (`6-auto-publish.mjs` loop) | Build → commit → push, on a cadence, while extraction runs. |
 | 7–8 | `7-verify.mjs`, `8-full-sweep.mjs` | Per-AC spot check and a full statewide sweep, both against the *live* site and a fresh re-fetch of the source PDF — never trusting the pipeline's own prior output. |
@@ -453,6 +469,7 @@ exactly that switch.
 | 17 | `17-discover-notices.mjs` | Recursively crawls all 34 district Drive folders, collecting every PDF regardless of naming or depth, into `cache/notices-manifest.json`. |
 | 18 | `18-extract-notices.py` | Fetch + parse, resumable by Drive file ID (AC/part isn't known until a file is read). Batched with a hard per-batch timeout — a Drive quota or a stuck worker aborts that batch, not the whole run. |
 | 19 | `19-build-notices-data.mjs` | Merge build — fresh buckets for districts this run touched, prior published records carried forward for everything else — plus `guard-notices-coverage.mjs`. Runs inside `.github/workflows/notices-import.yml`, not locally; see *The notices list* above for why. |
+| audit | `notices-gap-report.mjs`, `audit-notices-drive.mjs`, `recheck-roll-site-fails.mjs` | Read-only checks that need no local cache: live per-district notices gap vs the CEO, every file of any type in all 34 Drive trees, and a live re-test of every roll failure in the test log. |
 
 PDF bytes are never written to disk — at 60,923 parts that would be hundreds of
 gigabytes of redundant storage, and the rows are the only part worth keeping.
@@ -470,25 +487,22 @@ apt-get install tesseract-ocr          # or: winget install UB-Mannheim.Tesserac
 
 ## Status
 
-**Live.** All three datasets imported and cross-checked against the CEO's
-own numbers:
+**Archived 2026-09-23, still live.** All three datasets imported and
+cross-checked against the CEO's own numbers:
 
 - [x] Draft roll — **224/224 constituencies, 60,923/60,923 booths, 100%**,
       ~44.4M electors, 0 unreadable parts
 - [x] ASD list — **224/224 constituencies, 100%**, 10,766,778 rows, 0
       unreadable parts (85 minutes statewide, text-layer extraction)
-- [x] Cross-checked against the CEO's own 04-09-2026 press note: both the
-      elector count and, separately, the notices count — the site's
-      district table shows both comparisons live, with each gap explained
-      in place
-- [x] Notices list — **32/34 districts, 189/224 constituencies,
-      4,032,576 rows**, cross-checked at **94% of the CEO's own
-      per-district notices-generated total** for the districts covered
-      (several individual districts land at 99–101%). Two districts
-      (Chitradurga, Vijayapura) remain uncovered — their Drive folders
-      return a stable 401 regardless of source IP, a genuine access
-      problem at those two folders specifically, not throttling. See
-      *The notices list* above for the full pipeline.
+- [x] Cross-checked against the CEO's 18-09-2026 press note (the newest
+      district-wise note at archival): electors at 99.2% (the CEO figure
+      keeps growing with new registrations; the draft roll is frozen) and
+      notices at 99.06%. The site's district table shows both
+      comparisons live.
+- [x] Notices list — **34/34 districts, 221/224 constituencies,
+      4,340,895 rows, 99.06% of the CEO's count.** The 3 missing ACs
+      (Belgaum 4, 6, 13) and the rest of the gap are booths never
+      uploaded at source; see *The notices list* above.
 - [x] The five-verdict search, all three lists, one box — live
 - [x] Statewide sweep tests for the roll and ASD datasets, live-site +
       source-PDF cross-checks, corner cases (approximate serials,
@@ -505,12 +519,12 @@ own numbers:
       expected, actual, verdict), committed automatically on a cadence by
       `16-commit-test-log.mjs`. See `test-logs/README.md`.
 - [ ] Exhaustive per-booth sweep (`14-exhaustive-sweep.mjs`, every booth
-      rather than one per AC): ASD dataset complete, 0 real failures
-      statewide. The roll dataset's own pass is running (~4 days,
-      CDN-bound), started on explicit request.
-- [ ] Notices coverage for Chitradurga and Vijayapura — needs the source
-      offices to fix their folder sharing settings, not further retries;
-      worth an occasional manual re-check.
+      rather than one per AC): ASD complete. The roll pass stopped at
+      49,853/60,923 booths and was not finished; of its site checks, 2
+      EPICs are still wrong live. See `HANDOFF.md` section 17, *Open issues*.
+- [ ] One known OCR misread (AC112 part 202 serial 476) and the two
+      EPICs above remain uncorrected; `HANDOFF.md` section 17 has the
+      safe way to patch them.
 
 See `HANDOFF.md` for the full session-by-session history, and
 `OBSERVATIONS-ASD.md` for the ASD dataset's original design derivation.
